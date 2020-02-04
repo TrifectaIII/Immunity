@@ -24,8 +24,11 @@ app.use('/client',express.static(__dirname + '/client'));
 
 //Global Game Variables
 //width and height of game canvas
-const game_width = 600
-const game_height = 300
+const game_width = 750
+const game_height = 750
+
+// starting health
+const health_start = 3;
 
 //players speed
 const player_speed = 5
@@ -79,6 +82,8 @@ io.sockets.on('connection', function (socket) {
 
     socket.x = game_width/2;
     socket.y = game_height/2;
+
+    socket.health = health_start;
 
     socket.on('move', function (direction) {
         switch (direction) {
@@ -148,6 +153,7 @@ setInterval(function () {
         player_info[id].x = io.sockets.connected[id].x;
         player_info[id].y = io.sockets.connected[id].y;
         player_info[id].color = io.sockets.connected[id].color;
+        player_info[id].health = io.sockets.connected[id].health;
     }
 
     var shot_info  = {};
@@ -163,6 +169,7 @@ setInterval(function () {
         for (let player in io.sockets.connected) {
             let socket = io.sockets.connected[player]
             if (player != shots[id]. socket && distance(socket, shots[id]) < 27) {
+                io.sockets.connected[player].health -= 1;
                 destroyed = true;
             } 
         }
