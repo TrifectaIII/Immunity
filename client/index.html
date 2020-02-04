@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Multiplayer Game</title>
+
+        <!-- favicon.io -->
+        <link rel="apple-touch-icon" sizes="180x180" href="client/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="client/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="client/favicon-16x16.png">
+        <link rel="manifest" href="client/site.webmanifest">
+
+        <link href="/client/style.css" rel="stylesheet" type="text/css"/>
+
+        <!-- socket io exposed by server -->
+        <script src="/socket.io/socket.io.js"></script>
+
+        <!-- p5.js from cdn -->
+        <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.min.js"></script>
+    </head>
+
+    <body>
+        <h1>Multiplayer Game</h1>
+        <div id='canvas-hold'></div>
+        <h3>Instructions</h3>
+        <p>WASD to Move</p>
+        <script src="/client/script.js"></script>
+    </body>
+</html>
