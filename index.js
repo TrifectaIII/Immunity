@@ -39,6 +39,12 @@ function distance(socket1, socket2) {
     );
 }
 
+function direction(socket, x , y) {
+    return 30;
+}
+
+var shots = {};
+
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
 
@@ -109,17 +115,27 @@ io.sockets.on('connection', function (socket) {
             socket.y = game_height;
         }
     });
+
+
+    socket.on('shoot', function (dest_x, dest_y) {
+        var id = Math.random();
+        shots[id] = {};
+        shots[id].x = socket.x;
+        shots[id].y = socket.y;
+        shots[id].color = socket.color;
+        shots[id].direction = direction(socket, dest_x, dest_y);
+    });
 });
 
 setInterval(function () {
-    var player_info = {};
+    var players = {};
 
     for (let id in io.sockets.connected) {
-        player_info[id] = {};
-        player_info[id].x = io.sockets.connected[id].x;
-        player_info[id].y = io.sockets.connected[id].y;
-        player_info[id].color = io.sockets.connected[id].color;
+        players[id] = {};
+        players[id].x = io.sockets.connected[id].x;
+        players[id].y = io.sockets.connected[id].y;
+        players[id].color = io.sockets.connected[id].color;
     }
 
-    io.sockets.emit('server_update', player_info);
+    io.sockets.emit('server_update', players, shots);
 },20);

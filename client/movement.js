@@ -1,14 +1,3 @@
-var socket = io();
-
-//object to hold player info
-var players = {};
-
-//recieve player info from server
-socket.on ('server_update', function (player_info) {
-    players = player_info;
-    console.log(players)
-})
-
 // Movement keys
 
 //variables to track pressing
@@ -80,19 +69,3 @@ setInterval(function () {
         socket.emit('move','down');
     }
 }, 20);
-
-
-// p5 setup
-function setup () {
-    createCanvas(600,300).parent('canvas-hold');
-}
-
-//p5 drawing
-function draw () {
-    clear()
-    for (let id in players) {
-        let player = players[id];
-        fill(player.color);
-        ellipse(player.x, player.y, 50,50);
-    }
-}
