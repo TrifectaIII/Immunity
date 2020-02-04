@@ -23,24 +23,35 @@ app.use('/client',express.static(__dirname + '/client'));
 
 
 //Global Game Variables
+//width and height of game canvas
 const game_width = 600
 const game_height = 300
 
+//players speed
 const player_speed = 5
+//players component speed when moving @ angle
 const player_speed_angle = Math.round(player_speed/(Math.sqrt(2)))
 
+//speed of shots
+const shot_speed = 20
+
+//colors for each player to tell them apart
 const colors = ['blue','red','yellow','green','orange','purple']
 var colorStep = 0
 
-function distance(socket1, socket2) {
+//calculates distance between a player and a shot
+function distance(socket, shot) {
     return Math.sqrt(
-        Math.pow(socket1.x-socket2.x, 2) + 
-        Math.pow(socket1.y-socket2.y ,2)
+        Math.pow(socket.x-shot.x, 2) + 
+        Math.pow(socket.y-shot.y ,2)
     );
 }
 
-function direction(socket, x , y) {
-    return 30;
+//calculates component velocities of shot based on velocity and destination coordinates
+function velocity(x, y, dest_x, dest_y) {
+    var angle = Math.atan2(dest_x - x, dest_y - y);
+    return {x:Math.sin(angle) * shot_speed,
+            y:Math.cos(angle) * shot_speed};
 }
 
 var shots = {};
@@ -116,26 +127,66 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
-
+    //handle shooting
     socket.on('shoot', function (dest_x, dest_y) {
         var id = Math.random();
         shots[id] = {};
         shots[id].x = socket.x;
         shots[id].y = socket.y;
         shots[id].color = socket.color;
-        shots[id].direction = direction(socket, dest_x, dest_y);
+        shots[id].socket = socket.id;
+        shots[id].velocity = velocity(socket.x, socket.y, dest_x, dest_y);
     });
 });
 
 setInterval(function () {
-    var players = {};
 
+    //collect info on players from sockets
+    var player_info = {};
     for (let id in io.sockets.connected) {
-        players[id] = {};
-        players[id].x = io.sockets.connected[id].x;
-        players[id].y = io.sockets.connected[id].y;
-        players[id].color = io.sockets.connected[id].color;
+        player_info[id] = {};
+        player_info[id].x = io.sockets.connected[id].x;
+        player_info[id].y = io.sockets.connected[id].y;
+        player_info[id].color = io.sockets.connected[id].color;
     }
 
-    io.sockets.emit('server_update', players, shots);
+    var shot_info  = {};
+
+    //move shots automatically
+    for (let id in shots) {
+        shots[id].x += shots[id].velocity.x;
+        shots[id].y += shots[id].velocity.y;
+
+        let destroyed = false;
+
+        // check for collisions with enemies
+        for (let player in io.sockets.connected) {
+            let socket = io.sockets.connected[player]
+            if (player != shots[id]. socket && distance(socket, shots[id]) < 27) {
+                destroyed = true;
+            } 
+        }
+
+        // destroy shots if they get too far off track
+        if (shots[id].x < 0 ||
+            shots[id].x > game_width ||
+            shots[id].y < 0 ||
+            shots[id].y > game_height) {
+                destroyed = true;
+        }
+        
+        if (destroyed) {
+            delete shots[id]
+        }
+        // collect info on remaining shots
+        else {
+            shot_info[id] = {};
+            shot_info[id].x = shots[id].x;
+            shot_info[id].y = shots[id].y;
+            shot_info[id].color = shots[id].color;
+        }
+    }
+
+    //send data to all sockets
+    io.sockets.emit('server_update', player_info, shot_info);
 },20);
