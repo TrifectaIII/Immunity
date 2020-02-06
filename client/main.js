@@ -1,9 +1,13 @@
 var socket = io();
 
 //object to hold player info
-var players = {};
-var shots = {};
-var game = {};
+var players = {}
+var shots = {}
+var game = {}
+var screen_offset = {
+    x:0,
+    y:0,
+}
 
 //recieve player info from server
 socket.on ('server_update', function (player_info, shot_info) {
@@ -14,13 +18,13 @@ socket.on ('server_update', function (player_info, shot_info) {
 // p5 setup when settings recieved from server
 socket.once('game_settings', function (settings) {
     game = settings;
-    createCanvas(settings.width,settings.height).parent('canvas-hold');
+    createCanvas(settings.screenWidth,settings.screenHeight).parent('canvas-hold');
 
     strokeWeight(2);
     stroke('black');
 
     textAlign(CENTER, CENTER);
-    textSize(25);
+    textSize(20);
 
     //Start shoot eventListener from shoot.js
     start_shoot()
@@ -32,84 +36,121 @@ function setup () {
 
 //p5 drawing
 function draw () {
-    clear()
-    background('#FFF1E8');
-    strokeWeight(2);
-
-    //draw all shots
-    for (let id in shots) {
-        let shot = shots[id];
-        fill(game.colorPairs[shot.color][0]);
-        stroke(game.colorPairs[shot.color][1]);
-        ellipse(shot.x, shot.y, 10, 10);
-    }
-
-    //draw all other players
-    for (let id in players) {
-        if (id != socket.id) {
-            let player = players[id];
-
-            //draw player
-            fill(game.colorPairs[player.color][0]);
-            stroke(game.colorPairs[player.color][1]);
-            strokeWeight(2);
-            ellipse(player.x, player.y, 50, 50);
-
-            //draw healthbar
-            let x_offset = 15
-            let y_offset_abs = 35;
-            let y_offset = y_offset_abs;
-            if (player.y > game.height - 45) {
-                y_offset = -35;
-            }
-            strokeWeight(0);
-            fill('black');
-            rect(
-                player.x-x_offset-1, player.y + y_offset-(y_offset/y_offset_abs), 
-                x_offset*2 + 2, 7*(y_offset/y_offset_abs),
-            );
-            if (player.health > 0) {
-                fill(game.colorPairs[player.color][0]);
-                rect(
-                    player.x - x_offset, player.y + y_offset, 
-                    x_offset*2*(player.health/game.health_start), 5*(y_offset/y_offset_abs),
-                );
-            }
-        }
-    }
-    stroke('black');
-    // then draw client player on top
     if (socket.id in players) {
         let player = players[socket.id];
+
+        //send movement data
+        sendMove();
+
+        //refresh screen
+        clear()
+        background('#FFF1E8');
+
+        //calculate screen offset
+        screen_offset.x = Math.min(Math.max(0, player.x - game.screenWidth/2), game.width-game.screenWidth);
+        screen_offset.y = Math.min(Math.max(0, player.y - game.screenHeight/2), game.height-game.screenHeight);
+
+        //draw grid
+        strokeWeight(1);
+        stroke('#C2C3C7');
+        for (let x = 100; x < game.width; x+=100) {
+            if (x-screen_offset.x > 0 &&
+                x-screen_offset.x < game.screenWidth) {
+                    line(x-screen_offset.x, 0,
+                         x-screen_offset.x, game.screenWidth);
+            }
+        }
+        for (let y = 100; y < game.height; y+=100) {
+            if (y-screen_offset.y > 0 &&
+                y-screen_offset.y < game.screenHeight) {
+                    line(0, y-screen_offset.y,
+                         game.screenHeight, y-screen_offset.y);
+            }
+        }
+
+        //draw all shots
+        strokeWeight(2);
+        for (let id in shots) {
+            let shot = shots[id];
+            if (shot.x-screen_offset.x > 0 &&
+                shot.x-screen_offset.x < game.screenWidth &&
+                shot.y-screen_offset.y > 0 &&
+                shot.y-screen_offset.y < game.screenHeight) {
+                    fill(game.colorPairs[shot.color][0]);
+                    stroke(game.colorPairs[shot.color][1]);
+                    ellipse(shot.x-screen_offset.x, shot.y-screen_offset.y, 10, 10);
+            }
+        }
+
+        //draw all other players
+        for (let id in players) {
+            if (id != socket.id) {
+                let player = players[id];
+
+                if (player.x-screen_offset.x > -50 &&
+                    player.x-screen_offset.x < game.screenWidth + 50 &&
+                    player.y-screen_offset.y > -50 &&
+                    player.y-screen_offset.y < game.screenHeight + 50) {
+
+                        //draw player
+                        fill(game.colorPairs[player.color][0]);
+                        stroke(game.colorPairs[player.color][1]);
+                        strokeWeight(2);
+                        ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
+
+                        //draw healthbar
+                        let x_offset = 15
+                        let y_offset_abs = 35;
+                        let y_offset = y_offset_abs;
+                        if (player.y-screen_offset.y > game.screenHeight - 50) {
+                            y_offset = -35;
+                        }
+                        strokeWeight(0);
+                        fill('black');
+                        rect(
+                            player.x-x_offset-1-screen_offset.x, player.y + y_offset-(y_offset/y_offset_abs)-screen_offset.y, 
+                            x_offset*2 + 2, 7*(y_offset/y_offset_abs),
+                        );
+                        if (player.health > 0) {
+                            fill(game.colorPairs[player.color][0]);
+                            rect(
+                                player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
+                                x_offset*2*(player.health/game.health_start), 5*(y_offset/y_offset_abs),
+                            );
+                        }
+                }
+            }
+        }
+        // then draw client player on top
         fill(game.colorPairs[player.color][0]);
         stroke(game.colorPairs[player.color][1]);
         strokeWeight(2);
-        ellipse(player.x, player.y, 50, 50);
-    }
+        ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
 
-    // draw crosshair
-    strokeWeight(2);
-    fill(0,0);
-    ellipse(mouseX, mouseY, 30, 30);
-    line(mouseX+20, mouseY, mouseX-20, mouseY);
-    line(mouseX, mouseY+20, mouseX, mouseY-20);
+        // draw crosshair
+        strokeWeight(2);
+        fill(0,0);
+        ellipse(mouseX, mouseY, 30, 30);
+        line(mouseX+20, mouseY, mouseX-20, mouseY);
+        line(mouseX, mouseY+20, mouseX, mouseY-20);
 
-    // draw user healthbar
-    if (socket.id in players) {
-        let player = players[socket.id];
+        // draw user healthbar
         strokeWeight(0);
         fill('black');
         rect(
-            game.width/4-2, game.height - 27,
-            game.width/2+4, 24,
+            game.screenWidth/4-2, game.screenHeight - 27,
+            game.screenWidth/2+4, 24,
         );
         if (player.health > 0) {
             fill(game.colorPairs[player.color][0]);
             rect(
-                game.width/4, game.height - 25,
-                game.width/2*(player.health/game.health_start), 20
+                game.screenWidth/4, game.screenHeight - 25,
+                game.screenWidth/2*(player.health/game.health_start), 20
             );
         }
-        
+        stroke('black');
+        strokeWeight(4);
+        fill(game.colorPairs[player.color][0]);
+        text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-14);
     }
 }

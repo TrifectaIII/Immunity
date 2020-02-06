@@ -7,10 +7,9 @@ function start_shoot () {
         event.preventDefault();
         if (socket.id in players) {
             let player = players[socket.id];
-            let vel = velocity(angle(player.x, player.y, mouseX, mouseY));
+            let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y));
             socket.emit('shoot', vel);
         }
-        
     });
 
     // full spread on space
@@ -20,7 +19,7 @@ function start_shoot () {
             let player = players[socket.id];
             let vels = [];
             for (let i = -2; i <= 2; i++) {
-                let vel = velocity(angle(player.x, player.y, mouseX, mouseY) + i * game.full_spread_angle);
+                let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.full_spread_angle);
                 vels.push(vel);
             }
             socket.emit('full_spread', vels)

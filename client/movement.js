@@ -43,7 +43,7 @@ document.addEventListener('keyup', function (event) {
 });
 
 //move based on currently pressed keys
-setInterval(function () {
+function sendMove () {
     if (right && !left && up && !down) {
         socket.emit('move','rightup');
     }
@@ -68,4 +68,4 @@ setInterval(function () {
     else if (!up && down) {
         socket.emit('move','down');
     }
-}, 20);
+}

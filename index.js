@@ -28,11 +28,14 @@ app.use('/client',express.static(__dirname + '/client'));
 //Global Server Settings
 var game = {
     //width and height of game canvas
-    width: 600,
-    height: 600,
+    width: 1000,
+    height: 1000,
+
+    screenWidth:600,
+    screenHeight:600,
 
     // starting health
-    health_start: 3,
+    health_start: 10,
 
     //players speed
     player_speed: 5,
@@ -48,7 +51,7 @@ var game = {
 
     colorPairs:{
         'blue':['#29ADFF','#1D2B53'],
-        'yellow':['#FFEC27','#FFA300'],
+        'yellow':['#FFEC27','#AB5236'],
         'pink':['#FF77A8','#7E2553'],
         'green':['#00E436','#008751'],
     },
@@ -58,7 +61,7 @@ var game = {
 game.colorStep = 0;
 
 //players component speed when moving @ angle
-game.player_speed_angle = Math.round(game.player_speed/(Math.sqrt(2)));
+game.player_speed_angle = game.player_speed/(Math.sqrt(2));
 
 //calculates distance between a player and a shot
 function distance(socket, shot) {
@@ -159,6 +162,7 @@ io.sockets.on('connection', function (socket) {
             shots[id].socket = socket.id;
             shots[id].velocity = vel;
         });
+        socket.health -= 1;
     });
 });
 
