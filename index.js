@@ -27,6 +27,9 @@ app.use('/client',express.static(__dirname + '/client'));
 
 //Global Server Settings
 var game = {
+    //space between server updates in MS
+    tickRate: 20,
+
     //width and height of game canvas
     width: 2000,
     height: 2000,
@@ -36,6 +39,9 @@ var game = {
 
     // starting health
     health_start: 10,
+
+    //time in MS to respawn
+    respawnTime:3000,
 
     //players speed
     player_speed: 5,
@@ -102,58 +108,52 @@ io.sockets.on('connection', function (socket) {
 
     socket.health = game.health_start;
 
-    socket.on('move', function (direction) {
-        switch (direction) {
-            case 'rightup':
-                socket.x += game.player_speed_angle;
-                socket.y -= game.player_speed_angle;
-                break;
-            case 'leftup':
-                socket.x -= game.player_speed_angle;
-                socket.y -= game.player_speed_angle;
-                break;
-            case 'rightdown':
-                socket.x += game.player_speed_angle;
-                socket.y += game.player_speed_angle;
-                break;
-            case 'leftdown':
-                socket.x -= game.player_speed_angle;
-                socket.y += game.player_speed_angle;
-                break;
-            case 'right':
-                socket.x += game.player_speed;
-                break;
-            case 'left':
-                socket.x -= game.player_speed;
-                break;
-            case 'up':
-                socket.y -= game.player_speed;
-                break;
-            case 'down':
-                socket.y += game.player_speed;
-                break;
-        }
+    socket.alive = true;
 
-        //boundaries
-        socket.x = Math.max(socket.x, 0);
-        socket.x = Math.min(socket.x, game.width);
-        socket.y = Math.max(socket.y, 0);
-        socket.y = Math.min(socket.y, game.height);
+    socket.on('move', function (direction) {
+        if (socket.alive) {
+            switch (direction) {
+                case 'rightup':
+                    socket.x += game.player_speed_angle;
+                    socket.y -= game.player_speed_angle;
+                    break;
+                case 'leftup':
+                    socket.x -= game.player_speed_angle;
+                    socket.y -= game.player_speed_angle;
+                    break;
+                case 'rightdown':
+                    socket.x += game.player_speed_angle;
+                    socket.y += game.player_speed_angle;
+                    break;
+                case 'leftdown':
+                    socket.x -= game.player_speed_angle;
+                    socket.y += game.player_speed_angle;
+                    break;
+                case 'right':
+                    socket.x += game.player_speed;
+                    break;
+                case 'left':
+                    socket.x -= game.player_speed;
+                    break;
+                case 'up':
+                    socket.y -= game.player_speed;
+                    break;
+                case 'down':
+                    socket.y += game.player_speed;
+                    break;
+            }
+
+            //boundaries
+            socket.x = Math.max(socket.x, 0);
+            socket.x = Math.min(socket.x, game.width);
+            socket.y = Math.max(socket.y, 0);
+            socket.y = Math.min(socket.y, game.height);
+        }
     });
 
     //handle shooting
     socket.on('shoot', function (vel) {
-        var id = Math.random();
-        shots[id] = {};
-        shots[id].x = socket.x;
-        shots[id].y = socket.y;
-        shots[id].color = socket.color;
-        shots[id].socket = socket.id;
-        shots[id].velocity = vel;
-    });
-
-    socket.on('full_spread', function (vels) {
-        vels.forEach(function (vel) {
+        if (socket.alive) {
             var id = Math.random();
             shots[id] = {};
             shots[id].x = socket.x;
@@ -161,9 +161,30 @@ io.sockets.on('connection', function (socket) {
             shots[id].color = socket.color;
             shots[id].socket = socket.id;
             shots[id].velocity = vel;
-        });
-        if (socket.health > 0) {
-            socket.health -= 1;
+        }
+    });
+
+    socket.on('full_spread', function (vels) {
+        if (socket.alive) {
+            vels.forEach(function (vel) {
+                var id = Math.random();
+                shots[id] = {};
+                shots[id].x = socket.x;
+                shots[id].y = socket.y;
+                shots[id].color = socket.color;
+                shots[id].socket = socket.id;
+                shots[id].velocity = vel;
+            });
+            if (socket.health > 0) {
+                socket.health -= 1;
+                socket.alive = socket.health > 0;
+                if (!socket.alive) {
+                    setTimeout(function () {
+                        socket.alive = true;
+                        socket.health = game.health_start;
+                    }, game.respawnTime)
+                }
+            }
         }
     });
 });
@@ -192,12 +213,18 @@ setInterval(function () {
         // check for collisions with enemies
         for (let player in io.sockets.connected) {
             let socket = io.sockets.connected[player]
-            if (player != shots[id]. socket && distance(socket, shots[id]) < 27) {
-                if (io.sockets.connected[player].health > 0) {
-                    io.sockets.connected[player].health -= 1;
+            if (socket.alive && player != shots[id].socket && distance(socket, shots[id]) < 27) {
+                if (socket.health > 0) {
+                    socket.health -= 1;
                     destroyed = true;
+                    socket.alive = socket.health > 0;
+                    if (!socket.alive) {
+                        setTimeout(function () {
+                            socket.alive = true;
+                            socket.health = game.health_start;
+                        }, game.respawnTime)
+                    }
                 }
-                
             } 
         }
 
@@ -224,4 +251,4 @@ setInterval(function () {
 
     //send data to all sockets
     io.sockets.emit('server_update', player_info, shot_info);
-}, 20);
+}, game.tickRate);

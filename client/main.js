@@ -1,6 +1,6 @@
 var socket = io();
 
-//object to hold player info
+//object to hold draw info
 var players = {}
 var shots = {}
 var game = {}
@@ -8,6 +8,8 @@ var screen_offset = {
     x:0,
     y:0,
 }
+var deathTimer = 0;
+var deathCount;
 
 //recieve player info from server
 socket.on ('server_update', function (player_info, shot_info) {
@@ -24,7 +26,6 @@ socket.once('game_settings', function (settings) {
     stroke('black');
 
     textAlign(CENTER, CENTER);
-    textSize(20);
     textFont(loadFont('client/homespun.ttf'));
 
     //Start shoot eventListener from shoot.js
@@ -140,7 +141,7 @@ function draw () {
         stroke(game.colorPairs[player.color][1]);
         strokeWeight(2);
         ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
-        //draw death cross
+        //draw death cross and death message
         if (player.health <= 0) {
             strokeWeight(5);
             stroke('#FF004D');
@@ -152,6 +153,11 @@ function draw () {
                     player.y-screen_offset.y-25,
                     player.x-screen_offset.x-25,
                     player.y-screen_offset.y+25);
+            
+            background(0, 200);
+            textSize(40);
+            stroke('black');
+            text("YOU ARE DEAD", game.screenWidth/2, game.screenHeight/2);
         }
 
         // draw crosshair
@@ -168,16 +174,33 @@ function draw () {
             game.screenWidth/4-2, game.screenHeight - 27,
             game.screenWidth/2+4, 24,
         );
+        fill(game.colorPairs[player.color][0]);
         if (player.health > 0) {
-            fill(game.colorPairs[player.color][0]);
             rect(
                 game.screenWidth/4, game.screenHeight - 25,
                 game.screenWidth/2*(player.health/game.health_start), 20
             );
+            stroke('black');
+            strokeWeight(4);
+            textSize(20);
+            text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-17);
+            if (deathTimer > 0) {
+                deathTimer = 0;
+                clearInterval(deathCount);
+            }
         }
-        stroke('black');
-        strokeWeight(4);
-        fill(game.colorPairs[player.color][0]);
-        text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-17);
+        else {
+            let deathProg = Math.min(deathTimer/game.respawnTime, 1)
+            rect(
+                game.screenWidth/4, game.screenHeight - 25,
+                game.screenWidth/2*(deathProg), 20
+            );
+            if (deathTimer == 0) {
+                deathTimer += 50;
+                deathCount = setInterval(function () {
+                    deathTimer += 50;
+                }, 50);
+            }
+        }
     }
 }
