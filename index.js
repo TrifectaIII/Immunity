@@ -31,8 +31,8 @@ var game = {
     tickRate: 20,
 
     //width and height of game canvas
-    width: 2000,
-    height: 2000,
+    width: 1500,
+    height: 1500,
 
     screenWidth: 600,
     screenHeight: 600,
@@ -41,7 +41,7 @@ var game = {
     health_start: 10,
 
     //time in MS to respawn
-    respawnTime: 5000,
+    respawnTime: 3000,
 
     //players speed
     player_speed: 5,
@@ -53,7 +53,10 @@ var game = {
     full_spread_angle:Math.PI/32,
 
     //lifespan of shots (in ticks)
-    shotLifespan: 30,
+    shotLifespan: 40,
+
+    //lifespan of full spread
+    fullSpreadLifespan: 15,
 
     //colors for each player to tell them apart
     colors:['blue','yellow','pink','green'],
@@ -180,6 +183,7 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
+    //handle full spread
     socket.on('full_spread', function (vels) {
         if (socket.alive) {
             vels.forEach(function (vel) {
@@ -190,7 +194,7 @@ io.sockets.on('connection', function (socket) {
                 shots[id].color = socket.color;
                 shots[id].socket = socket.id;
                 shots[id].velocity = vel;
-                shots[id].lifespan = game.shotLifespan;
+                shots[id].lifespan = game.fullSpreadLifespan;
             });
             if (socket.health > 0) {
                 socket.health -= 1;

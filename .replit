@@ -1,2 +1,2 @@
-language = "Nodejs"
+swalanguage = "Nodejs"
 run = "node index.js"
