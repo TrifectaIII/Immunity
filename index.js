@@ -34,14 +34,14 @@ var game = {
     width: 2000,
     height: 2000,
 
-    screenWidth:600,
-    screenHeight:600,
+    screenWidth: 600,
+    screenHeight: 600,
 
     // starting health
     health_start: 10,
 
     //time in MS to respawn
-    respawnTime:3000,
+    respawnTime: 5000,
 
     //players speed
     player_speed: 5,
@@ -72,6 +72,9 @@ game.colorStep = 0;
 //players component speed when moving @ angle
 game.player_speed_angle = game.player_speed/(Math.sqrt(2));
 
+//object to hold info re: shots
+var shots = {};
+
 //calculates distance between a player and a shot
 function distance(socket, shot) {
     return Math.sqrt(
@@ -87,9 +90,6 @@ function randint(low,high) {
     }
     return Math.floor(Math.random()*(low+1-high) +high)
 }
-
-//object to hold info re: shots
-var shots = {};
 
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
@@ -114,12 +114,16 @@ io.sockets.on('connection', function (socket) {
         game.colorStep = 0
     }
 
-    socket.x = randint(0,game.width);
-    socket.y = randint(0,game.height);
+    socket.spawn = function () {
+        socket.x = randint(100,game.width-100);
+        socket.y = randint(100,game.height-100);
 
-    socket.health = game.health_start;
+        socket.health = game.health_start;
 
-    socket.alive = true;
+        socket.alive = true;
+    }
+
+    socket.spawn();
 
     socket.on('move', function (direction) {
         if (socket.alive) {
@@ -192,12 +196,7 @@ io.sockets.on('connection', function (socket) {
                 socket.health -= 1;
                 socket.alive = socket.health > 0;
                 if (!socket.alive) {
-                    setTimeout(function () {
-                        socket.alive = true;
-                        socket.health = game.health_start;
-                        socket.x = randint(0,game.width);
-                        socket.y = randint(0,game.height);
-                    }, game.respawnTime)
+                    setTimeout(socket.spawn, game.respawnTime)
                 }
             }
         }
@@ -234,12 +233,7 @@ setInterval(function () {
                     destroyed = true;
                     socket.alive = socket.health > 0;
                     if (!socket.alive) {
-                        setTimeout(function () {
-                            socket.alive = true;
-                            socket.health = game.health_start;
-                            socket.x = randint(0,game.width);
-                            socket.y = randint(0,game.height);
-                        }, game.respawnTime)
+                        setTimeout(socket.spawn, game.respawnTime)
                     }
                 }
             } 

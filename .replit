@@ -1,2 +1,2 @@
-alanguage = "Nodejs"
+language = "Nodejs"
 run = "node index.js"
