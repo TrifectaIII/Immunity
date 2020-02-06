@@ -22,25 +22,33 @@ app.get('/',function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 
-//Global Game Variables
-//width and height of game canvas
-const game_width = 750
-const game_height = 750
+// GAME TOOLS
+///////////////////////////////////////////////////
 
-// starting health
-const health_start = 3;
+//Global Server Settings
+var game = {
+    //width and height of game canvas
+    width: 750,
+    height: 750,
 
-//players speed
-const player_speed = 5
+    // starting health
+    health_start: 3,
+
+    //players speed
+    player_speed: 5,
+
+    //speed of shots
+    shot_speed: 15,
+
+    //colors for each player to tell them apart
+    colors: ['blue','red','yellow','green','orange','purple'],
+}
+
+//keeps track of which color is next
+game.colorStep = 0;
+
 //players component speed when moving @ angle
-const player_speed_angle = Math.round(player_speed/(Math.sqrt(2)))
-
-//speed of shots
-const shot_speed = 20
-
-//colors for each player to tell them apart
-const colors = ['blue','red','yellow','green','orange','purple']
-var colorStep = 0
+game.player_speed_angle = Math.round(game.player_speed/(Math.sqrt(2)));
 
 //calculates distance between a player and a shot
 function distance(socket, shot) {
@@ -50,13 +58,7 @@ function distance(socket, shot) {
     );
 }
 
-//calculates component velocities of shot based on velocity and destination coordinates
-function velocity(x, y, dest_x, dest_y) {
-    var angle = Math.atan2(dest_x - x, dest_y - y);
-    return {x:Math.sin(angle) * shot_speed,
-            y:Math.cos(angle) * shot_speed};
-}
-
+//object to hold info re: shots
 var shots = {};
 
 // SOCKET HANDLING
@@ -67,80 +69,78 @@ io.sockets.on('connection', function (socket) {
 
 	//log a new connection
 	console.log('NEW USER. ID: ',socket.id);
-    console.log(Object.keys(io.sockets.connected));
+    console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
-    socket.on('disconnect', function () {
+    socket.once('disconnect', function () {
         console.log('USER DC. ID: ',socket.id);
-        console.log(Object.keys(io.sockets.connected));
+        console.log("Total Players:", Object.keys(io.sockets.connected).length);
     })
 
-    socket.color = colors[colorStep]
-    colorStep += 1
-    if (colorStep >= colors.length) {
-        colorStep = 0
+    socket.emit('game_settings', {
+        width:game.width,
+        height:game.height,
+        shot_speed:game.shot_speed,
+    })
+
+    socket.color = game.colors[game.colorStep]
+    game.colorStep += 1
+    if (game.colorStep >= game.colors.length) {
+        game.colorStep = 0
     }
 
-    socket.x = game_width/2;
-    socket.y = game_height/2;
+    socket.x = game.width/2;
+    socket.y = game.height/2;
 
-    socket.health = health_start;
+    socket.health = game.health_start;
 
     socket.on('move', function (direction) {
         switch (direction) {
             case 'rightup':
-                socket.x += player_speed_angle;
-                socket.y -= player_speed_angle;
+                socket.x += game.player_speed_angle;
+                socket.y -= game.player_speed_angle;
                 break;
             case 'leftup':
-                socket.x -= player_speed_angle;
-                socket.y -= player_speed_angle;
+                socket.x -= game.player_speed_angle;
+                socket.y -= game.player_speed_angle;
                 break;
             case 'rightdown':
-                socket.x += player_speed_angle;
-                socket.y += player_speed_angle;
+                socket.x += game.player_speed_angle;
+                socket.y += game.player_speed_angle;
                 break;
             case 'leftdown':
-                socket.x -= player_speed_angle;
-                socket.y += player_speed_angle;
+                socket.x -= game.player_speed_angle;
+                socket.y += game.player_speed_angle;
                 break;
             case 'right':
-                socket.x += player_speed;
+                socket.x += game.player_speed;
                 break;
             case 'left':
-                socket.x -= player_speed;
+                socket.x -= game.player_speed;
                 break;
             case 'up':
-                socket.y -= player_speed;
+                socket.y -= game.player_speed;
                 break;
             case 'down':
-                socket.y += player_speed;
+                socket.y += game.player_speed;
                 break;
         }
 
         //boundaries
-        if (socket.x < 0) {
-            socket.x = 0
-        }
-        else if (socket.x > game_width) {
-            socket.x = game_width;
-        }
-        if (socket.y < 0) {
-            socket.y = 0
-        }
-        else if (socket.y > game_height) {
-            socket.y = game_height;
-        }
+        socket.x = Math.max(socket.x, 0);
+        socket.x = Math.min(socket.x, game.width);
+        socket.y = Math.max(socket.y, 0);
+        socket.y = Math.min(socket.y, game.height);
     });
 
     //handle shooting
-    socket.on('shoot', function (dest_x, dest_y) {
+    socket.on('shoot', function (vel) {
         var id = Math.random();
         shots[id] = {};
         shots[id].x = socket.x;
         shots[id].y = socket.y;
         shots[id].color = socket.color;
         shots[id].socket = socket.id;
-        shots[id].velocity = velocity(socket.x, socket.y, dest_x, dest_y);
+        shots[id].velocity = vel;
     });
 });
 
@@ -176,15 +176,16 @@ setInterval(function () {
 
         // destroy shots if they get too far off track
         if (shots[id].x < 0 ||
-            shots[id].x > game_width ||
+            shots[id].x > game.width ||
             shots[id].y < 0 ||
-            shots[id].y > game_height) {
+            shots[id].y > game.height) {
                 destroyed = true;
         }
         
         if (destroyed) {
-            delete shots[id]
+            delete shots[id];
         }
+
         // collect info on remaining shots
         else {
             shot_info[id] = {};
