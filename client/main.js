@@ -217,13 +217,13 @@ function drawPlayer (player) {
         strokeWeight(5);
         stroke('#FF004D');
         line(player.x-screen_offset.x+25,
-                player.y-screen_offset.y+25,
-                player.x-screen_offset.x-25,
-                player.y-screen_offset.y-25);
+             player.y-screen_offset.y+25,
+             player.x-screen_offset.x-25,
+             player.y-screen_offset.y-25);
         line(player.x-screen_offset.x+25,
-                player.y-screen_offset.y-25,
-                player.x-screen_offset.x-25,
-                player.y-screen_offset.y+25);
+             player.y-screen_offset.y-25,
+             player.x-screen_offset.x-25,
+             player.y-screen_offset.y+25);
     }
 }
 
@@ -233,7 +233,7 @@ function deathMsg (player) {
         background(0, 200);
         fill(game.colorPairs[player.color][0]);
         stroke('black');
-        strokeWeight(2);
+        strokeWeight(3);
         textSize(40);
         text("YOU ARE DEAD", game.screenWidth/2, game.screenHeight/2);
     }
@@ -249,8 +249,10 @@ function drawCrosshair (player) {
     line(mouseX, mouseY+20, mouseX, mouseY-20);
 }
 
-//draw client players healthbar
-function drawHealthbar (player) {
+//draws the main bar at bottom of the screen
+function drawMainbar (player, prog) {
+    //prog is ratio from 0 to 1
+    prog = Math.min(1,Math.max(0,prog));
     strokeWeight(0);
     fill('black');
     rect(
@@ -260,8 +262,13 @@ function drawHealthbar (player) {
     fill(game.colorPairs[player.color][0]);
     rect(
         game.screenWidth/4, game.screenHeight - 25,
-        game.screenWidth/2*(player.health/game.health_start), 20
+        game.screenWidth/2*(prog), 20
     );
+}
+
+//draw client players healthbar
+function drawHealthbar (player) {
+    drawMainbar(player, player.health/game.health_start);
     stroke('black');
     strokeWeight(4);
     textSize(20);
@@ -271,16 +278,5 @@ function drawHealthbar (player) {
 
 //draw client players respawn timer bar
 function drawRespawnTimer (player) {
-    strokeWeight(0);
-    fill('black');
-    rect(
-        game.screenWidth/4-2, game.screenHeight - 27,
-        game.screenWidth/2+4, 24,
-    );
-    fill(game.colorPairs[player.color][0]);
-    let deathProg = Math.min(deathTimer/game.respawnTime, 1)
-    rect(
-        game.screenWidth/4, game.screenHeight - 25,
-        game.screenWidth/2*(deathProg), 20
-    );
+    drawMainbar(player, deathTimer/game.respawnTime);
 }
