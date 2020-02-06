@@ -52,6 +52,9 @@ var game = {
     //angle between each shot of full spread
     full_spread_angle:Math.PI/32,
 
+    //lifespan of shots (in ticks)
+    shotLifespan: 30,
+
     //colors for each player to tell them apart
     colors:['blue','yellow','pink','green'],
 
@@ -161,6 +164,7 @@ io.sockets.on('connection', function (socket) {
             shots[id].color = socket.color;
             shots[id].socket = socket.id;
             shots[id].velocity = vel;
+            shots[id].lifespan = game.shotLifespan;
         }
     });
 
@@ -174,6 +178,7 @@ io.sockets.on('connection', function (socket) {
                 shots[id].color = socket.color;
                 shots[id].socket = socket.id;
                 shots[id].velocity = vel;
+                shots[id].lifespan = game.shotLifespan;
             });
             if (socket.health > 0) {
                 socket.health -= 1;
@@ -235,6 +240,10 @@ setInterval(function () {
             shots[id].y > game.height) {
                 destroyed = true;
         }
+
+        //destroy if end of life
+        shots[id].lifespan -= 1;
+        destroyed = destroyed || shots[id].lifespan <= 1;
         
         if (destroyed) {
             delete shots[id];
