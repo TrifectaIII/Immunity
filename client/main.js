@@ -25,6 +25,7 @@ socket.once('game_settings', function (settings) {
 
     textAlign(CENTER, CENTER);
     textSize(20);
+    textFont(loadFont('client/homespun.ttf'));
 
     //Start shoot eventListener from shoot.js
     start_shoot()
@@ -151,6 +152,6 @@ function draw () {
         stroke('black');
         strokeWeight(4);
         fill(game.colorPairs[player.color][0]);
-        text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-14);
+        text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-17);
     }
 }

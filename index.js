@@ -28,8 +28,8 @@ app.use('/client',express.static(__dirname + '/client'));
 //Global Server Settings
 var game = {
     //width and height of game canvas
-    width: 1000,
-    height: 1000,
+    width: 2000,
+    height: 2000,
 
     screenWidth:600,
     screenHeight:600,

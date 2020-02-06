@@ -22,12 +22,12 @@
 body {
     text-align:center;
     font-family: 'Press Start 2P', cursive;
-    background-color:black;
+    background-color:var(--p8-blue);
     color:var(--p8-yellow);
 }
 
 canvas {
-    border:5px solid red;
+    border:5px solid var(--p8-darkblue);
     cursor:none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
