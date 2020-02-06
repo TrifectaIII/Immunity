@@ -162,7 +162,9 @@ io.sockets.on('connection', function (socket) {
             shots[id].socket = socket.id;
             shots[id].velocity = vel;
         });
-        socket.health -= 1;
+        if (socket.health > 0) {
+            socket.health -= 1;
+        }
     });
 });
 
@@ -191,8 +193,11 @@ setInterval(function () {
         for (let player in io.sockets.connected) {
             let socket = io.sockets.connected[player]
             if (player != shots[id]. socket && distance(socket, shots[id]) < 27) {
-                io.sockets.connected[player].health -= 1;
-                destroyed = true;
+                if (io.sockets.connected[player].health > 0) {
+                    io.sockets.connected[player].health -= 1;
+                    destroyed = true;
+                }
+                
             } 
         }
 
@@ -219,4 +224,4 @@ setInterval(function () {
 
     //send data to all sockets
     io.sockets.emit('server_update', player_info, shot_info);
-},20);
+}, 20);

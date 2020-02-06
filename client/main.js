@@ -100,24 +100,37 @@ function draw () {
                         ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
 
                         //draw healthbar
-                        let x_offset = 15
-                        let y_offset_abs = 35;
-                        let y_offset = y_offset_abs;
-                        if (player.y-screen_offset.y > game.screenHeight - 50) {
-                            y_offset = -35;
-                        }
-                        strokeWeight(0);
-                        fill('black');
-                        rect(
-                            player.x-x_offset-1-screen_offset.x, player.y + y_offset-(y_offset/y_offset_abs)-screen_offset.y, 
-                            x_offset*2 + 2, 7*(y_offset/y_offset_abs),
-                        );
                         if (player.health > 0) {
+                            let x_offset = 15
+                            let y_offset_abs = 35;
+                            let y_offset = y_offset_abs;
+                            if (player.y-screen_offset.y > game.screenHeight - 50) {
+                                y_offset = -35;
+                            }
+                            strokeWeight(0);
+                            fill('black');
+                            rect(
+                                player.x-x_offset-1-screen_offset.x, player.y + y_offset-(y_offset/y_offset_abs)-screen_offset.y, 
+                                x_offset*2 + 2, 7*(y_offset/y_offset_abs),
+                            );
                             fill(game.colorPairs[player.color][0]);
                             rect(
                                 player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
                                 x_offset*2*(player.health/game.health_start), 5*(y_offset/y_offset_abs),
                             );
+                        }
+                        //draw death cross
+                        else {
+                            strokeWeight(5);
+                            stroke('#FF004D');
+                            line(player.x-screen_offset.x+25,
+                                 player.y-screen_offset.y+25,
+                                 player.x-screen_offset.x-25,
+                                 player.y-screen_offset.y-25);
+                            line(player.x-screen_offset.x+25,
+                                 player.y-screen_offset.y-25,
+                                 player.x-screen_offset.x-25,
+                                 player.y-screen_offset.y+25);
                         }
                 }
             }
@@ -127,6 +140,19 @@ function draw () {
         stroke(game.colorPairs[player.color][1]);
         strokeWeight(2);
         ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
+        //draw death cross
+        if (player.health <= 0) {
+            strokeWeight(5);
+            stroke('#FF004D');
+            line(player.x-screen_offset.x+25,
+                    player.y-screen_offset.y+25,
+                    player.x-screen_offset.x-25,
+                    player.y-screen_offset.y-25);
+            line(player.x-screen_offset.x+25,
+                    player.y-screen_offset.y-25,
+                    player.x-screen_offset.x-25,
+                    player.y-screen_offset.y+25);
+        }
 
         // draw crosshair
         strokeWeight(2);
