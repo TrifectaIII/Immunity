@@ -28,8 +28,8 @@ app.use('/client',express.static(__dirname + '/client'));
 //Global Server Settings
 var game = {
     //width and height of game canvas
-    width: 750,
-    height: 750,
+    width: 600,
+    height: 600,
 
     // starting health
     health_start: 3,
@@ -40,8 +40,18 @@ var game = {
     //speed of shots
     shot_speed: 15,
 
+    //angle between each shot of full spread
+    full_spread_angle:Math.PI/32,
+
     //colors for each player to tell them apart
-    colors: ['blue','red','yellow','green','orange','purple'],
+    colors:['blue','yellow','pink','green'],
+
+    colorPairs:{
+        'blue':['#29ADFF','#1D2B53'],
+        'yellow':['#FFEC27','#FFA300'],
+        'pink':['#FF77A8','#7E2553'],
+        'green':['#00E436','#008751'],
+    },
 }
 
 //keeps track of which color is next
@@ -76,11 +86,7 @@ io.sockets.on('connection', function (socket) {
         console.log("Total Players:", Object.keys(io.sockets.connected).length);
     })
 
-    socket.emit('game_settings', {
-        width:game.width,
-        height:game.height,
-        shot_speed:game.shot_speed,
-    })
+    socket.emit('game_settings', game)
 
     socket.color = game.colors[game.colorStep]
     game.colorStep += 1
@@ -141,6 +147,18 @@ io.sockets.on('connection', function (socket) {
         shots[id].color = socket.color;
         shots[id].socket = socket.id;
         shots[id].velocity = vel;
+    });
+
+    socket.on('full_spread', function (vels) {
+        vels.forEach(function (vel) {
+            var id = Math.random();
+            shots[id] = {};
+            shots[id].x = socket.x;
+            shots[id].y = socket.y;
+            shots[id].color = socket.color;
+            shots[id].socket = socket.id;
+            shots[id].velocity = vel;
+        });
     });
 });
 

@@ -1,14 +1,40 @@
 @import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
 
+:root {
+    --p8-black:#000000;
+    --p8-brown:#AB5236;
+    --p8-red:#FF004D;
+    --p8-blue:#29ADFF;
+    --p8-darkblue:#1D2B53;
+    --p8-darkgrey:#5F574F;
+    --p8-mango:#FFA300;
+    --p8-purple:#83769C;
+    --p8-darkpink:#7E2553;
+    --p8-grey:#C2C3C7;
+    --p8-yellow:#FFEC27;
+    --p8-pink:#FF77A8;
+    --p8-darkgreen:#008751;
+    --p8-white:#FFF1E8;
+    --p8-green:#00E436;
+    --p8-tan:#FFCCAA;
+}
+
 body {
     text-align:center;
     font-family: 'Press Start 2P', cursive;
     background-color:black;
-    color:yellow;
+    color:var(--p8-yellow);
 }
 
 canvas {
     border:5px solid red;
+    cursor:none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 p span {
