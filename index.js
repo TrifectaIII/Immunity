@@ -80,6 +80,14 @@ function distance(socket, shot) {
     );
 }
 
+//returns random integer between low and high, inclusive
+function randint(low,high) {
+    if (high > low) {
+        return Math.floor(Math.random()*(high+1-low) +low)
+    }
+    return Math.floor(Math.random()*(low+1-high) +high)
+}
+
 //object to hold info re: shots
 var shots = {};
 
@@ -106,8 +114,8 @@ io.sockets.on('connection', function (socket) {
         game.colorStep = 0
     }
 
-    socket.x = game.width/2;
-    socket.y = game.height/2;
+    socket.x = randint(0,game.width);
+    socket.y = randint(0,game.height);
 
     socket.health = game.health_start;
 
@@ -187,6 +195,8 @@ io.sockets.on('connection', function (socket) {
                     setTimeout(function () {
                         socket.alive = true;
                         socket.health = game.health_start;
+                        socket.x = randint(0,game.width);
+                        socket.y = randint(0,game.height);
                     }, game.respawnTime)
                 }
             }
@@ -227,6 +237,8 @@ setInterval(function () {
                         setTimeout(function () {
                             socket.alive = true;
                             socket.health = game.health_start;
+                            socket.x = randint(0,game.width);
+                            socket.y = randint(0,game.height);
                         }, game.respawnTime)
                     }
                 }
