@@ -5,7 +5,7 @@ function start_shoot () {
     //shoot on click
     canvas.addEventListener('click', function (event) {
         event.preventDefault();
-        if (socket.id in players) {
+        if (socket.id in players && players[socket.id].health > 0) {
             let player = players[socket.id];
             let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y));
             socket.emit('shoot', vel);
@@ -14,15 +14,18 @@ function start_shoot () {
 
     // full spread on space
     document.addEventListener('keypress', function (event) {
-        if (event.keyCode == 32 && socket.id in players) {
+        if (event.keyCode == 32) {
             event.preventDefault();
-            let player = players[socket.id];
-            let vels = [];
-            for (let i = -2; i <= 2; i++) {
-                let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.full_spread_angle);
-                vels.push(vel);
+            if (socket.id in players &&
+                players[socket.id].health > 0) {
+                    let player = players[socket.id];
+                    let vels = [];
+                    for (let i = -2; i <= 2; i++) {
+                        let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.full_spread_angle);
+                        vels.push(vel);
+                    }
+                    socket.emit('full_spread', vels)
             }
-            socket.emit('full_spread', vels)
         }
     });
 }

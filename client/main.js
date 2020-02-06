@@ -29,7 +29,7 @@ socket.once('game_settings', function (settings) {
     textFont(loadFont('client/homespun.ttf'));
 
     //Start shoot eventListener from shoot.js
-    start_shoot()
+    start_shoot();
 });
 
 //does nothing right now
