@@ -342,7 +342,7 @@ function drawMinimap () {
     ellipse(
         (player.x/game.width)*minimap.width + minimap.offset.x,
         (player.y/game.height)*minimap.height + minimap.offset.y,
-        minimap.pip_size, minimap.pip_size,
+        minimap.pip_size*1.25, minimap.pip_size*1.25,
     );
 
 }
