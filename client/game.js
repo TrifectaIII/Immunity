@@ -16,8 +16,8 @@ function minimapSetup () {
     minimap.height = game.screenHeight/7;
     minimap.overflow = 3;
     minimap.offset = {
-        x:3,
-        y:game.screenHeight - minimap.height - 3,
+        x:minimap.overflow + 3,
+        y:game.screenHeight - minimap.height - minimap.overflow - 3,
     }
     minimap.pip_size = 5;
 }
@@ -285,7 +285,7 @@ function drawMinimap () {
         minimap.height + minimap.overflow*2
     );
 
-    //draw other players
+    //draw other player pips
     for (let id in players) {
         if (id != socket.id && players[id].health > 0) {
             let player = players[id];
@@ -298,7 +298,7 @@ function drawMinimap () {
         }
     }
 
-    //draw player with outline indicator
+    //draw client player pip with outline indicator + larger
     let player = players[socket.id];
     strokeWeight(1);
     stroke('#FFF1E8');
