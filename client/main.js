@@ -36,6 +36,13 @@ socket.on ('game_update', function (player_info, shot_info) {
     shots = shot_info;
 });
 
+var homespunFont;
+
+//p5 preload
+function preload () {
+    homespunFont = loadFont('client/homespun.ttf');
+}
+
 // p5 setup
 function setup () {
     createCanvas(game.screenWidth, game.screenHeight).parent('canvas-hold');
@@ -43,7 +50,7 @@ function setup () {
     stroke('black');
 
     textAlign(CENTER, CENTER);
-    textFont(loadFont('client/homespun.ttf'));
+    textFont(homespunFont);
 }
 
 // p5 drawing
@@ -64,7 +71,7 @@ function draw () {
 //returns random integer between low and high, inclusive
 function randint(low,high) {
     if (high > low) {
-        return Math.floor(Math.random()*(high+1-low) +low)
+        return Math.floor(Math.random()*(high+1-low) +low);
     }
-    return Math.floor(Math.random()*(low+1-high) +high)
+    return Math.floor(Math.random()*(low+1-high) +high);
 }

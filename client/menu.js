@@ -13,7 +13,6 @@ function drawLoading () {
     fill('#29ADFF');
     textSize(40);
     text("Loading...", game.screenWidth/2, game.screenHeight/2);
-    drawMenuCrosshair();
 
     loadingProg -= 0.1;
     stroke(loadingColors[Math.floor(-(loadingProg/loadingColors.length)%loadingColors.length)]);
@@ -28,6 +27,8 @@ function drawLoading () {
             game.screenHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
         );
     }
+    
+    drawMenuCrosshair();
 }
 
 // draw cosshair for menu
