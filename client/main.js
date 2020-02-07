@@ -11,6 +11,9 @@ var screen_offset = {
 var deathTimer = 0;
 var deathCount;
 
+//mini map settings
+var minimap = {};
+
 //recieve player info from server
 socket.on ('server_update', function (player_info, shot_info) {
     players = player_info;
@@ -30,6 +33,15 @@ socket.once('game_settings', function (settings) {
 
     //Start shoot eventListener from shoot.js
     start_shoot();
+
+    //set up minimap settings
+    minimap.width = game.screenWidth/7;
+    minimap.height = game.screenHeight/7;
+    minimap.offset = {
+        x:3,
+        y:game.screenHeight - minimap.height - 3,
+    }
+    minimap.pip_size = 5;
 });
 
 //does nothing right now
@@ -41,8 +53,10 @@ function draw () {
     if (socket.id in players) {
         let player = players[socket.id];
 
-        //send movement data
-        sendMove();
+        //send movement data only if alive
+        if (player.health > 0) {
+            sendMove();
+        }
 
         //refresh screen
         clear()
@@ -57,14 +71,24 @@ function draw () {
         //draw dead players
         drawDead();
 
+        //draw client player if dead
+        if (player.health <= 0) {
+            drawPlayer(player);
+        }
+
         //draw all shots
         drawShots();
 
         //draw living players
         drawLiving();
 
-        // then draw client player on top
-        drawPlayer(player);
+        // then draw client player on top if living
+        if (player.health > 0) {
+            drawPlayer(player);
+        }
+
+        //draw minimap
+        drawMinimap();
 
         //draw death message if client player is dead
         deathMsg(player);
@@ -145,9 +169,13 @@ function drawDead () {
                 player.x-screen_offset.x < game.screenWidth + 50 &&
                 player.y-screen_offset.y > -50 &&
                 player.y-screen_offset.y < game.screenHeight + 50) {
-                    //draw player
-                    fill(game.colorPairs[player.color][0]);
-                    stroke(game.colorPairs[player.color][1]);
+                    //draw player as transparent
+                    let fillcolor = color(game.colorPairs[player.color][0]);
+                    fillcolor.setAlpha(100);
+                    let strokecolor = color(game.colorPairs[player.color][1]);
+                    strokecolor.setAlpha(100)
+                    fill(fillcolor);
+                    stroke(strokecolor);
                     strokeWeight(2);
                     ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
 
@@ -279,4 +307,36 @@ function drawHealthbar (player) {
 //draw client players respawn timer bar
 function drawRespawnTimer (player) {
     drawMainbar(player, deathTimer/game.respawnTime);
+}
+
+function drawMinimap () {
+    //draw minimap background
+    strokeWeight(0);
+    fill(0, 150);
+    rect(minimap.offset.x,minimap.offset.y, minimap.width, minimap.height);
+
+    //draw other players
+    for (let id in players) {
+        if (id != socket.id && players[id].health > 0) {
+            let player = players[id];
+            fill(game.colorPairs[player.color][0]);
+            ellipse(
+                (player.x/game.width)*minimap.width + minimap.offset.x,
+                (player.y/game.height)*minimap.height + minimap.offset.y,
+                minimap.pip_size, minimap.pip_size,
+            );
+        }
+    }
+
+    //draw player with outline indicator
+    let player = players[socket.id];
+    strokeWeight(1);
+    stroke('#FFF1E8');
+    fill(game.colorPairs[player.color][0]);
+    ellipse(
+        (player.x/game.width)*minimap.width + minimap.offset.x,
+        (player.y/game.height)*minimap.height + minimap.offset.y,
+        minimap.pip_size, minimap.pip_size,
+    );
+
 }
