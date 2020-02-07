@@ -1,3 +1,13 @@
+//object to hold info re: screen offset based on player position
+var screen_offset = {
+    x:0,
+    y:0,
+}
+
+// timer to display respawn bar
+var deathStart;
+var deathTime;
+
 //minimap settings
 var minimap = {};
 
@@ -63,21 +73,16 @@ function drawGame () {
 
         //draw UI
         if (player.health > 0) {
-            //draw healthbar, then reset respawn timer if not already reset
+            //draw healthbar, then erase time of death
             drawHealthbar(player);
-            if (deathTimer > 0) {
-                deathTimer = 0;
-                clearInterval(deathCount);
-            }
+            deathStart = 0;
         } else {
-            //draw respawnbar, then start respawn tiemr if not started
-            drawRespawnTimer(player);
-            if (deathTimer == 0) {
-                deathTimer += 50;
-                deathCount = setInterval(function () {
-                    deathTimer += 50;
-                }, 50);
+            //draw respawnbar, then note time of death
+            if (deathStart == 0) {
+                deathStart = (new Date()).getTime();
             }
+            deathTime = (new Date()).getTime() - deathStart;
+            drawRespawnTimer(player);
         }
     }
 }
@@ -271,7 +276,7 @@ function drawHealthbar (player) {
 
 //draw client players respawn timer bar
 function drawRespawnTimer (player) {
-    drawMainbar(player, deathTimer/game.respawnTime);
+    drawMainbar(player, deathTime/game.respawnTime);
 }
 
 //draws minimap 

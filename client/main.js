@@ -9,17 +9,6 @@ var players = {}
 //shots info from server
 var shots = {}
 
-//object to hold info re: screen offset based on player position
-var screen_offset = {
-    x:0,
-    y:0,
-}
-
-// timer and counter to display respawn timer
-var deathTimer = 0;
-var deathCount;
-
-
 
 //recieve player info from server
 socket.on ('server_update', function (player_info, shot_info) {
