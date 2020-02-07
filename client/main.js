@@ -64,6 +64,7 @@ function draw () {
         //draw loading screen from menu.js
         case "loading":
             drawLoading();
+            // drawServerMenu(); //just for testing
             break;
     }
 }
