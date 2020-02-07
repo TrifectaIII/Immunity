@@ -185,24 +185,29 @@ io.sockets.on('connection', function (socket) {
 
     //handle full spread
     socket.on('full_spread', function (vels) {
-        if (socket.alive) {
-            vels.forEach(function (vel) {
-                var id = Math.random();
-                shots[id] = {};
-                shots[id].x = socket.x;
-                shots[id].y = socket.y;
-                shots[id].color = socket.color;
-                shots[id].socket = socket.id;
-                shots[id].velocity = vel;
-                shots[id].lifespan = game.fullSpreadLifespan;
-            });
-            if (socket.health > 0) {
-                socket.health -= 1;
-                socket.alive = socket.health > 0;
-                if (!socket.alive) {
-                    setTimeout(socket.spawn, game.respawnTime)
+        try {
+            if (socket.alive) {
+                vels.forEach(function (vel) {
+                    var id = Math.random();
+                    shots[id] = {};
+                    shots[id].x = socket.x;
+                    shots[id].y = socket.y;
+                    shots[id].color = socket.color;
+                    shots[id].socket = socket.id;
+                    shots[id].velocity = vel;
+                    shots[id].lifespan = game.fullSpreadLifespan;
+                });
+                if (socket.health > 0) {
+                    socket.health -= 1;
+                    socket.alive = socket.health > 0;
+                    if (!socket.alive) {
+                        setTimeout(socket.spawn, game.respawnTime)
+                    }
                 }
             }
+        }
+        catch (error) {
+            console.log('fullspread failed: ',error)
         }
     });
 });
