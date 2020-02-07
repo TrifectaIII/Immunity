@@ -4,9 +4,8 @@ var screen_offset = {
     y:0,
 }
 
-// timer to display respawn bar
+// hold time of death
 var deathStart;
-var deathTime;
 
 //minimap settings
 var minimap = {};
@@ -77,12 +76,12 @@ function drawGame () {
             drawHealthbar(player);
             deathStart = 0;
         } else {
-            //draw respawnbar, then note time of death
+            //note time of death, then draw respawn bar
             if (deathStart == 0) {
                 deathStart = (new Date()).getTime();
             }
-            deathTime = (new Date()).getTime() - deathStart;
-            drawRespawnTimer(player);
+            let deathTime = (new Date()).getTime() - deathStart;
+            drawMainbar(player, deathTime/game.respawnTime);
         }
     }
 }
@@ -272,11 +271,6 @@ function drawHealthbar (player) {
     textSize(20);
     fill('#FFF1E8');
     text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-17);
-}
-
-//draw client players respawn timer bar
-function drawRespawnTimer (player) {
-    drawMainbar(player, deathTime/game.respawnTime);
 }
 
 //draws minimap 
