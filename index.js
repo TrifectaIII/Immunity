@@ -248,13 +248,13 @@ setInterval(function () {
             } 
         }
 
-        // destroy shots if they get too far off track
-        if (shots[id].x < 0 ||
-            shots[id].x > game.width ||
-            shots[id].y < 0 ||
-            shots[id].y > game.height) {
-                destroyed = true;
-        }
+        // // destroy shots if they get too far off track
+        // if (shots[id].x < 0 ||
+        //     shots[id].x > game.width ||
+        //     shots[id].y < 0 ||
+        //     shots[id].y > game.height) {
+        //         destroyed = true;
+        // }
 
         //destroy if end of life
         shots[id].lifespan -= 1;
