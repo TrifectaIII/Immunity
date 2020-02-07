@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
 
+/* color palette from https://lospec.com/palette-list/pico-8     */
 :root {
     --p8-black:#000000;
     --p8-brown:#AB5236;

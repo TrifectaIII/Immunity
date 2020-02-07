@@ -37,6 +37,7 @@ socket.once('game_settings', function (settings) {
     //set up minimap settings
     minimap.width = game.screenWidth/7;
     minimap.height = game.screenHeight/7;
+    minimap.overflow = 3;
     minimap.offset = {
         x:3,
         y:game.screenHeight - minimap.height - 3,
@@ -313,7 +314,12 @@ function drawMinimap () {
     //draw minimap background
     strokeWeight(0);
     fill(0, 150);
-    rect(minimap.offset.x,minimap.offset.y, minimap.width, minimap.height);
+    rect(
+        minimap.offset.x - minimap.overflow,
+        minimap.offset.y - minimap.overflow, 
+        minimap.width + minimap.overflow*2, 
+        minimap.height + minimap.overflow*2
+    );
 
     //draw other players
     for (let id in players) {
