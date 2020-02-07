@@ -274,5 +274,5 @@ setInterval(function () {
     }
 
     //send data to all sockets
-    io.sockets.emit('server_update', player_info, shot_info);
+    io.sockets.emit('game_update', player_info, shot_info);
 }, game.tickRate);

@@ -5,10 +5,12 @@ function start_shoot () {
     //shoot on click
     canvas.addEventListener('click', function (event) {
         event.preventDefault();
-        if (socket.id in players && players[socket.id].health > 0) {
-            let player = players[socket.id];
-            let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y));
-            socket.emit('shoot', vel);
+        if (state == "game" && 
+            socket.id in players && 
+            players[socket.id].health > 0) {
+                let player = players[socket.id];
+                let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y));
+                socket.emit('shoot', vel);
         }
     });
 
@@ -16,7 +18,8 @@ function start_shoot () {
     document.addEventListener('keypress', function (event) {
         if (event.keyCode == 32) {
             event.preventDefault();
-            if (socket.id in players &&
+            if (state == "game" && 
+                socket.id in players &&
                 players[socket.id].health > 0) {
                     let player = players[socket.id];
                     let vels = [];
