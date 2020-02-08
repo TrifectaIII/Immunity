@@ -88,6 +88,8 @@ function drawGame () {
             let deathTime = (new Date()).getTime() - deathStart;
             drawMainbar(player, deathTime/game.respawnTime);
         }
+
+        drawGameCode(player);
     }
 }
 
@@ -314,4 +316,18 @@ function drawMinimap () {
         (player.y/game.height)*minimap.height + minimap.offset.y,
         minimap.pip_size*1.25, minimap.pip_size*1.25,
     );
+}
+
+//display room code so others can join
+function drawGameCode (player) {
+    push();
+    textAlign(LEFT);
+    stroke('black');
+    strokeWeight(0);
+    textSize(30);
+    fill(game.colorPairs[player.color][1]);
+    text('Room Code: '+gameCode, 15, 20);
+
+    text('Players: '+Object.keys(players).length.toString()+'/'+game.roomCap, 15, 60)
+    pop();
 }

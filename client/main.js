@@ -1,3 +1,6 @@
+//SOCKET.IO
+/////////////////////////////
+
 //game state
 var state = 'menu';
 
@@ -24,9 +27,13 @@ function join_game(code) {
         state = 'menu';
     });
 
+    //confirm room joining
+    socket.once('joined', function (code) {
+        gameCode = code;
+    });
+
     // setup game when receive settings
     socket.once('game_settings', function (settings) {
-        console.log('game_settings')
         game = settings;
         resizeCanvas(game.screenWidth,game.screenHeight);
 
@@ -35,20 +42,23 @@ function join_game(code) {
 
         //Start shoot eventListener from shoot.js
         start_shoot();
-    });
 
-    //recieve player info from server
-    socket.on ('game_update', function (player_info, shot_info) {
-        //save to objects in game.js
-        players = player_info;
-        shots = shot_info;
+        //recieve player info from server
+        socket.on ('game_update', function (player_info, shot_info) {
+            //save to objects in game.js
+            players = player_info;
+            shots = shot_info;
 
-        //change state
-        if (state != 'game') {
-            state = 'game';
-        }
+            //change state
+            if (state != 'game') {
+                state = 'game';
+            }
+        });
     });
 }
+
+//p5.js
+/////////////////////////////
 
 var homespunFont;
 

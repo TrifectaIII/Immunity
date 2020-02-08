@@ -27,6 +27,9 @@ app.use('/client',express.static(__dirname + '/client'));
 
 //Global Server Settings
 var game = {
+    //max players per room
+    roomCap: 4,
+
     //space between server updates in MS
     tickRate: 20,
 
@@ -69,14 +72,8 @@ var game = {
     },
 }
 
-//keeps track of which color is next
-game.colorStep = 0;
-
 //players component speed when moving @ angle
 game.player_speed_angle = game.player_speed/(Math.sqrt(2));
-
-//object to hold info re: shots
-var shots = {};
 
 //calculates distance between a player and a shot
 function distance(socket, shot) {
@@ -107,6 +104,10 @@ var gameRooms = {};
 //handle incoming socket connections
 io.sockets.on('connection', function (socket) {
 
+
+    // CONNECTION/DISCONNECT
+    ////////////////////////////////
+
 	//log a new connection
 	console.log('NEW USER. ID: ',socket.id);
     console.log("Total Players:", Object.keys(io.sockets.connected).length);
@@ -120,17 +121,23 @@ io.sockets.on('connection', function (socket) {
             for (let i=0; i<gameRooms[socket.gameCode].players.length; i++) {
                 if (socket.id == gameRooms[socket.gameCode].players[i].id) {
                     gameRooms[socket.gameCode].players[i] = 'none';
-                    if (gameRooms[socket.gameCode].players == ['none', 'none', 'none', 'none']) {
+                    if (gameRooms[socket.gameCode].players == Array(game.roomCap).fill('none')) {
                         delete gameRooms[socket.gameCode];
                     }
                     break;
                 }
             }
+            // console.log(gameRooms);
         }        
     })
 
+    // JOIN ROOM
+    ////////////////////////////////
+
     //connect socket to room
     socket.on('join_game', function (code) {
+
+        let joined = false;
 
         //create new room on request
         if (code == 'new_game' || !(code in gameRooms)) {
@@ -143,10 +150,13 @@ io.sockets.on('connection', function (socket) {
 
             gameRooms[gameCode] = {
                 shots: {},
-                players: [socket, 'none', 'none', 'none'],
+                players: Array(game.roomCap).fill('none'),
             }
+            gameRooms[gameCode].players[0] = socket;
 
             socket.emit('joined',gameCode);
+
+            joined = true;
         }
 
         //add to room if room has empty space
@@ -163,6 +173,8 @@ io.sockets.on('connection', function (socket) {
             }
 
             socket.emit('joined',code);
+
+            joined = true;
         }
 
         //reject socket if room full
@@ -170,174 +182,184 @@ io.sockets.on('connection', function (socket) {
             socket.emit('room_full');
         }
 
-        console.log(gameRooms);
-    });
+        // FINISH
+        ////////////////////////////////
 
-    //relay settings to socket
-    socket.emit('game_settings', game)
+        //flesh socket out if joined
+        if (joined) {
+            // console.log(gameRooms);
 
-    socket.color = game.colors[game.colorStep]
-    game.colorStep += 1
-    if (game.colorStep >= game.colors.length) {
-        game.colorStep = 0
-    }
+            //relay settings to socket
+            socket.emit('game_settings', game)
 
-    socket.spawn = function () {
-        socket.x = randint(100,game.width-100);
-        socket.y = randint(100,game.height-100);
+            socket.color = game.colors[randint(0, game.colors.length-1)]
 
-        socket.health = game.health_start;
+            socket.spawn = function () {
+                socket.x = randint(100,game.width-100);
+                socket.y = randint(100,game.height-100);
 
-        socket.alive = true;
-    }
+                socket.health = game.health_start;
 
-    socket.spawn();
-
-    socket.on('move', function (direction) {
-        if (socket.alive) {
-            switch (direction) {
-                case 'rightup':
-                    socket.x += game.player_speed_angle;
-                    socket.y -= game.player_speed_angle;
-                    break;
-                case 'leftup':
-                    socket.x -= game.player_speed_angle;
-                    socket.y -= game.player_speed_angle;
-                    break;
-                case 'rightdown':
-                    socket.x += game.player_speed_angle;
-                    socket.y += game.player_speed_angle;
-                    break;
-                case 'leftdown':
-                    socket.x -= game.player_speed_angle;
-                    socket.y += game.player_speed_angle;
-                    break;
-                case 'right':
-                    socket.x += game.player_speed;
-                    break;
-                case 'left':
-                    socket.x -= game.player_speed;
-                    break;
-                case 'up':
-                    socket.y -= game.player_speed;
-                    break;
-                case 'down':
-                    socket.y += game.player_speed;
-                    break;
+                socket.alive = true;
             }
 
-            //boundaries
-            socket.x = Math.max(socket.x, 0);
-            socket.x = Math.min(socket.x, game.width);
-            socket.y = Math.max(socket.y, 0);
-            socket.y = Math.min(socket.y, game.height);
-        }
-    });
+            socket.spawn();
 
-    //handle shooting
-    socket.on('shoot', function (vel) {
-        if (socket.alive) {
-            var id = Math.random();
-            shots[id] = {};
-            shots[id].x = socket.x;
-            shots[id].y = socket.y;
-            shots[id].color = socket.color;
-            shots[id].socket = socket.id;
-            shots[id].velocity = vel;
-            shots[id].lifespan = game.shotLifespan;
-        }
-    });
+            socket.on('move', function (direction) {
+                if (socket.alive) {
+                    switch (direction) {
+                        case 'rightup':
+                            socket.x += game.player_speed_angle;
+                            socket.y -= game.player_speed_angle;
+                            break;
+                        case 'leftup':
+                            socket.x -= game.player_speed_angle;
+                            socket.y -= game.player_speed_angle;
+                            break;
+                        case 'rightdown':
+                            socket.x += game.player_speed_angle;
+                            socket.y += game.player_speed_angle;
+                            break;
+                        case 'leftdown':
+                            socket.x -= game.player_speed_angle;
+                            socket.y += game.player_speed_angle;
+                            break;
+                        case 'right':
+                            socket.x += game.player_speed;
+                            break;
+                        case 'left':
+                            socket.x -= game.player_speed;
+                            break;
+                        case 'up':
+                            socket.y -= game.player_speed;
+                            break;
+                        case 'down':
+                            socket.y += game.player_speed;
+                            break;
+                    }
 
-    //handle full spread
-    socket.on('full_spread', function (vels) {
-        try {
-            if (socket.alive) {
-                vels.forEach(function (vel) {
+                    //boundaries
+                    socket.x = Math.max(socket.x, 0);
+                    socket.x = Math.min(socket.x, game.width);
+                    socket.y = Math.max(socket.y, 0);
+                    socket.y = Math.min(socket.y, game.height);
+                }
+            });
+
+            //handle shooting
+            socket.on('shoot', function (vel) {
+                if (socket.alive) {
                     var id = Math.random();
-                    shots[id] = {};
-                    shots[id].x = socket.x;
-                    shots[id].y = socket.y;
-                    shots[id].color = socket.color;
-                    shots[id].socket = socket.id;
-                    shots[id].velocity = vel;
-                    shots[id].lifespan = game.fullSpreadLifespan;
-                });
-                if (socket.health > 0) {
-                    socket.health -= 1;
-                    socket.alive = socket.health > 0;
-                    if (!socket.alive) {
-                        setTimeout(socket.spawn, game.respawnTime)
+                    gameRooms[socket.gameCode].shots[id] = {};
+                    gameRooms[socket.gameCode].shots[id].x = socket.x;
+                    gameRooms[socket.gameCode].shots[id].y = socket.y;
+                    gameRooms[socket.gameCode].shots[id].color = socket.color;
+                    gameRooms[socket.gameCode].shots[id].socket = socket.id;
+                    gameRooms[socket.gameCode].shots[id].velocity = vel;
+                    gameRooms[socket.gameCode].shots[id].lifespan = game.shotLifespan;
+                }
+            });
+
+            //handle full spread
+            socket.on('full_spread', function (vels) {
+                try {
+                    if (socket.alive) {
+                        vels.forEach(function (vel) {
+                            var id = Math.random();
+                            gameRooms[socket.gameCode].shots[id] = {};
+                            gameRooms[socket.gameCode].shots[id].x = socket.x;
+                            gameRooms[socket.gameCode].shots[id].y = socket.y;
+                            gameRooms[socket.gameCode].shots[id].color = socket.color;
+                            gameRooms[socket.gameCode].shots[id].socket = socket.id;
+                            gameRooms[socket.gameCode].shots[id].velocity = vel;
+                            gameRooms[socket.gameCode].shots[id].lifespan = game.fullSpreadLifespan;
+                        });
+                        if (socket.health > 0) {
+                            socket.health -= 1;
+                            socket.alive = socket.health > 0;
+                            if (!socket.alive) {
+                                setTimeout(socket.spawn, game.respawnTime);
+                            }
+                        }
                     }
                 }
-            }
-        }
-        catch (error) {
-            console.log('fullspread failed: ',error)
+                catch (error) {
+                    console.log('fullspread failed: ',error)
+                }
+            });
         }
     });
+
+    
 });
 
+
+// MAIN GAME LOOP
+////////////////////////////////////////////////////////
+
 setInterval(function () {
+    //loop through each room
+    for (let gameCode in gameRooms) {
+        let room = gameRooms[gameCode];
 
-    //collect info on players from sockets
-    var player_info = {};
-    for (let id in io.sockets.connected) {
-        player_info[id] = {};
-        player_info[id].x = io.sockets.connected[id].x;
-        player_info[id].y = io.sockets.connected[id].y;
-        player_info[id].color = io.sockets.connected[id].color;
-        player_info[id].health = io.sockets.connected[id].health;
-    }
+        //collect info on players from sockets
+        var player_info = {};
+        for (let i=0; i<room.players.length; i++) {
+            let player = room.players[i]
+            if (player != 'none') {
+                player_info[player.id] = {};
+                player_info[player.id].x = player.x;
+                player_info[player.id].y = player.y;
+                player_info[player.id].color = player.color;
+                player_info[player.id].health = player.health;
+            }
+        }
 
-    var shot_info  = {};
+        //handle shots
+        var shot_info = {};
 
-    //move shots automatically
-    for (let id in shots) {
-        shots[id].x += shots[id].velocity.x;
-        shots[id].y += shots[id].velocity.y;
+        for (let id in room.shots) {
+            let shot = room.shots[id];
 
-        let destroyed = false;
+            //move based on velocity
+            shot.x += shot.velocity.x;
+            shot.y += shot.velocity.y;
 
-        // check for collisions with enemies
-        for (let player in io.sockets.connected) {
-            let socket = io.sockets.connected[player]
-            if (socket.alive && player != shots[id].socket && distance(socket, shots[id]) < 27) {
-                if (socket.health > 0) {
-                    socket.health -= 1;
-                    destroyed = true;
-                    socket.alive = socket.health > 0;
-                    if (!socket.alive) {
-                        setTimeout(socket.spawn, game.respawnTime)
+            let destroyed = false;
+
+            // check for collisions with enemies
+            for (let i=0; i<room.players.length; i++) {
+                let enemy = room.players[i];
+                if (enemy.alive && enemy.id != shot.socket && distance(enemy, shot) < 27) {
+                    if (enemy.health > 0) {
+                        enemy.health -= 1;
+                        destroyed = true;
+                        enemy.alive = enemy.health > 0;
+                        if (!enemy.alive) {
+                            setTimeout(enemy.spawn, game.respawnTime)
+                        }
                     }
-                }
-            } 
+                } 
+            }
+
+            //destroy if end of life
+            shot.lifespan -= 1;
+            destroyed = destroyed || shot.lifespan <= 1;
+            
+            if (destroyed) {
+                delete room.shots[id];
+            }
+
+            // collect info on remaining shot
+            else {
+                shot_info[id] = {};
+                shot_info[id].x = shot.x;
+                shot_info[id].y = shot.y;
+                shot_info[id].color = shot.color;
+            }
         }
 
-        // // destroy shots if they get too far off track
-        // if (shots[id].x < 0 ||
-        //     shots[id].x > game.width ||
-        //     shots[id].y < 0 ||
-        //     shots[id].y > game.height) {
-        //         destroyed = true;
-        // }
-
-        //destroy if end of life
-        shots[id].lifespan -= 1;
-        destroyed = destroyed || shots[id].lifespan <= 1;
-        
-        if (destroyed) {
-            delete shots[id];
-        }
-
-        // collect info on remaining shots
-        else {
-            shot_info[id] = {};
-            shot_info[id].x = shots[id].x;
-            shot_info[id].y = shots[id].y;
-            shot_info[id].color = shots[id].color;
-        }
+        //emit to the room
+        io.sockets.to(gameCode).emit('game_update', player_info, shot_info);
     }
-
-    //send data to all sockets
-    io.sockets.emit('game_update', player_info, shot_info);
 }, game.tickRate);
