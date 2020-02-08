@@ -49,5 +49,7 @@ p span {
     font-size: 30px;
     font-family: 'Press Start 2P', cursive;
     text-align:center;
+    padding:0px;
+    margin:0px;
 }
 

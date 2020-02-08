@@ -97,6 +97,13 @@ function randint(low,high) {
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
 
+//counter to generate game codes
+var gameCodeCounter = 100;
+
+//object to hold individual game rooms
+var gameRooms = {};
+
+
 //handle incoming socket connections
 io.sockets.on('connection', function (socket) {
 
@@ -104,11 +111,69 @@ io.sockets.on('connection', function (socket) {
 	console.log('NEW USER. ID: ',socket.id);
     console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
+    //log a disconnect, and remove from gameroom
     socket.once('disconnect', function () {
         console.log('USER DC. ID: ',socket.id);
         console.log("Total Players:", Object.keys(io.sockets.connected).length);
+
+        if ('gameCode' in socket) {
+            for (let i=0; i<gameRooms[socket.gameCode].players.length; i++) {
+                if (socket.id == gameRooms[socket.gameCode].players[i].id) {
+                    gameRooms[socket.gameCode].players[i] = 'none';
+                    if (gameRooms[socket.gameCode].players == ['none', 'none', 'none', 'none']) {
+                        delete gameRooms[socket.gameCode];
+                    }
+                    break;
+                }
+            }
+        }        
     })
 
+    //connect socket to room
+    socket.on('join_game', function (code) {
+
+        //create new room on request
+        if (code == 'new_game' || !(code in gameRooms)) {
+            gameCodeCounter += 1;
+            let gameCode = gameCodeCounter.toString();
+
+            socket.gameCode = gameCode;
+
+            socket.join(gameCode);
+
+            gameRooms[gameCode] = {
+                shots: {},
+                players: [socket, 'none', 'none', 'none'],
+            }
+
+            socket.emit('joined',gameCode);
+        }
+
+        //add to room if room has empty space
+        else if (code in gameRooms && gameRooms[code].players.includes('none')) {
+            socket.gameCode = code;
+
+            socket.join(code);
+
+            for (let i=0; i<gameRooms[code].players.length; i++) {
+                if (gameRooms[code].players[i] == 'none') {
+                    gameRooms[code].players[i] = socket;
+                    break;
+                }
+            }
+
+            socket.emit('joined',code);
+        }
+
+        //reject socket if room full
+        else {
+            socket.emit('room_full');
+        }
+
+        console.log(gameRooms);
+    });
+
+    //relay settings to socket
     socket.emit('game_settings', game)
 
     socket.color = game.colors[game.colorStep]

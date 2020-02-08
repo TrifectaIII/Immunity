@@ -96,7 +96,7 @@ function setupCodeInput (canv) {
 
 //gets value of codeInput 
 function getCodeInput () {
-    return codeInput.elt.value;
+    return codeInput.elt.value.trim();
 }
 
 function hideCodeInput () {

@@ -1,33 +1,54 @@
 //game state
 var state = 'menu';
 
-//connect to socket
-var socket = io();
+//socket object
+var socket;
 
-// p5 setup when settings recieved from server
-socket.once('game_settings', function (settings) {
-    game = settings;
-    resizeCanvas(game.screenWidth,game.screenHeight);
+//current game code
+var gameCode;
 
-    //set up minimap settings from game.js
-    minimapSetup();
+//function to join the game
+function join_game(code) {
 
-    //Start shoot eventListener from shoot.js
-    start_shoot();
-});
+    state = 'load'
 
-//recieve player info from server
-socket.on ('game_update', function (player_info, shot_info) {
-    //save to objects in game.js
-    players = player_info;
-    shots = shot_info;
+    gameCode = code;
 
-    //change state
-    if (state != 'game') {
-        state = 'game';
-        hideCodeInput();
-    }
-});
+    socket = io();
+
+    socket.emit('join_game', code);
+
+    //reset if no space in room
+    socket.once('room_full', function () {
+        socket.close();
+        state = 'menu';
+    });
+
+    // setup game when receive settings
+    socket.once('game_settings', function (settings) {
+        console.log('game_settings')
+        game = settings;
+        resizeCanvas(game.screenWidth,game.screenHeight);
+
+        //set up minimap settings from game.js
+        minimapSetup();
+
+        //Start shoot eventListener from shoot.js
+        start_shoot();
+    });
+
+    //recieve player info from server
+    socket.on ('game_update', function (player_info, shot_info) {
+        //save to objects in game.js
+        players = player_info;
+        shots = shot_info;
+
+        //change state
+        if (state != 'game') {
+            state = 'game';
+        }
+    });
+}
 
 var homespunFont;
 
@@ -74,10 +95,14 @@ function mouseClicked () {
         case "menu":
             switch (clickServerMenu()) {
                 case "new game":
-                    console.log('new game')
+                    hideCodeInput();
+                    join_game('new_game');
                     break;
                 case "join":
-                    console.log('join')
+                    if (getCodeInput() != '') {
+                        hideCodeInput();
+                        join_game(getCodeInput());
+                    }
                     break;
             }
             break;
