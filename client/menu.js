@@ -91,7 +91,7 @@ function setupCodeInput (canv) {
     codeInput.canv = canv;
     codeInput.hide();
     codeInput.size(200,75);
-    codeInput.class('codeInput');
+    codeInput.class('gameInput');
 }
 
 //gets value of codeInput 
@@ -118,8 +118,8 @@ function drawServerMenu () {
     strokeWeight(2);
     fill('black');
     textSize(40);
-    text("- OR -", game.screenWidth/2, game.screenHeight*2/5);
-    text("Enter Game Code:", game.screenWidth/2, game.screenHeight/2);
+    text("- OR -", game.screenWidth/2, game.screenHeight*17/40);
+    text("Enter Game Code:", game.screenWidth/2, game.screenHeight*16/30);
 
     //draw create game button
     joinButton.draw();
@@ -135,6 +135,76 @@ function drawServerMenu () {
 }
 
 function clickServerMenu () {
+    if (createGameButton.mouseOver()) {
+        return "new game";
+    }
+    if (joinButton.mouseOver()) {
+        return "join";
+    }
+}
+
+// Server Menu
+///////////////////////////////////////
+
+var setNameButton = new Button(
+    "SUBMIT", 
+    game.screenWidth/2, game.screenHeight/4, 
+    250, 100, 
+    '#AB5236', '#FFEC27'
+);
+
+//input element to type in game code
+var nameInput;
+
+function setupNameInput (canv) {
+    nameInput = createElement('input');
+    nameInput.canv = canv;
+    nameInput.hide();
+    nameInput.size(200,75);
+    nameInput.class('gameInput');
+}
+
+//gets value of codeInput 
+function getNameInput () {
+    return nameInput.elt.value.trim();
+}
+
+function hideNameInput () {
+    nameInput.hide();
+}
+
+function drawNameMenu () {
+    //refresh screen
+    clear();
+
+    //draw background
+    drawMenuGrid();
+
+    //draw create game button
+    createGameButton.draw();
+
+    //draw text for code entry
+    stroke('black');
+    strokeWeight(2);
+    fill('black');
+    textSize(40);
+    text("- OR -", game.screenWidth/2, game.screenHeight*17/40);
+    text("Enter Game Code:", game.screenWidth/2, game.screenHeight*16/30);
+
+    //draw create game button
+    joinButton.draw();
+
+    drawMenuCrosshair();
+
+    //display input for game code
+    codeInput.position(
+        codeInput.canv.position().x + game.screenWidth/2 - codeInput.size().width/2 + 5, //need to offset by 5 for some reason
+        codeInput.canv.position().y + game.screenHeight*2/3 - codeInput.size().height/2
+    );
+    codeInput.show();
+}
+
+function clickNameMenu () {
     if (createGameButton.mouseOver()) {
         return "new game";
     }

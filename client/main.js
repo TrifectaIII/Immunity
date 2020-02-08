@@ -2,7 +2,7 @@
 /////////////////////////////
 
 //game state
-var state = 'menu';
+var state = 'serverMenu';
 
 //socket object
 var socket;
@@ -27,7 +27,7 @@ function join_game(code) {
     //reset if no space in room
     socket.once('room_full', function () {
         socket.close();
-        state = 'menu';
+        state = 'serverMenu';
     });
 
     //confirm room joining
@@ -87,36 +87,59 @@ function setup () {
 function draw () {
     switch (state) {
         //draw game from game.js
-        case "game":
+        case 'game':
             drawGame();
             break;
 
         //draw loading screen from menu.js
-        case "load":
+        case 'load':
             drawLoading();
             break;
 
-        //draw menu from menu.js
-        case "menu":
+        //draw server menu from menu.js
+        case 'serverMenu':
             drawServerMenu();
             break;
+
+        //draw name menu from menu.js
+        case 'nameMenu':
+            break;
+
     }
 }
 
+//look for button clicks during menus
 function mouseClicked () {
     switch (state) {
-        case "menu":
+        case 'serverMenu':
             switch (clickServerMenu()) {
-                case "new game":
+                case 'new game':
                     hideCodeInput();
                     join_game('new_game');
                     break;
-                case "join":
+                case 'join':
                     if (getCodeInput() != '') {
                         hideCodeInput();
                         join_game(getCodeInput());
                     }
                     break;
+            }
+            break;
+        case 'nameMenu':
+            break;
+    }
+}
+
+//look for enter presses on menu
+function keyPressed () {
+    switch (state) {
+        case 'serverMenu':
+            if (keyCode == ENTER) {
+                if (getCodeInput() != '') {
+                    hideCodeInput();
+                    join_game(getCodeInput());
+                }
+                return false;
             }
             break;
     }

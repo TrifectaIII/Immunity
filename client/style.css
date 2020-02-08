@@ -42,7 +42,7 @@ p span {
     color:red;
 }
 
-.codeInput {
+.gameInput {
     box-sizing:border-box;
     border: 5px solid black;
     outline: none;

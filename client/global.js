@@ -1,7 +1,7 @@
 //game settings from server
 var game = {
-    screenWidth: 600,
-    screenHeight: 600,
+    screenWidth: 800,
+    screenHeight: 800,
 }
 
 //returns random integer between low and high, inclusive

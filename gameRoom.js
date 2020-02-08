@@ -11,8 +11,8 @@ var game = {
     height: 1500,
 
     //size of client canvas
-    screenWidth: 600,
-    screenHeight: 600,
+    screenWidth: 800,
+    screenHeight: 800,
 
     // starting health
     maxHealth: 10,
