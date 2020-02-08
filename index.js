@@ -25,6 +25,9 @@ app.use('/client',express.static(__dirname + '/client'));
 // GAME TOOLS
 ///////////////////////////////////////////////////
 
+//include gameRoom constructor from gameRoom.js
+var gameRoom = require('./gameRoom.js');
+
 //Global Server Settings
 var game = {
     //max players per room
