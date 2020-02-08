@@ -91,6 +91,10 @@ function randint(low,high) {
     return Math.floor(Math.random()*(low+1-high) +high)
 }
 
+function sizeOf (obj) {
+    return Object.keys(obj).length;
+}
+
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
 
@@ -118,15 +122,7 @@ io.sockets.on('connection', function (socket) {
         console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
         if ('gameCode' in socket) {
-            for (let i=0; i<gameRooms[socket.gameCode].players.length; i++) {
-                if (socket.id == gameRooms[socket.gameCode].players[i].id) {
-                    gameRooms[socket.gameCode].players[i] = 'none';
-                    if (gameRooms[socket.gameCode].players == Array(game.roomCap).fill('none')) {
-                        delete gameRooms[socket.gameCode];
-                    }
-                    break;
-                }
-            }
+            delete gameRooms[socket.gameCode].players[socket.id];
             // console.log(gameRooms);
         }        
     })
@@ -150,9 +146,10 @@ io.sockets.on('connection', function (socket) {
 
             gameRooms[gameCode] = {
                 shots: {},
-                players: Array(game.roomCap).fill('none'),
+                players: {},
             }
-            gameRooms[gameCode].players[0] = socket;
+
+            gameRooms[gameCode].players[socket.id] = socket;
 
             socket.emit('joined',gameCode);
 
@@ -160,17 +157,12 @@ io.sockets.on('connection', function (socket) {
         }
 
         //add to room if room has empty space
-        else if (code in gameRooms && gameRooms[code].players.includes('none')) {
+        else if (code in gameRooms && sizeOf(gameRooms[code].players) < 4) {
             socket.gameCode = code;
 
             socket.join(code);
 
-            for (let i=0; i<gameRooms[code].players.length; i++) {
-                if (gameRooms[code].players[i] == 'none') {
-                    gameRooms[code].players[i] = socket;
-                    break;
-                }
-            }
+            gameRooms[code].players[socket.id] = socket;
 
             socket.emit('joined',code);
 
@@ -304,15 +296,13 @@ setInterval(function () {
 
         //collect info on players from sockets
         var player_info = {};
-        for (let i=0; i<room.players.length; i++) {
-            let player = room.players[i]
-            if (player != 'none') {
-                player_info[player.id] = {};
-                player_info[player.id].x = player.x;
-                player_info[player.id].y = player.y;
-                player_info[player.id].color = player.color;
-                player_info[player.id].health = player.health;
-            }
+        for (let id in room.players) {
+            let player = room.players[id]
+            player_info[player.id] = {};
+            player_info[player.id].x = player.x;
+            player_info[player.id].y = player.y;
+            player_info[player.id].color = player.color;
+            player_info[player.id].health = player.health;
         }
 
         //handle shots
@@ -328,8 +318,8 @@ setInterval(function () {
             let destroyed = false;
 
             // check for collisions with enemies
-            for (let i=0; i<room.players.length; i++) {
-                let enemy = room.players[i];
+            for (let id in room.players) {
+                let enemy = room.players[id];
                 if (enemy.alive && enemy.id != shot.socket && distance(enemy, shot) < 27) {
                     if (enemy.health > 0) {
                         enemy.health -= 1;
