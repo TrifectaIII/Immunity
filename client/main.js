@@ -10,6 +10,9 @@ var socket;
 //current game code
 var gameCode;
 
+//p5 canvas
+var canv;
+
 //function to join the game
 function join_game(code) {
 
@@ -41,7 +44,7 @@ function join_game(code) {
         minimapSetup();
 
         //Start shoot eventListener from shoot.js
-        start_shoot();
+        start_shoot(canv.elt);
 
         //recieve player info from server
         socket.on ('game_update', function (player_info, shot_info) {
@@ -69,7 +72,7 @@ function preload () {
 
 // p5 setup
 function setup () {
-    let canv = createCanvas(game.screenWidth, game.screenHeight);
+    canv = createCanvas(game.screenWidth, game.screenHeight);
     canv.parent('canvas-hold');
     strokeWeight(2);
     stroke('black');

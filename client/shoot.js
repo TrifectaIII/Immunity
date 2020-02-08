@@ -1,9 +1,8 @@
 // adds listeners for shooting
-function start_shoot () {
-    var canvas = document.querySelector('canvas');
+function start_shoot (canvas_element) {
 
     //shoot on click
-    canvas.addEventListener('click', function (event) {
+    canvas_element.addEventListener('click', function (event) {
         event.preventDefault();
         if (state == "game" && 
             socket.id in players && 
