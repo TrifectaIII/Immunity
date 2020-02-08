@@ -1,3 +1,9 @@
+//player info from server
+var players = {}
+
+//shots info from server
+var shots = {}
+
 //object to hold info re: screen offset based on player position
 var screen_offset = {
     x:0,

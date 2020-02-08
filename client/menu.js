@@ -1,39 +1,105 @@
-function drawServerMenu () {
-    //refresh screen
-    clear()
-    background('#5F574F');
+// draw cosshair for menu
+function drawMenuCrosshair () {
+    stroke("black");
+    strokeWeight(2);
+    fill(0,0);
+    ellipse(mouseX, mouseY, 30, 30);
+    line(mouseX+20, mouseY, mouseX-20, mouseY);
+    line(mouseX, mouseY+20, mouseX, mouseY-20);
+}
 
-    //draw create game button
+//button objects
+function Button (text, x, y, width, height, colorOff, colorOn) {
+    this.text = text;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.colorOn = colorOn;
+    this.colorOff = colorOff;
+}
+
+//checks if mouse os over the button
+Button.prototype.mouseOver = function () {
+    return (mouseX > this.x - this.width/2 &&
+        mouseX < this.x + this.width/2 &&
+        mouseY > this.y - this.height/2 &&
+        mouseY < this.y + this.height/2);
+}
+
+//draws button
+Button.prototype.draw = function () {
+
+    //draw box
     stroke('black');
-    strokeWeight(3);
-    fill('#1D2B53');
-    if (mouseX > game.screenWidth/5 &&
-        mouseX < game.screenWidth*4/5 &&
-        mouseY > game.screenHeight/4-50 &&
-        mouseY < game.screenHeight/4+50) {
-            fill('#29ADFF');
+    strokeWeight(4);
+    fill(this.colorOff);
+    if (this.mouseOver()) {
+        fill(this.colorOn);
     }
-    rect(
-            game.screenWidth/5, game.screenHeight/4-50,
-            game.screenWidth*3/5, 100
-        )
+    rect(this.x-this.width/2,this.y-this.height/2, this.width, this.height);
 
     //draw text
     stroke('black');
     strokeWeight(3);
     fill('#FFF1E8');
     textSize(40);
-    text("CREATE NEW GAME", game.screenWidth/2, game.screenHeight/4);
-    text("OR", game.screenWidth/2, game.screenHeight/2);
-    text("USE GAME CODE", game.screenWidth/2, game.screenHeight*2/3);
+    text(this.text, this.x, this.y);
+}
+
+// Server Menu
+///////////////////////////////////////
+var createGameButton = new Button(
+    "New Game", 
+    game.screenWidth/2, game.screenHeight/4, 
+    250, 100, 
+    '#1D2B53', '#29ADFF'
+);
+
+var joinButton = new Button(
+    "Join",
+    game.screenWidth/2, game.screenHeight*5/6,
+    150, 100,
+    '#008751', '#00E436'
+)
+
+function drawServerMenu () {
+    //refresh screen
+    clear();
+    background('#5F574F');
+
+    //draw create game button
+    createGameButton.draw();
+
+    //draw text for code entry
+    stroke('black');
+    strokeWeight(3);
+    fill('#FFF1E8');
+    textSize(40);
+    text("Enter Game Code:", game.screenWidth/2, game.screenHeight/2);
+
+    //draw create game button
+    joinButton.draw();
 
     drawMenuCrosshair();
 }
 
+function clickServerMenu () {
+    if (createGameButton.mouseOver()) {
+        return "new game";
+    }
+    if (joinButton.mouseOver()) {
+        return "join";
+    }
+}
+
+// Loading Screen
+///////////////////////////////////////
+
 var loadingProg = 0;
 var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
 
-// draw loading screen
+
 function drawLoading () {
     //refresh screen
     clear()
@@ -61,14 +127,4 @@ function drawLoading () {
     }
     
     drawMenuCrosshair();
-}
-
-// draw cosshair for menu
-function drawMenuCrosshair () {
-    stroke("black");
-    strokeWeight(2);
-    fill(0,0);
-    ellipse(mouseX, mouseY, 30, 30);
-    line(mouseX+20, mouseY, mouseX-20, mouseY);
-    line(mouseX, mouseY+20, mouseX, mouseY-20);
 }

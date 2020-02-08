@@ -1,39 +1,29 @@
+//game state
+var state = 'menu';
+
+//connect to socket
 var socket = io();
-
-//global game state
-var state = 'loading';
-
-//game settings from server
-var game = {
-    screenWidth: 600,
-    screenHeight: 600,
-}
-
-//player info from server
-var players = {}
-
-//shots info from server
-var shots = {}
 
 // p5 setup when settings recieved from server
 socket.once('game_settings', function (settings) {
     game = settings;
     resizeCanvas(game.screenWidth,game.screenHeight);
 
-    //Start shoot eventListener from shoot.js
-    start_shoot();
-
     //set up minimap settings from game.js
     minimapSetup();
 
-    //change state
-    state = 'game';
+    //Start shoot eventListener from shoot.js
+    start_shoot();
 });
 
 //recieve player info from server
 socket.on ('game_update', function (player_info, shot_info) {
+    //save to objects in game.js
     players = player_info;
     shots = shot_info;
+
+    //change state
+    state = 'game';
 });
 
 var homespunFont;
@@ -48,7 +38,6 @@ function setup () {
     createCanvas(game.screenWidth, game.screenHeight).parent('canvas-hold');
     strokeWeight(2);
     stroke('black');
-
     textAlign(CENTER, CENTER);
     textFont(homespunFont);
 }
@@ -64,15 +53,26 @@ function draw () {
         //draw loading screen from menu.js
         case "loading":
             drawLoading();
-            // drawServerMenu(); //just for testing
+            break;
+
+        //draw menu from menu.js
+        case "menu":
+            drawServerMenu();
             break;
     }
 }
 
-//returns random integer between low and high, inclusive
-function randint(low,high) {
-    if (high > low) {
-        return Math.floor(Math.random()*(high+1-low) +low);
+function mouseClicked () {
+    switch (state) {
+        case "menu":
+            switch (clickServerMenu()) {
+                case "new game":
+                    console.log('new game')
+                    break;
+                case "join":
+                    console.log('join')
+                    break;
+            }
+            break;
     }
-    return Math.floor(Math.random()*(low+1-high) +high);
 }
