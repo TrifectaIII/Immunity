@@ -205,7 +205,7 @@ function drawLiving () {
                     fill(game.colorPairs[player.color][0]);
                     rect(
                         player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
-                        x_offset*2*(player.health/game.health_start), 5*(y_offset/y_offset_abs),
+                        x_offset*2*(player.health/game.maxHealth), 5*(y_offset/y_offset_abs),
                     );
             }
         }
@@ -274,12 +274,12 @@ function drawMainbar (player, prog) {
 
 //draw client players healthbar
 function drawHealthbar (player) {
-    drawMainbar(player, player.health/game.health_start);
+    drawMainbar(player, player.health/game.maxHealth);
     stroke('black');
     strokeWeight(4);
     textSize(20);
     fill('#FFF1E8');
-    text(player.health.toString()+' / '+game.health_start.toString() ,game.screenWidth/2,game.screenHeight-17);
+    text(player.health.toString()+' / '+game.maxHealth.toString() ,game.screenWidth/2,game.screenHeight-17);
 }
 
 //draws minimap 

@@ -23,10 +23,10 @@ function start_shoot (canvas_element) {
                     let player = players[socket.id];
                     let vels = [];
                     for (let i = -2; i <= 2; i++) {
-                        let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.full_spread_angle);
+                        let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.fullSpreadAngle);
                         vels.push(vel);
                     }
-                    socket.emit('full_spread', vels)
+                    socket.emit('full_spread', vels);
             }
         }
     });
@@ -40,7 +40,7 @@ function angle(x, y, dest_x, dest_y) {
 //calculates component velocities of shot based on velocity and angle
 function velocity(ang) {
     return {
-        x:Math.sin(ang) * game.shot_speed,
-        y:Math.cos(ang) * game.shot_speed,
+        x:Math.sin(ang) * game.shotSpeed,
+        y:Math.cos(ang) * game.shotSpeed,
     };
 }

@@ -47,10 +47,10 @@ function join_game(code) {
         start_shoot(canv.elt);
 
         //recieve player info from server
-        socket.on ('game_update', function (player_info, shot_info) {
+        socket.on ('game_update', function (game_info) {
             //save to objects in game.js
-            players = player_info;
-            shots = shot_info;
+            players = game_info.player_info;
+            shots = game_info.shot_info;
 
             //change state
             if (state != 'game') {
