@@ -40,12 +40,11 @@ function drawGame () {
 
         //refresh screen
         clear()
-        background('#FFF1E8');
 
         //calculate screen offset based on player position
         calcOffset(player);
 
-        //draw grid
+        //draw grid background
         drawGrid();
 
         //draw dead players
@@ -100,6 +99,7 @@ function calcOffset (player) {
 
 //draw grid to visually indicate movement around world
 function drawGrid () {
+    background('#FFF1E8');
     strokeWeight(1);
     stroke('#C2C3C7');
     for (let x = 100; x < game.width; x+=100) {

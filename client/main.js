@@ -51,7 +51,7 @@ function draw () {
             break;
 
         //draw loading screen from menu.js
-        case "loading":
+        case "load":
             drawLoading();
             break;
 

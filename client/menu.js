@@ -8,6 +8,25 @@ function drawMenuCrosshair () {
     line(mouseX, mouseY+20, mouseX, mouseY-20);
 }
 
+//draw grid background for menus
+function drawMenuGrid () {
+    background('#FFF1E8');
+    strokeWeight(1);
+    stroke('#C2C3C7');
+    for (let x = 100; x < game.screenWidth; x+=100) {
+        line(
+            x, 0,
+            x, game.screenWidth
+        );
+    }
+    for (let y = 100; y < game.screenHeight; y+=100) {
+        line(
+            0, y,
+            game.screenHeight, y
+        );
+    }
+}
+
 //button objects
 function Button (text, x, y, width, height, colorOff, colorOn) {
     this.text = text;
@@ -41,7 +60,7 @@ Button.prototype.draw = function () {
 
     //draw text
     stroke('black');
-    strokeWeight(3);
+    strokeWeight(4);
     fill('#FFF1E8');
     textSize(40);
     text(this.text, this.x, this.y);
@@ -66,16 +85,19 @@ var joinButton = new Button(
 function drawServerMenu () {
     //refresh screen
     clear();
-    background('#5F574F');
+
+    //draw background
+    drawMenuGrid();
 
     //draw create game button
     createGameButton.draw();
 
     //draw text for code entry
     stroke('black');
-    strokeWeight(3);
-    fill('#FFF1E8');
+    strokeWeight(2);
+    fill('black');
     textSize(40);
+    text("- OR -", game.screenWidth/2, game.screenHeight*2/5);
     text("Enter Game Code:", game.screenWidth/2, game.screenHeight/2);
 
     //draw create game button
@@ -103,12 +125,14 @@ var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
 function drawLoading () {
     //refresh screen
     clear()
-    background('#5F574F');
+
+    //draw background
+    drawMenuGrid();
 
     //draw text
     stroke('black');
-    strokeWeight(3);
-    fill('#29ADFF');
+    strokeWeight(2);
+    fill('black');
     textSize(40);
     text("Loading...", game.screenWidth/2, game.screenHeight/2);
 
