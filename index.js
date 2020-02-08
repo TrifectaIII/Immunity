@@ -28,7 +28,7 @@ app.use('/client',express.static(__dirname + '/client'));
 //Global Server Settings
 var game = {
     //max players per room
-    roomCap: 4,
+    roomCap: 6,
 
     //space between server updates in MS
     tickRate: 20,
@@ -98,9 +98,6 @@ function sizeOf (obj) {
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
 
-//counter to generate game codes
-var gameCodeCounter = 100;
-
 //object to hold individual game rooms
 var gameRooms = {};
 
@@ -116,13 +113,18 @@ io.sockets.on('connection', function (socket) {
 	console.log('NEW USER. ID: ',socket.id);
     console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
-    //log a disconnect, and remove from gameroom
+    //log a disconnect
     socket.once('disconnect', function () {
         console.log('USER DC. ID: ',socket.id);
         console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
+        //remove from room
         if ('gameCode' in socket) {
             delete gameRooms[socket.gameCode].players[socket.id];
+            //if room empty, delete it
+            if (sizeOf(gameRooms[socket.gameCode].players) <= 0) {
+                delete gameRooms[socket.gameCode];
+            }
             // console.log(gameRooms);
         }        
     })
@@ -137,7 +139,10 @@ io.sockets.on('connection', function (socket) {
 
         //create new room on request
         if (code == 'new_game' || !(code in gameRooms)) {
-            gameCodeCounter += 1;
+            let gameCodeCounter = 101
+            while (gameCodeCounter.toString() in gameRooms) {
+                gameCodeCounter += 1;
+            }
             let gameCode = gameCodeCounter.toString();
 
             socket.gameCode = gameCode;

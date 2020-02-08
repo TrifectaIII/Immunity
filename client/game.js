@@ -66,16 +66,14 @@ function drawGame () {
             drawPlayer(player);
         }
 
-        //draw minimap
-        drawMinimap();
-
         //draw death message if client player is dead
         deathMsg(player);
 
-        // draw crosshair
-        drawCrosshair(player);
-
         //draw UI
+
+        //draw minimap
+        drawMinimap();
+
         if (player.health > 0) {
             //draw healthbar, then erase time of death
             drawHealthbar(player);
@@ -90,6 +88,9 @@ function drawGame () {
         }
 
         drawGameCode(player);
+
+        // draw crosshair
+        drawCrosshair(player);
     }
 }
 
