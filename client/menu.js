@@ -68,6 +68,7 @@ Button.prototype.draw = function () {
 
 // Server Menu
 ///////////////////////////////////////
+
 var createGameButton = new Button(
     "New Game", 
     game.screenWidth/2, game.screenHeight/4, 
@@ -81,6 +82,26 @@ var joinButton = new Button(
     150, 100,
     '#008751', '#00E436'
 )
+
+//input element to type in game code
+var codeInput;
+
+function setupCodeInput (canv) {
+    codeInput = createElement('input');
+    codeInput.canv = canv;
+    codeInput.hide();
+    codeInput.size(200,75);
+    codeInput.class('codeInput');
+}
+
+//gets value of codeInput 
+function getCodeInput () {
+    return codeInput.elt.value;
+}
+
+function hideCodeInput () {
+    codeInput.hide();
+}
 
 function drawServerMenu () {
     //refresh screen
@@ -104,6 +125,13 @@ function drawServerMenu () {
     joinButton.draw();
 
     drawMenuCrosshair();
+
+    //display input for game code
+    codeInput.position(
+        codeInput.canv.position().x + game.screenWidth/2 - codeInput.size().width/2 + 5, //need to offset by 5 for some reason
+        codeInput.canv.position().y + game.screenHeight*2/3 - codeInput.size().height/2
+    );
+    codeInput.show();
 }
 
 function clickServerMenu () {

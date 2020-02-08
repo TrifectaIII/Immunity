@@ -41,3 +41,13 @@ canvas {
 p span {
     color:red;
 }
+
+.codeInput {
+    box-sizing:border-box;
+    border: 5px solid black;
+    outline: none;
+    font-size: 30px;
+    font-family: 'Press Start 2P', cursive;
+    text-align:center;
+}
+

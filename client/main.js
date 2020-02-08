@@ -23,7 +23,10 @@ socket.on ('game_update', function (player_info, shot_info) {
     shots = shot_info;
 
     //change state
-    state = 'game';
+    if (state != 'game') {
+        state = 'game';
+        hideCodeInput();
+    }
 });
 
 var homespunFont;
@@ -35,11 +38,15 @@ function preload () {
 
 // p5 setup
 function setup () {
-    createCanvas(game.screenWidth, game.screenHeight).parent('canvas-hold');
+    let canv = createCanvas(game.screenWidth, game.screenHeight);
+    canv.parent('canvas-hold');
     strokeWeight(2);
     stroke('black');
     textAlign(CENTER, CENTER);
     textFont(homespunFont);
+
+    //setup input element for menu
+    setupCodeInput(canv);
 }
 
 // p5 drawing
