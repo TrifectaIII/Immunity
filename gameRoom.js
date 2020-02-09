@@ -33,10 +33,10 @@ var game = {
     fullSpreadLifespan: 15,
 
     //number of shots per full spread
-    fullSpreadCount: 5,
+    fullSpreadCount: 3,
 
     //angle between each shot of full spread
-    fullSpreadAngle:Math.PI/32,
+    fullSpreadAngle: Math.PI/16,
 
     //colors for each player to tell them apart
     colorPairs:{

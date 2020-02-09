@@ -13,17 +13,22 @@ function start_shoot (canvas_element) {
         }
     });
 
-    // full spread on space
     document.addEventListener('keypress', function (event) {
-        if (event.keyCode == 32) {
+        if (event.keyCode == 32) {//space key
             event.preventDefault();
             if (state == "game" && 
                 socket.id in players &&
                 players[socket.id].health > 0) {
                     let player = players[socket.id];
                     let vels = [];
-                    for (let i = -2; i <= 2; i++) {
-                        let vel = velocity(angle(player.x, player.y, mouseX+screen_offset.x, mouseY+screen_offset.y) + i * game.fullSpreadAngle);
+                    for (let i = 0; i < game.fullSpreadCount; i++) {
+                        let vel = velocity(
+                            angle(
+                                player.x, player.y, 
+                                mouseX+screen_offset.x, mouseY+screen_offset.y
+                            ) 
+                            + (i - game.fullSpreadCount/2 + 0.5) * game.fullSpreadAngle
+                        );
                         vels.push(vel);
                     }
                     socket.emit('full_spread', vels);
