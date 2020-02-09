@@ -78,10 +78,8 @@ function preload () {
 function setup () {
     canv = createCanvas(game.screenWidth, game.screenHeight);
     canv.parent('canvas-hold');
-    strokeWeight(2);
-    stroke('black');
-    textAlign(CENTER, CENTER);
     textFont(homespunFont);
+    textAlign(CENTER,CENTER);
 
     //setup input for server menu
     setupCodeInput(canv);

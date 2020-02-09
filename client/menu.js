@@ -1,15 +1,18 @@
 // draw cosshair for menu
 function drawMenuCrosshair () {
+    push();
     stroke("black");
     strokeWeight(2);
     fill(0,0);
     ellipse(mouseX, mouseY, 30, 30);
     line(mouseX+20, mouseY, mouseX-20, mouseY);
     line(mouseX, mouseY+20, mouseX, mouseY-20);
+    pop();
 }
 
 //draw grid background for menus
 function drawMenuGrid () {
+    push();
     background('#FFF1E8');
     strokeWeight(1);
     stroke('#C2C3C7');
@@ -25,6 +28,7 @@ function drawMenuGrid () {
             game.screenHeight, y
         );
     }
+    pop();
 }
 
 //button objects
@@ -48,7 +52,8 @@ Button.prototype.mouseOver = function () {
 
 //draws button
 Button.prototype.draw = function () {
-
+    push();
+    textAlign(CENTER, CENTER);
     //draw box
     stroke('black');
     strokeWeight(4);
@@ -64,6 +69,7 @@ Button.prototype.draw = function () {
     fill('#FFF1E8');
     textSize(40);
     text(this.text, this.x, this.y);
+    pop();
 }
 
 // Server Menu
@@ -104,6 +110,9 @@ function hideCodeInput () {
 }
 
 function drawServerMenu () {
+    push();
+    textAlign(CENTER, CENTER);
+
     //refresh screen
     clear();
 
@@ -132,6 +141,7 @@ function drawServerMenu () {
         codeInput.canv.position().y + game.screenHeight*2/3 - codeInput.size().height/2
     );
     codeInput.show();
+    pop();
 }
 
 function clickServerMenu () {
@@ -174,6 +184,9 @@ function hideNameInput () {
 }
 
 function drawNameMenu () {
+    push();
+    textAlign(CENTER, CENTER);
+
     //refresh screen
     clear();
 
@@ -198,6 +211,7 @@ function drawNameMenu () {
         nameInput.canv.position().y + game.screenHeight/2 - nameInput.size().height/2
     );
     nameInput.show();
+    pop();
 }
 
 function clickNameMenu () {
@@ -212,6 +226,9 @@ var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
 
 
 function drawLoading () {
+    push();
+    textAlign(CENTER, CENTER);
+
     //refresh screen
     clear()
 
@@ -240,4 +257,6 @@ function drawLoading () {
     }
     
     drawMenuCrosshair();
+
+    pop();
 }

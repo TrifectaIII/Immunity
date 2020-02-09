@@ -33,6 +33,8 @@ function drawGame () {
     if (socket.id in players) {
         let player = players[socket.id];
 
+        push();
+
         //send movement data only if alive
         if (player.health > 0) {
             sendMove();
@@ -95,6 +97,9 @@ function drawGame () {
 
         // draw crosshair
         drawCrosshair(player);
+
+
+        pop();
     }
 }
 
@@ -106,27 +111,34 @@ function calcOffset (player) {
 
 //draw grid to visually indicate movement around world
 function drawGrid () {
-    background('#FFF1E8');
+    push();
     strokeWeight(1);
     stroke('#C2C3C7');
+    background('#FFF1E8');
     for (let x = 100; x < game.width; x+=100) {
         if (x-screen_offset.x > 0 &&
             x-screen_offset.x < game.screenWidth) {
-                line(x-screen_offset.x, 0,
-                        x-screen_offset.x, game.screenWidth);
+                line(
+                    x-screen_offset.x, 0,
+                    x-screen_offset.x, game.screenWidth
+                );
         }
     }
     for (let y = 100; y < game.height; y+=100) {
             if (y-screen_offset.y > 0 &&
                 y-screen_offset.y < game.screenHeight) {
-                    line(0, y-screen_offset.y,
-                         game.screenHeight, y-screen_offset.y);
+                    line(
+                        0, y-screen_offset.y,
+                        game.screenHeight, y-screen_offset.y
+                    );
             }
         }
+    pop();
 }
 
 //draw all shots
 function drawShots() {
+    push();
     strokeWeight(2);
     for (let id in shots) {
         let shot = shots[id];
@@ -139,10 +151,12 @@ function drawShots() {
                 ellipse(shot.x-screen_offset.x, shot.y-screen_offset.y, 10, 10);
         }
     }
+    pop();
 }
 
 //draw dead players 
 function drawDead () {
+    push();
     for (let id in players) {
         if (id != socket.id) {
             let player = players[id];
@@ -175,10 +189,12 @@ function drawDead () {
             }
         }
     }
+    pop();
 }
 
 //draw living players
 function drawLiving () {
+    push();
     for (let id in players) {
         if (id != socket.id) {
             let player = players[id];
@@ -216,10 +232,12 @@ function drawLiving () {
             }
         }
     }
+    pop();
 }
 
 //draw client's player
 function drawPlayer (player) {
+    push();
     fill(game.colorPairs[player.color][0]);
     stroke(game.colorPairs[player.color][1]);
     strokeWeight(2);
@@ -237,34 +255,41 @@ function drawPlayer (player) {
              player.x-screen_offset.x-25,
              player.y-screen_offset.y+25);
     }
+    pop();
 }
 
 //tint screen and display message when player is dead
 function deathMsg (player) {
     if (player.health <= 0) {
+        push();
+        textAlign(CENTER, CENTER);
         background(0, 200);
         fill(game.colorPairs[player.color][0]);
         stroke('black');
         strokeWeight(3);
         textSize(40);
         text("YOU ARE DEAD", game.screenWidth/2, game.screenHeight/2);
+        pop();
     }
 }
 
 //draw cosshair
 function drawCrosshair (player) {
+    push();
     stroke(game.colorPairs[player.color][1]);
     strokeWeight(2);
     fill(0,0);
     ellipse(mouseX, mouseY, 30, 30);
     line(mouseX+20, mouseY, mouseX-20, mouseY);
     line(mouseX, mouseY+20, mouseX, mouseY-20);
+    pop();
 }
 
 //draws the main bar at bottom of the screen
 function drawMainbar (player, prog) {
     //prog is ratio from 0 to 1
     prog = Math.min(1,Math.max(0,prog));
+    push();
     strokeWeight(0);
     fill('black');
     rect(
@@ -276,20 +301,25 @@ function drawMainbar (player, prog) {
         game.screenWidth/4, game.screenHeight - 25,
         game.screenWidth/2*(prog), 20
     );
+    pop();
 }
 
 //draw client players healthbar
 function drawHealthbar (player) {
+    push();
+    textAlign(CENTER, CENTER);
     drawMainbar(player, player.health/game.maxHealth);
     stroke('black');
     strokeWeight(4);
     textSize(20);
     fill('#FFF1E8');
     text(player.health.toString()+' / '+game.maxHealth.toString() ,game.screenWidth/2,game.screenHeight-17);
+    pop();
 }
 
 //draws minimap 
 function drawMinimap () {
+    push();
     //draw minimap background
     strokeWeight(0);
     fill(0, 150);
@@ -323,12 +353,13 @@ function drawMinimap () {
         (player.y/game.height)*minimap.height + minimap.offset.y,
         minimap.pip_size*1.25, minimap.pip_size*1.25,
     );
+    pop();
 }
 
 //display room code so others can join
 function drawRoomId (player) {
     push();
-    textAlign(LEFT);
+    textAlign(LEFT, CENTER);
     stroke('black');
     strokeWeight(0);
     textSize(30);
@@ -342,7 +373,7 @@ function drawRoomId (player) {
 function drawPlayerInfo () {
     push();
     rectMode(CORNERS);
-    textAlign(RIGHT);
+    textAlign(RIGHT, CENTER);
     stroke('black');
     strokeWeight(0);
     textSize(30);
