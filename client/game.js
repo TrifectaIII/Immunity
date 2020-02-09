@@ -91,7 +91,7 @@ function drawGame () {
         drawRoomId(player);
 
         //draw names of players
-        drawPlayerText();
+        drawPlayerInfo();
 
         // draw crosshair
         drawCrosshair(player);
@@ -200,12 +200,14 @@ function drawLiving () {
                     if (player.y-screen_offset.y > game.screenHeight - 50) {
                         y_offset = -35;
                     }
-                    strokeWeight(0);
+                    stroke(game.colorPairs[player.color][1]);
+                    strokeWeight(2);
                     fill('black');
                     rect(
-                        player.x-x_offset-1-screen_offset.x, player.y + y_offset-(y_offset/y_offset_abs)-screen_offset.y, 
-                        x_offset*2 + 2, 7*(y_offset/y_offset_abs),
+                        player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
+                        x_offset*2, 5*(y_offset/y_offset_abs),
                     );
+                    strokeWeight(0);
                     fill(game.colorPairs[player.color][0]);
                     rect(
                         player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
@@ -337,17 +339,39 @@ function drawRoomId (player) {
     pop();
 }
 
-function drawPlayerText () {
+function drawPlayerInfo () {
     push();
+    rectMode(CORNERS);
     textAlign(RIGHT);
     stroke('black');
     strokeWeight(0);
     textSize(30);
     let counter = 0;
     for (let id in players) {
+        //draw name and killstreak
         let player = players[id];
         fill(game.colorPairs[player.color][1]);
-        text(player.name + ' : '+player.killStreak, game.screenWidth-15, 20+counter*40);
-        counter++
+        text(player.name + ' : '+player.killStreak, game.screenWidth-15, 20+counter*50);
+        
+        //draw healthbar
+        let barWidth = 110;
+        let barHeight = 6;
+        let barOffset = 15;
+        fill('black');
+        stroke(game.colorPairs[player.color][1]);
+        strokeWeight(2);
+        rect(
+            game.screenWidth-(barWidth+barOffset), 40+counter*50, 
+            game.screenWidth-(barOffset), 40+counter*50 + barHeight
+        );
+        strokeWeight(0);
+        fill(game.colorPairs[player.color][0]);
+        rect(
+            game.screenWidth-barOffset - barWidth*(player.health/game.maxHealth), 40+counter*50, 
+            game.screenWidth-(barOffset), 40+counter*50 + barHeight
+        );
+
+        counter++;
     }
+    pop();
 }
