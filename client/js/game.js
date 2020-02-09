@@ -173,7 +173,11 @@ function drawDead () {
                     fill(fillcolor);
                     stroke(strokecolor);
                     strokeWeight(2);
-                    ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
+                    ellipse(
+                        player.x-screen_offset.x, player.y-screen_offset.y, 
+                        game.playerRadius*2 - 1, 
+                        game.playerRadius*2 - 1
+                    );
 
                     //draw death cross
                     strokeWeight(5);
@@ -207,7 +211,11 @@ function drawLiving () {
                     fill(game.colorPairs[player.color][0]);
                     stroke(game.colorPairs[player.color][1]);
                     strokeWeight(2);
-                    ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
+                    ellipse(
+                        player.x-screen_offset.x, player.y-screen_offset.y, 
+                        game.playerRadius*2 - 1, 
+                        game.playerRadius*2 - 1
+                    );
 
                     //draw healthbar
                     let x_offset = 15
@@ -241,7 +249,12 @@ function drawPlayer (player) {
     fill(game.colorPairs[player.color][0]);
     stroke(game.colorPairs[player.color][1]);
     strokeWeight(2);
-    ellipse(player.x-screen_offset.x, player.y-screen_offset.y, 50, 50);
+    ellipse(
+        player.x-screen_offset.x, 
+        player.y-screen_offset.y, 
+        game.playerRadius*2 - 1, 
+        game.playerRadius*2 - 1
+    );
     //draw death cross if dead
     if (player.health <= 0) {
         strokeWeight(5);

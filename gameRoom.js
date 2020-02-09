@@ -16,14 +16,17 @@ var game = {
     screenWidth: 800,
     screenHeight: 800,
 
-    // starting health
+    // starting health for players
     maxHealth: 10,
 
-    //time in MS to respawn
+    // time in MS to respawn players
     respawnTime: 3000,
 
     //players speed
     playerSpeed: 5,
+
+    //size of player
+    playerRadius: 25,
 
     //speed of shots + full spread
     shotSpeed: 15,
@@ -131,7 +134,7 @@ Room.prototype.update = function () {
             let enemy = this.players[id];
             if (enemy.alive && 
                 enemy.id != shot.socketId && 
-                distance(enemy, shot) < 27) {
+                distance(enemy, shot) < game.playerRadius) {
                     if (enemy.health > 0) {
                         enemy.health -= 1;
                         destroyed = true;
@@ -184,7 +187,6 @@ Room.prototype.update = function () {
         player_info: player_info,
         shot_info: shot_info,
     }
-    // this.io.to(this.roomId).emit('game_update', player_info, shot_info);
 }
 
 //add a socket if space available
@@ -217,6 +219,7 @@ Room.prototype.addSocket = function (socket) {
         //save room context for listeners
         let room = this;
 
+        //lets player move 
         socket.on('move', function (direction) {
             if (socket.alive) {
                 switch (direction) {
