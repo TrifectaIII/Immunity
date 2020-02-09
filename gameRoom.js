@@ -253,6 +253,16 @@ Room.prototype.addSocket = function (socket) {
                         break;
                 }
 
+                //Loop through each enemy player after moving
+                for (let id in room.players) {
+                    if (id != socket.id) {
+                        let enemySocket = room.players[id];
+                        //DO BALL COLLISION HERE
+                        //use game.playerRadius to access radius
+                        
+                    }
+                }
+
                 //boundaries
                 socket.x = Math.max(socket.x, 0);
                 socket.x = Math.min(socket.x, game.width);
