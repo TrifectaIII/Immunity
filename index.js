@@ -1,17 +1,17 @@
 // SETUP
 ///////////////////////////////////////////////////
 
-var express = require('express'); // load express package
-var app = express(); //create express app
-var serv = require('http').Server(app); //serve http over app
-var io = require('socket.io')(serv); // connect socket.io to server
+const express = require('express'); // load express package
+const app = express(); //create express app
+const serv = require('http').Server(app); //serve http over app
+const io = require('socket.io')(serv); // connect socket.io to server
 
 
 // HTTP SERVER
 ///////////////////////////////////////////////////
 
 //Start Server
-serv.listen(process.env.PORT); // specified port or 8k as backup
+serv.listen(process.env.PORT || 8000); // specified port or 8k as backup
 
 //route main page in index
 app.get('/',function(req, res) {
@@ -26,7 +26,8 @@ app.use('/client',express.static(__dirname + '/client'));
 ///////////////////////////////////////////////////
 
 //include gameRoom constructor from gameRoom.js
-var gameRoom = require('./gameRoom.js');
+const gameRoom = require('./gameRoom.js');
+
 
 // SOCKET HANDLING
 ///////////////////////////////////////////////////
