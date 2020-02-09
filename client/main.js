@@ -2,27 +2,28 @@
 /////////////////////////////
 
 //game state
-var state = 'serverMenu';
+var state = 'nameMenu';
 
 //socket object
 var socket;
 
 //current game code
-var gameCode;
+var roomId;
 
 //p5 canvas
 var canv;
 
+//players name
+var name;
+
 //function to join the game
-function join_game(code) {
+function join_game() {
 
     state = 'load'
 
-    gameCode = code;
-
     socket = io();
 
-    socket.emit('join_game', code);
+    socket.emit('join_game', roomId, name);
 
     //reset if no space in room
     socket.once('room_full', function () {
@@ -31,13 +32,16 @@ function join_game(code) {
     });
 
     //confirm room joining
-    socket.once('joined', function (code) {
-        gameCode = code;
+    socket.once('joined', function (newId) {
+        roomId = newId;
     });
 
     // setup game when receive settings
     socket.once('game_settings', function (settings) {
+
+        //update settings object
         game = settings;
+
         resizeCanvas(game.screenWidth,game.screenHeight);
 
         //set up minimap settings from game.js
@@ -79,8 +83,12 @@ function setup () {
     textAlign(CENTER, CENTER);
     textFont(homespunFont);
 
-    //setup input element for menu
+    //setup input for server menu
     setupCodeInput(canv);
+
+    //setup input for name menu
+    setupNameInput(canv);
+
 }
 
 // p5 drawing
@@ -103,8 +111,8 @@ function draw () {
 
         //draw name menu from menu.js
         case 'nameMenu':
+            drawNameMenu();
             break;
-
     }
 }
 
@@ -115,17 +123,24 @@ function mouseClicked () {
             switch (clickServerMenu()) {
                 case 'new game':
                     hideCodeInput();
-                    join_game('new_game');
+                    roomId = 'new_game'
+                    join_game();
                     break;
                 case 'join':
                     if (getCodeInput() != '') {
                         hideCodeInput();
-                        join_game(getCodeInput());
+                        roomId = getCodeInput();
+                        join_game();
                     }
                     break;
             }
             break;
         case 'nameMenu':
+            if (clickNameMenu() && getNameInput() != '') {
+                name = getNameInput();
+                hideNameInput();
+                state = 'serverMenu';
+            }
             break;
     }
 }
@@ -137,7 +152,18 @@ function keyPressed () {
             if (keyCode == ENTER) {
                 if (getCodeInput() != '') {
                     hideCodeInput();
-                    join_game(getCodeInput());
+                    roomId = getCodeInput();
+                    join_game();
+                }
+                return false;
+            }
+            break;
+        case 'nameMenu':
+            if (keyCode == ENTER) {
+                if (getNameInput() != '') {
+                    name = getNameInput();
+                    hideNameInput();
+                    state = 'serverMenu';
                 }
                 return false;
             }

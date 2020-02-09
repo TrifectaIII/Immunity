@@ -87,7 +87,11 @@ function drawGame () {
             drawMainbar(player, deathTime/game.respawnTime);
         }
 
-        drawGameCode(player);
+        //draw info about the current gameRoom
+        drawRoomId(player);
+
+        //draw names of players
+        drawPlayerText();
 
         // draw crosshair
         drawCrosshair(player);
@@ -320,15 +324,30 @@ function drawMinimap () {
 }
 
 //display room code so others can join
-function drawGameCode (player) {
+function drawRoomId (player) {
     push();
     textAlign(LEFT);
     stroke('black');
     strokeWeight(0);
     textSize(30);
     fill(game.colorPairs[player.color][1]);
-    text('Room Code: '+gameCode, 15, 20);
+    text('Room Code: '+roomId, 15, 20);
 
     text('Players: '+Object.keys(players).length.toString()+'/'+game.roomCap, 15, 60)
     pop();
+}
+
+function drawPlayerText () {
+    push();
+    textAlign(RIGHT);
+    stroke('black');
+    strokeWeight(0);
+    textSize(30);
+    let counter = 0;
+    for (let id in players) {
+        let player = players[id];
+        fill(game.colorPairs[player.color][1]);
+        text(player.name + ' : '+player.killStreak, game.screenWidth-15, 20+counter*40);
+        counter++
+    }
 }

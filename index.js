@@ -74,7 +74,10 @@ io.sockets.on('connection', function (socket) {
     ////////////////////////////////
 
     //connect socket to room
-    socket.on('join_game', function (roomId) {
+    socket.once ('join_game', function (roomId, name) {
+
+        //set name of socket
+        socket.name = name.substring(0,6);
 
         //create new room on request
         if (roomId == 'new_game' || !(roomId in gameRooms)) {

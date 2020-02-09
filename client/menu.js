@@ -148,7 +148,7 @@ function clickServerMenu () {
 
 var setNameButton = new Button(
     "SUBMIT", 
-    game.screenWidth/2, game.screenHeight/4, 
+    game.screenWidth/2, game.screenHeight*2/3, 
     250, 100, 
     '#AB5236', '#FFEC27'
 );
@@ -160,7 +160,7 @@ function setupNameInput (canv) {
     nameInput = createElement('input');
     nameInput.canv = canv;
     nameInput.hide();
-    nameInput.size(200,75);
+    nameInput.size(400,75);
     nameInput.class('gameInput');
 }
 
@@ -181,36 +181,27 @@ function drawNameMenu () {
     drawMenuGrid();
 
     //draw create game button
-    createGameButton.draw();
+    setNameButton.draw();
 
     //draw text for code entry
     stroke('black');
     strokeWeight(2);
     fill('black');
     textSize(40);
-    text("- OR -", game.screenWidth/2, game.screenHeight*17/40);
-    text("Enter Game Code:", game.screenWidth/2, game.screenHeight*16/30);
-
-    //draw create game button
-    joinButton.draw();
+    text("Enter Name:", game.screenWidth/2, game.screenHeight/3);
 
     drawMenuCrosshair();
 
     //display input for game code
-    codeInput.position(
-        codeInput.canv.position().x + game.screenWidth/2 - codeInput.size().width/2 + 5, //need to offset by 5 for some reason
-        codeInput.canv.position().y + game.screenHeight*2/3 - codeInput.size().height/2
+    nameInput.position(
+        nameInput.canv.position().x + game.screenWidth/2 - nameInput.size().width/2 + 5, //need to offset by 5 for some reason
+        nameInput.canv.position().y + game.screenHeight/2 - nameInput.size().height/2
     );
-    codeInput.show();
+    nameInput.show();
 }
 
 function clickNameMenu () {
-    if (createGameButton.mouseOver()) {
-        return "new game";
-    }
-    if (joinButton.mouseOver()) {
-        return "join";
-    }
+    return setNameButton.mouseOver();
 }
 
 // Loading Screen

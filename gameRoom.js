@@ -75,6 +75,9 @@ function spawnSocket(socket,game) {
     //give max health
     socket.health = game.maxHealth;
 
+    //reset killstreak
+    socket.killStreak = 0;
+
     //set to alive
     socket.alive = true;
 }
@@ -91,19 +94,6 @@ function Room (roomId) {
 
 //updates room for update loop
 Room.prototype.update = function () {
-
-    //collect info on players from sockets
-    var player_info = {};
-
-    for (let id in this.players) {
-        let player = this.players[id];
-        player_info[id] = {
-            x: player.x,
-            y: player.y,
-            color: player.color,
-            health: player.health,
-        };
-    }
 
     //handle shots
     var shot_info = {};
@@ -128,6 +118,7 @@ Room.prototype.update = function () {
                         destroyed = true;
                         enemy.alive = enemy.health > 0;
                         if (!enemy.alive) {
+                            this.players[shot.socketId].killStreak += 1;
                             setTimeout(function () {
                                 spawnSocket(enemy, game);
                             }, game.respawnTime)
@@ -154,6 +145,21 @@ Room.prototype.update = function () {
         }
     }
 
+    //collect info on players from sockets
+    var player_info = {};
+
+    for (let id in this.players) {
+        let player = this.players[id];
+        player_info[id] = {
+            x: player.x,
+            y: player.y,
+            color: player.color,
+            health: player.health,
+            name: player.name,
+            killStreak: player.killStreak,
+        };
+    }
+
     //return player and shot object for emit to players
     return {
         player_info: player_info,
@@ -165,12 +171,16 @@ Room.prototype.update = function () {
 //add a socket if space available
 Room.prototype.addSocket = function (socket) {
     if (this.getPop() < game.roomCap) {
+
         //add to players object
         this.players[socket.id] = socket;
+
         //join socketio room
         socket.join(this.roomId);
+
         //set roomId to socket
         socket.roomId = this.roomId;
+
         //confirm join with server
         socket.emit('joined',this.roomId);
 
