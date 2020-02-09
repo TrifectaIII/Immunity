@@ -1,4 +1,6 @@
 //Global Server Settings
+///////////////////////////////////////////
+
 var game = {
     //max players per room
     roomCap: 6,
@@ -50,6 +52,10 @@ var game = {
 //players component speed when moving @ angle
 game.playerSpeedAngle = game.playerSpeed/(Math.sqrt(2));
 
+
+// Helper Functions
+///////////////////////////////////////////
+
 //returns random integer between low and high, inclusive
 function randint(low,high) {
     if (high > low) {
@@ -64,6 +70,19 @@ function distance(socket, shot) {
         Math.pow(socket.x-shot.x, 2) + 
         Math.pow(socket.y-shot.y ,2)
     );
+}
+
+//calculates angle of vector between player position and shot destination
+function angle(x, y, dest_x, dest_y) {
+    return Math.atan2(dest_x - x, dest_y - y);
+}
+
+//calculates component velocities of shot based on velocity and angle
+function velocity(ang) {
+    return {
+        x:Math.sin(ang) * game.shotSpeed,
+        y:Math.cos(ang) * game.shotSpeed,
+    };
 }
 
 //function which spawns or respawns a socket
@@ -240,8 +259,12 @@ Room.prototype.addSocket = function (socket) {
         });
 
         //handle shooting
-        socket.on('shoot', function (vel) {
+        socket.on('shoot', function (dest_x, dest_y) {
             if (socket.alive) {
+                //calculate velocity based on shot speed and where the player clicked
+                vel = velocity(angle(socket.x, socket.y, dest_x, dest_y));
+
+                //create new shot object
                 var id = Math.random();
                 room.shots[id] = {};
                 room.shots[id].x = socket.x;
@@ -254,23 +277,29 @@ Room.prototype.addSocket = function (socket) {
         });
 
         //handle full spread
-        socket.on('full_spread', function (vels) {
-            try {
-                if (socket.alive) {
-                    vels.forEach(function (vel) {
-                        var id = Math.random();
-                        room.shots[id] = {};
-                        room.shots[id].x = socket.x;
-                        room.shots[id].y = socket.y;
-                        room.shots[id].color = socket.color;
-                        room.shots[id].socketId = socket.id;
-                        room.shots[id].velocity = vel;
-                        room.shots[id].lifespan = game.fullSpreadLifespan;
-                    });
+        socket.on('full_spread', function (dest_x, dest_y) {
+            if (socket.alive) {
+                //calculate velocity for each shot in spread, based on 
+                // pellet count and angle
+                for (let i = 0; i < game.fullSpreadCount; i++) {
+
+                    let vel = velocity(
+                        angle(
+                            socket.x, socket.y, 
+                            dest_x, dest_y
+                        ) 
+                        + (i - game.fullSpreadCount/2 + 0.5) * game.fullSpreadAngle
+                    );
+
+                    var id = Math.random();
+                    room.shots[id] = {};
+                    room.shots[id].x = socket.x;
+                    room.shots[id].y = socket.y;
+                    room.shots[id].color = socket.color;
+                    room.shots[id].socketId = socket.id;
+                    room.shots[id].velocity = vel;
+                    room.shots[id].lifespan = game.fullSpreadLifespan;
                 }
-            }
-            catch (error) {
-                console.log('fullspread failed: ',error)
             }
         });
     }
