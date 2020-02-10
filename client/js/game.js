@@ -5,7 +5,7 @@ var players = {}
 var shots = {}
 
 //object to hold info re: screen offset based on player position
-var screen_offset = {
+var screenOffset = {
     x:0,
     y:0,
 }
@@ -48,6 +48,11 @@ function drawGame () {
 
         //draw grid background
         drawGrid();
+
+        //draw game area borders only if screen too big 
+        if (game.screenWidth > game.width || game.screenHeight > game.height) {
+            drawBorders();
+        }
 
         //draw dead players
         drawDead();
@@ -105,8 +110,57 @@ function drawGame () {
 
 //calculate screen offset based on player position
 function calcOffset (player) {
-    screen_offset.x = Math.min(Math.max(0, player.x - game.screenWidth/2), game.width-game.screenWidth);
-    screen_offset.y = Math.min(Math.max(0, player.y - game.screenHeight/2), game.height-game.screenHeight);
+    
+    //account for screens too large for the game area
+    if (game.screenWidth > game.width) {
+        screenOffset.x = (game.width-game.screenWidth)/2;
+    }
+    else {
+        screenOffset.x = Math.min(Math.max(0, player.x - game.screenWidth/2), game.width-game.screenWidth);
+    }
+    if (game.screenHeight > game.height) {
+        screenOffset.y = (game.height-game.screenHeight)/2;
+    }
+    else {
+        screenOffset.y = Math.min(Math.max(0, player.y - game.screenHeight/2), game.height-game.screenHeight);
+    }
+}
+
+//draws edge of game area
+function drawBorders () {
+    push();
+    strokeWeight(0);
+    fill('#83769C');
+    rectMode(CORNERS);
+    //left
+    if (screenOffset.x < 0) {
+        rect(
+            0, 0, 
+            -screenOffset.x, game.screenHeight
+        )
+    }
+    //right
+    if (screenOffset.x > game.width-game.screenWidth) {
+        rect(
+            game.width - screenOffset.x, 0, 
+            game.screenWidth, game.screenHeight
+        )
+    }
+    //top
+    if (screenOffset.y < 0) {
+        rect(
+            0, 0, 
+            game.screenWidth, -screenOffset.y
+        )
+    }
+    //bottom
+    if (screenOffset.y > game.height-game.screenHeight) {
+        rect(
+            0, game.height - screenOffset.y, 
+            game.screenWidth, game.screenHeight
+        )
+    }
+    pop();
 }
 
 //draw grid to visually indicate movement around world
@@ -116,20 +170,20 @@ function drawGrid () {
     stroke('#C2C3C7');
     background('#FFF1E8');
     for (let x = 100; x < game.width; x+=100) {
-        if (x-screen_offset.x > 0 &&
-            x-screen_offset.x < game.screenWidth) {
+        if (x-screenOffset.x > 0 &&
+            x-screenOffset.x < game.screenWidth) {
                 line(
-                    x-screen_offset.x, 0,
-                    x-screen_offset.x, game.screenWidth
+                    x-screenOffset.x, 0,
+                    x-screenOffset.x, game.screenWidth
                 );
         }
     }
     for (let y = 100; y < game.height; y+=100) {
-            if (y-screen_offset.y > 0 &&
-                y-screen_offset.y < game.screenHeight) {
+            if (y-screenOffset.y > 0 &&
+                y-screenOffset.y < game.screenHeight) {
                     line(
-                        0, y-screen_offset.y,
-                        game.screenHeight, y-screen_offset.y
+                        0, y-screenOffset.y,
+                        game.screenHeight, y-screenOffset.y
                     );
             }
         }
@@ -142,13 +196,13 @@ function drawShots() {
     strokeWeight(2);
     for (let id in shots) {
         let shot = shots[id];
-        if (shot.x-screen_offset.x > 0 &&
-            shot.x-screen_offset.x < game.screenWidth &&
-            shot.y-screen_offset.y > 0 &&
-            shot.y-screen_offset.y < game.screenHeight) {
+        if (shot.x-screenOffset.x > 0 &&
+            shot.x-screenOffset.x < game.screenWidth &&
+            shot.y-screenOffset.y > 0 &&
+            shot.y-screenOffset.y < game.screenHeight) {
                 fill(game.colorPairs[shot.color][0]);
                 stroke(game.colorPairs[shot.color][1]);
-                ellipse(shot.x-screen_offset.x, shot.y-screen_offset.y, 10, 10);
+                ellipse(shot.x-screenOffset.x, shot.y-screenOffset.y, 10, 10);
         }
     }
     pop();
@@ -161,10 +215,10 @@ function drawDead () {
         if (id != socket.id) {
             let player = players[id];
             if (player.health <= 0 &&
-                player.x-screen_offset.x > -50 &&
-                player.x-screen_offset.x < game.screenWidth + 50 &&
-                player.y-screen_offset.y > -50 &&
-                player.y-screen_offset.y < game.screenHeight + 50) {
+                player.x-screenOffset.x > -50 &&
+                player.x-screenOffset.x < game.screenWidth + 50 &&
+                player.y-screenOffset.y > -50 &&
+                player.y-screenOffset.y < game.screenHeight + 50) {
                     //draw player as transparent
                     let fillcolor = color(game.colorPairs[player.color][0]);
                     fillcolor.setAlpha(100);
@@ -174,7 +228,7 @@ function drawDead () {
                     stroke(strokecolor);
                     strokeWeight(2);
                     ellipse(
-                        player.x-screen_offset.x, player.y-screen_offset.y, 
+                        player.x-screenOffset.x, player.y-screenOffset.y, 
                         game.playerRadius*2 - 1, 
                         game.playerRadius*2 - 1
                     );
@@ -182,14 +236,14 @@ function drawDead () {
                     //draw death cross
                     strokeWeight(5);
                     stroke('#FF004D');
-                    line(player.x-screen_offset.x+25,
-                        player.y-screen_offset.y+25,
-                        player.x-screen_offset.x-25,
-                        player.y-screen_offset.y-25);
-                    line(player.x-screen_offset.x+25,
-                        player.y-screen_offset.y-25,
-                        player.x-screen_offset.x-25,
-                        player.y-screen_offset.y+25);
+                    line(player.x-screenOffset.x+25,
+                        player.y-screenOffset.y+25,
+                        player.x-screenOffset.x-25,
+                        player.y-screenOffset.y-25);
+                    line(player.x-screenOffset.x+25,
+                        player.y-screenOffset.y-25,
+                        player.x-screenOffset.x-25,
+                        player.y-screenOffset.y+25);
             }
         }
     }
@@ -203,16 +257,16 @@ function drawLiving () {
         if (id != socket.id) {
             let player = players[id];
             if (player.health > 0 &&
-                player.x-screen_offset.x > -50 &&
-                player.x-screen_offset.x < game.screenWidth + 50 &&
-                player.y-screen_offset.y > -50 &&
-                player.y-screen_offset.y < game.screenHeight + 50) {
+                player.x-screenOffset.x > -50 &&
+                player.x-screenOffset.x < game.screenWidth + 50 &&
+                player.y-screenOffset.y > -50 &&
+                player.y-screenOffset.y < game.screenHeight + 50) {
                     //draw player
                     fill(game.colorPairs[player.color][0]);
                     stroke(game.colorPairs[player.color][1]);
                     strokeWeight(2);
                     ellipse(
-                        player.x-screen_offset.x, player.y-screen_offset.y, 
+                        player.x-screenOffset.x, player.y-screenOffset.y, 
                         game.playerRadius*2 - 1, 
                         game.playerRadius*2 - 1
                     );
@@ -221,20 +275,20 @@ function drawLiving () {
                     let x_offset = 15
                     let y_offset_abs = 35;
                     let y_offset = y_offset_abs;
-                    if (player.y-screen_offset.y > game.screenHeight - 50) {
+                    if (player.y-screenOffset.y > game.screenHeight - 50) {
                         y_offset = -35;
                     }
                     stroke(game.colorPairs[player.color][1]);
                     strokeWeight(2);
                     fill('black');
                     rect(
-                        player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
+                        player.x - x_offset-screenOffset.x, player.y + y_offset-screenOffset.y, 
                         x_offset*2, 5*(y_offset/y_offset_abs),
                     );
                     strokeWeight(0);
                     fill(game.colorPairs[player.color][0]);
                     rect(
-                        player.x - x_offset-screen_offset.x, player.y + y_offset-screen_offset.y, 
+                        player.x - x_offset-screenOffset.x, player.y + y_offset-screenOffset.y, 
                         x_offset*2*(player.health/game.maxHealth), 5*(y_offset/y_offset_abs),
                     );
             }
@@ -250,8 +304,8 @@ function drawPlayer (player) {
     stroke(game.colorPairs[player.color][1]);
     strokeWeight(2);
     ellipse(
-        player.x-screen_offset.x, 
-        player.y-screen_offset.y, 
+        player.x-screenOffset.x, 
+        player.y-screenOffset.y, 
         game.playerRadius*2 - 1, 
         game.playerRadius*2 - 1
     );
@@ -259,14 +313,14 @@ function drawPlayer (player) {
     if (player.health <= 0) {
         strokeWeight(5);
         stroke('#FF004D');
-        line(player.x-screen_offset.x+25,
-             player.y-screen_offset.y+25,
-             player.x-screen_offset.x-25,
-             player.y-screen_offset.y-25);
-        line(player.x-screen_offset.x+25,
-             player.y-screen_offset.y-25,
-             player.x-screen_offset.x-25,
-             player.y-screen_offset.y+25);
+        line(player.x-screenOffset.x+25,
+             player.y-screenOffset.y+25,
+             player.x-screenOffset.x-25,
+             player.y-screenOffset.y-25);
+        line(player.x-screenOffset.x+25,
+             player.y-screenOffset.y-25,
+             player.x-screenOffset.x-25,
+             player.y-screenOffset.y+25);
     }
     pop();
 }

@@ -9,7 +9,7 @@ function start_shoot (canvas_element) {
             players[socket.id].health > 0) {
                 socket.emit(
                     'shoot', 
-                    mouseX+screen_offset.x, mouseY+screen_offset.y //x and y of mouse
+                    mouseX+screenOffset.x, mouseY+screenOffset.y //x and y of mouse
                 );
         }
     });
@@ -22,7 +22,7 @@ function start_shoot (canvas_element) {
                 players[socket.id].health > 0) {
                     socket.emit(
                         'full_spread', 
-                        mouseX+screen_offset.x, mouseY+screen_offset.y //x and y of mouse
+                        mouseX+screenOffset.x, mouseY+screenOffset.y //x and y of mouse
                     );
             }
         }
