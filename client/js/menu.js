@@ -175,7 +175,7 @@ var nameInput;
 function setupNameInput (canv) {
     nameInput = createElement('input');
     nameInput.canv = canv;
-    nameInput.elt.maxlength = 6;
+    nameInput.elt.maxLength = 6;
     nameInput.hide();
     nameInput.size(300,75);
     nameInput.class('gameInput');

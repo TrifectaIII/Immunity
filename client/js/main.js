@@ -79,6 +79,8 @@ function preload () {
 // p5 setup
 function setup () {
     canv = createCanvas(windowWidth, windowHeight);
+    canv.parent('canvas-hold');
+
     textFont(homespunFont);
     textAlign(CENTER,CENTER);
 

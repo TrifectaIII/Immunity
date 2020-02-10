@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap');
+@import url(https://fonts.googleapis.com/css?family=Aldrich);
 
 /* color palette from https://lospec.com/palette-list/pico-8     */
 :root {
@@ -20,14 +20,7 @@
     --p8-tan:#FFCCAA;
 }
 
-/* body {
-    text-align:center;
-    font-family: 'Press Start 2P', cursive;
-    background-color:var(--p8-blue);
-    color:var(--p8-yellow);
-} */
-
-html, body { /* just to be sure these are full screen*/
+html, body { 
     width:100%; 
     height:100%; 
     margin:0; 
@@ -35,7 +28,6 @@ html, body { /* just to be sure these are full screen*/
 } 
 
 canvas {
-    /* border:5px solid var(--p8-darkblue); */
     display:block;
     margin:0; 
     padding:0; 
@@ -50,16 +42,12 @@ canvas {
     user-select: none;
 }
 
-/* p span {
-    color:red;
-} */
-
 .gameInput {
     box-sizing:border-box;
     border: 5px solid black;
     outline: none;
-    font-size: 30px;
-    font-family: 'Press Start 2P', cursive;
+    font-size: 35px;
+    font-family: 'Aldrich', sans-serif;
     text-align:center;
     padding:0px;
     margin:0px;
