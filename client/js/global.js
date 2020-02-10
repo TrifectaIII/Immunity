@@ -1,9 +1,3 @@
-//game settings from server
-var game = {
-    screenWidth: 800,
-    screenHeight: 800,
-}
-
 //returns random integer between low and high, inclusive
 function randint(low,high) {
     if (high > low) {

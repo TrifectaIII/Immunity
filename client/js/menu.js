@@ -16,16 +16,16 @@ function drawMenuGrid () {
     background('#FFF1E8');
     strokeWeight(1);
     stroke('#C2C3C7');
-    for (let x = 100; x < game.screenWidth; x+=100) {
+    for (let x = 100; x < windowWidth; x+=100) {
         line(
             x, 0,
-            x, game.screenWidth
+            x, windowHeight
         );
     }
-    for (let y = 100; y < game.screenHeight; y+=100) {
+    for (let y = 100; y < windowHeight; y+=100) {
         line(
             0, y,
-            game.screenHeight, y
+            windowWidth, y
         );
     }
     pop();
@@ -75,20 +75,6 @@ Button.prototype.draw = function () {
 // Server Menu
 ///////////////////////////////////////
 
-var createGameButton = new Button(
-    "New Game", 
-    game.screenWidth/2, game.screenHeight/4, 
-    250, 100, 
-    '#1D2B53', '#29ADFF'
-);
-
-var joinButton = new Button(
-    "Join",
-    game.screenWidth/2, game.screenHeight*5/6,
-    150, 100,
-    '#008751', '#00E436'
-)
-
 //input element to type in game code
 var codeInput;
 
@@ -109,7 +95,33 @@ function hideCodeInput () {
     codeInput.hide();
 }
 
+var createGameButton;
+var joinButton;
+
 function drawServerMenu () {
+
+    if (!createGameButton) {
+        createGameButton = new Button(
+            "New Game", 
+            windowWidth/2, windowHeight/4, 
+            250, 100, 
+            '#1D2B53', '#29ADFF'
+        );
+    }
+    createGameButton.x = windowWidth/2;
+    createGameButton.y = windowHeight/4;
+
+    if(!joinButton) {
+        joinButton = new Button(
+            "Join",
+            windowWidth/2, windowHeight*5/6,
+            150, 100,
+            '#008751', '#00E436'
+        );
+    }
+    joinButton.x = windowWidth/2;
+    joinButton.y = windowHeight*5/6;
+
     push();
     textAlign(CENTER, CENTER);
 
@@ -127,8 +139,8 @@ function drawServerMenu () {
     strokeWeight(2);
     fill('black');
     textSize(40);
-    text("- OR -", game.screenWidth/2, game.screenHeight*17/40);
-    text("Enter Game Code:", game.screenWidth/2, game.screenHeight*16/30);
+    text("- OR -", windowWidth/2, windowHeight*17/40);
+    text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
 
     //draw create game button
     joinButton.draw();
@@ -137,8 +149,8 @@ function drawServerMenu () {
 
     //display input for game code
     codeInput.position(
-        codeInput.canv.position().x + game.screenWidth/2 - codeInput.size().width/2 + 5, //need to offset by 5 for some reason
-        codeInput.canv.position().y + game.screenHeight*2/3 - codeInput.size().height/2
+        codeInput.canv.position().x + windowWidth/2 - codeInput.size().width/2,
+        codeInput.canv.position().y + windowHeight*2/3 - codeInput.size().height/2
     );
     codeInput.show();
     pop();
@@ -153,15 +165,8 @@ function clickServerMenu () {
     }
 }
 
-// Server Menu
+// Name Menu
 ///////////////////////////////////////
-
-var setNameButton = new Button(
-    "SUBMIT", 
-    game.screenWidth/2, game.screenHeight*2/3, 
-    250, 100, 
-    '#AB5236', '#FFEC27'
-);
 
 //input element to type in game code
 var nameInput;
@@ -169,8 +174,9 @@ var nameInput;
 function setupNameInput (canv) {
     nameInput = createElement('input');
     nameInput.canv = canv;
+    nameInput.elt.maxlength = 6;
     nameInput.hide();
-    nameInput.size(400,75);
+    nameInput.size(300,75);
     nameInput.class('gameInput');
 }
 
@@ -183,7 +189,21 @@ function hideNameInput () {
     nameInput.hide();
 }
 
+var setNameButton;
+
 function drawNameMenu () {
+
+    if (!setNameButton) {
+        setNameButton = new Button(
+            "SUBMIT", 
+            windowWidth/2, windowHeight*2/3, 
+            250, 100, 
+            '#AB5236', '#FFEC27'
+        );
+    }
+    setNameButton.x = windowWidth/2;
+    setNameButton.y = windowHeight*2/3;
+
     push();
     textAlign(CENTER, CENTER);
 
@@ -201,14 +221,14 @@ function drawNameMenu () {
     strokeWeight(2);
     fill('black');
     textSize(40);
-    text("Enter Name:", game.screenWidth/2, game.screenHeight/3);
+    text("Enter Name:", windowWidth/2, windowHeight/3);
 
     drawMenuCrosshair();
 
     //display input for game code
     nameInput.position(
-        nameInput.canv.position().x + game.screenWidth/2 - nameInput.size().width/2 + 5, //need to offset by 5 for some reason
-        nameInput.canv.position().y + game.screenHeight/2 - nameInput.size().height/2
+        nameInput.canv.position().x + windowWidth/2 - nameInput.size().width/2,
+        nameInput.canv.position().y + windowHeight/2 - nameInput.size().height/2
     );
     nameInput.show();
     pop();
@@ -240,7 +260,7 @@ function drawLoading () {
     strokeWeight(2);
     fill('black');
     textSize(40);
-    text("Loading...", game.screenWidth/2, game.screenHeight/2);
+    text("Loading...", windowWidth/2, windowHeight/2);
 
     loadingProg -= 0.1;
     stroke(loadingColors[Math.floor(-(loadingProg/loadingColors.length)%loadingColors.length)]);
@@ -249,10 +269,10 @@ function drawLoading () {
     let spokeLength = 25;
     for (let i=1; i<=spokes; i++) {
         line(
-            game.screenWidth/2 - Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength, 
-            game.screenHeight/3*2 - Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            game.screenWidth/2 + Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            game.screenHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            windowWidth/2 - Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength, 
+            windowHeight/3*2 - Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            windowWidth/2 + Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            windowHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
         );
     }
     

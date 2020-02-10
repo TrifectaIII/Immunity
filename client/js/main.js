@@ -4,6 +4,7 @@
 //game state
 var state = 'nameMenu';
 
+
 //socket object
 var socket;
 
@@ -15,6 +16,9 @@ var canv;
 
 //players name
 var name;
+
+//game settings from server
+var game;
 
 //function to join the game
 function join_game() {
@@ -41,8 +45,6 @@ function join_game() {
 
         //update settings object
         game = settings;
-
-        resizeCanvas(game.screenWidth,game.screenHeight);
 
         //set up minimap settings from game.js
         minimapSetup();
@@ -76,8 +78,7 @@ function preload () {
 
 // p5 setup
 function setup () {
-    canv = createCanvas(game.screenWidth, game.screenHeight);
-    canv.parent('canvas-hold');
+    canv = createCanvas(windowWidth, windowHeight);
     textFont(homespunFont);
     textAlign(CENTER,CENTER);
 
@@ -87,6 +88,11 @@ function setup () {
     //setup input for name menu
     setupNameInput(canv);
 
+}
+
+//resize canvas to always match window size
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
 
 // p5 drawing

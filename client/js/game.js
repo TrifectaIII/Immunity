@@ -18,12 +18,12 @@ var minimap = {};
 
 //set up minimap settings based on game and screen size
 function minimapSetup () {
-    minimap.width = game.screenWidth/7;
-    minimap.height = game.screenHeight/7;
+    minimap.width = Math.min(200, Math.max(windowWidth/6, windowHeight/6));
+    minimap.height = (minimap.width/game.width) * game.height;
     minimap.overflow = 3;
     minimap.offset = {
         x:minimap.overflow + 3,
-        y:game.screenHeight - minimap.height - minimap.overflow - 3,
+        y:windowHeight - minimap.height - minimap.overflow - 3,
     }
     minimap.pip_size = 5;
 }
@@ -112,17 +112,17 @@ function calcOffset (player) {
     let margin = 100;
     
     //account for screens too large for the game area
-    if (game.screenWidth > game.width + 2*margin) {
-        screenOffset.x = (game.width-game.screenWidth)/2;
+    if (windowWidth > game.width + 2*margin) {
+        screenOffset.x = (game.width-windowWidth)/2;
     }
     else {
-        screenOffset.x = Math.min(Math.max(-margin, player.x - game.screenWidth/2), game.width-game.screenWidth + margin);
+        screenOffset.x = Math.min(Math.max(-margin, player.x - windowWidth/2), game.width-windowWidth + margin);
     }
-    if (game.screenHeight > game.height + 2*margin) {
-        screenOffset.y = (game.height-game.screenHeight)/2;
+    if (windowHeight > game.height + 2*margin) {
+        screenOffset.y = (game.height-windowHeight)/2;
     }
     else {
-        screenOffset.y = Math.min(Math.max(-margin, player.y - game.screenHeight/2), game.height-game.screenHeight + margin);
+        screenOffset.y = Math.min(Math.max(-margin, player.y - windowHeight/2), game.height-windowHeight + margin);
     }
 }
 
@@ -136,28 +136,28 @@ function drawBorders () {
     if (screenOffset.x < 0) {
         rect(
             0, 0, 
-            -screenOffset.x, game.screenHeight
+            -screenOffset.x, windowHeight
         )
     }
     //right
-    if (screenOffset.x > game.width-game.screenWidth) {
+    if (screenOffset.x > game.width-windowWidth) {
         rect(
             game.width - screenOffset.x, 0, 
-            game.screenWidth, game.screenHeight
+            windowWidth, windowHeight
         )
     }
     //top
     if (screenOffset.y < 0) {
         rect(
             0, 0, 
-            game.screenWidth, -screenOffset.y
+            windowWidth, -screenOffset.y
         )
     }
     //bottom
-    if (screenOffset.y > game.height-game.screenHeight) {
+    if (screenOffset.y > game.height-windowHeight) {
         rect(
             0, game.height - screenOffset.y, 
-            game.screenWidth, game.screenHeight
+            windowWidth, windowHeight
         )
     }
     pop();
@@ -171,19 +171,19 @@ function drawGrid () {
     background('#FFF1E8');
     for (let x = 100; x < game.width; x+=100) {
         if (x-screenOffset.x > 0 &&
-            x-screenOffset.x < game.screenWidth) {
+            x-screenOffset.x < windowWidth) {
                 line(
                     x-screenOffset.x, 0,
-                    x-screenOffset.x, game.screenWidth
+                    x-screenOffset.x, windowHeight
                 );
         }
     }
     for (let y = 100; y < game.height; y+=100) {
             if (y-screenOffset.y > 0 &&
-                y-screenOffset.y < game.screenHeight) {
+                y-screenOffset.y < windowHeight) {
                     line(
                         0, y-screenOffset.y,
-                        game.screenHeight, y-screenOffset.y
+                        windowWidth, y-screenOffset.y
                     );
             }
         }
@@ -197,9 +197,9 @@ function drawShots() {
     for (let id in shots) {
         let shot = shots[id];
         if (shot.x-screenOffset.x > 0 &&
-            shot.x-screenOffset.x < game.screenWidth &&
+            shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
-            shot.y-screenOffset.y < game.screenHeight) {
+            shot.y-screenOffset.y < windowHeight) {
                 fill(game.colorPairs[shot.color][0]);
                 stroke(game.colorPairs[shot.color][1]);
                 ellipse(shot.x-screenOffset.x, shot.y-screenOffset.y, 10, 10);
@@ -216,9 +216,9 @@ function drawDead () {
             let player = players[id];
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
-                player.x-screenOffset.x < game.screenWidth + 50 &&
+                player.x-screenOffset.x < windowWidth + 50 &&
                 player.y-screenOffset.y > -50 &&
-                player.y-screenOffset.y < game.screenHeight + 50) {
+                player.y-screenOffset.y < windowHeight + 50) {
                     //draw player as transparent
                     let fillcolor = color(game.colorPairs[player.color][0]);
                     fillcolor.setAlpha(100);
@@ -258,9 +258,9 @@ function drawLiving () {
             let player = players[id];
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
-                player.x-screenOffset.x < game.screenWidth + 50 &&
+                player.x-screenOffset.x < windowWidth + 50 &&
                 player.y-screenOffset.y > -50 &&
-                player.y-screenOffset.y < game.screenHeight + 50) {
+                player.y-screenOffset.y < windowHeight + 50) {
                     //draw player
                     fill(game.colorPairs[player.color][0]);
                     stroke(game.colorPairs[player.color][1]);
@@ -275,7 +275,7 @@ function drawLiving () {
                     let x_offset = 15
                     let y_offset_abs = 35;
                     let y_offset = y_offset_abs;
-                    if (player.y-screenOffset.y > game.screenHeight - 50) {
+                    if (player.y-screenOffset.y > windowHeight - 50) {
                         y_offset = -35;
                     }
                     stroke(game.colorPairs[player.color][1]);
@@ -335,7 +335,7 @@ function deathMsg (player) {
         stroke('black');
         strokeWeight(3);
         textSize(40);
-        text("YOU ARE DEAD", game.screenWidth/2, game.screenHeight/2);
+        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
         pop();
     }
 }
@@ -360,13 +360,13 @@ function drawMainbar (player, prog) {
     strokeWeight(0);
     fill('black');
     rect(
-        game.screenWidth/4-2, game.screenHeight - 27,
-        game.screenWidth/2+4, 24,
+        windowWidth/4-2, windowHeight - 27,
+        windowWidth/2+4, 24,
     );
     fill(game.colorPairs[player.color][0]);
     rect(
-        game.screenWidth/4, game.screenHeight - 25,
-        game.screenWidth/2*(prog), 20
+        windowWidth/4, windowHeight - 25,
+        windowWidth/2*(prog), 20
     );
     pop();
 }
@@ -380,7 +380,7 @@ function drawHealthbar (player) {
     strokeWeight(4);
     textSize(20);
     fill('#FFF1E8');
-    text(player.health.toString()+' / '+game.maxHealth.toString() ,game.screenWidth/2,game.screenHeight-17);
+    text(player.health.toString()+' / '+game.maxHealth.toString() ,windowWidth/2,windowHeight-17);
     pop();
 }
 
@@ -449,7 +449,7 @@ function drawPlayerInfo () {
         //draw name and killstreak
         let player = players[id];
         fill(game.colorPairs[player.color][1]);
-        text(player.name + ' : '+player.killStreak, game.screenWidth-15, 20+counter*50);
+        text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
         
         //draw healthbar
         let barWidth = 110;
@@ -459,14 +459,14 @@ function drawPlayerInfo () {
         stroke(game.colorPairs[player.color][1]);
         strokeWeight(2);
         rect(
-            game.screenWidth-(barWidth+barOffset), 40+counter*50, 
-            game.screenWidth-(barOffset), 40+counter*50 + barHeight
+            windowWidth-(barWidth+barOffset), 40+counter*50, 
+            windowWidth-(barOffset), 40+counter*50 + barHeight
         );
         strokeWeight(0);
         fill(game.colorPairs[player.color][0]);
         rect(
-            game.screenWidth-barOffset - barWidth*(player.health/game.maxHealth), 40+counter*50, 
-            game.screenWidth-(barOffset), 40+counter*50 + barHeight
+            windowWidth-barOffset - barWidth*(player.health/game.maxHealth), 40+counter*50, 
+            windowWidth-(barOffset), 40+counter*50 + barHeight
         );
 
         counter++;

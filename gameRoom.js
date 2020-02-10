@@ -9,12 +9,8 @@ var game = {
     tickRate: 20,
 
     //size of game area
-    width: 1500,
-    height: 1500,
-
-    //size of client canvas
-    screenWidth: 800,
-    screenHeight: 800,
+    width: 3000,
+    height: 3000,
 
     // starting health for players
     maxHealth: 10,
