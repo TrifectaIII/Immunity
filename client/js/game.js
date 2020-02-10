@@ -49,10 +49,8 @@ function drawGame () {
         //draw grid background
         drawGrid();
 
-        //draw game area borders only if screen too big 
-        if (game.screenWidth > game.width || game.screenHeight > game.height) {
-            drawBorders();
-        }
+        //draw game area borders
+        drawBorders();
 
         //draw dead players
         drawDead();
@@ -110,19 +108,21 @@ function drawGame () {
 
 //calculate screen offset based on player position
 function calcOffset (player) {
+
+    let margin = 100;
     
     //account for screens too large for the game area
-    if (game.screenWidth > game.width) {
+    if (game.screenWidth > game.width + 2*margin) {
         screenOffset.x = (game.width-game.screenWidth)/2;
     }
     else {
-        screenOffset.x = Math.min(Math.max(0, player.x - game.screenWidth/2), game.width-game.screenWidth);
+        screenOffset.x = Math.min(Math.max(-margin, player.x - game.screenWidth/2), game.width-game.screenWidth + margin);
     }
-    if (game.screenHeight > game.height) {
+    if (game.screenHeight > game.height + 2*margin) {
         screenOffset.y = (game.height-game.screenHeight)/2;
     }
     else {
-        screenOffset.y = Math.min(Math.max(0, player.y - game.screenHeight/2), game.height-game.screenHeight);
+        screenOffset.y = Math.min(Math.max(-margin, player.y - game.screenHeight/2), game.height-game.screenHeight + margin);
     }
 }
 
@@ -130,7 +130,7 @@ function calcOffset (player) {
 function drawBorders () {
     push();
     strokeWeight(0);
-    fill('#83769C');
+    fill('#C2C3C7');
     rectMode(CORNERS);
     //left
     if (screenOffset.x < 0) {
