@@ -111,6 +111,33 @@ function calcOffset (player) {
     }
 }
 
+//draw grid to visually indicate movement around world
+function drawGrid () {
+    push();
+    strokeWeight(1);
+    stroke('#C2C3C7');
+    background('#FFF1E8');
+    for (let x = 100; x < game.width; x+=100) {
+        if (x-screenOffset.x > 0 &&
+            x-screenOffset.x < windowWidth) {
+                line(
+                    x-screenOffset.x, 0,
+                    x-screenOffset.x, windowHeight
+                );
+        }
+    }
+    for (let y = 100; y < game.height; y+=100) {
+        if (y-screenOffset.y > 0 &&
+            y-screenOffset.y < windowHeight) {
+                line(
+                    0, y-screenOffset.y,
+                    windowWidth, y-screenOffset.y
+                );
+        }
+    }
+    pop();
+}
+
 //draws edge of game area
 function drawBorders () {
     push();
@@ -145,33 +172,6 @@ function drawBorders () {
             windowWidth, windowHeight
         )
     }
-    pop();
-}
-
-//draw grid to visually indicate movement around world
-function drawGrid () {
-    push();
-    strokeWeight(1);
-    stroke('#C2C3C7');
-    background('#FFF1E8');
-    for (let x = 100; x < game.width; x+=100) {
-        if (x-screenOffset.x > 0 &&
-            x-screenOffset.x < windowWidth) {
-                line(
-                    x-screenOffset.x, 0,
-                    x-screenOffset.x, windowHeight
-                );
-        }
-    }
-    for (let y = 100; y < game.height; y+=100) {
-            if (y-screenOffset.y > 0 &&
-                y-screenOffset.y < windowHeight) {
-                    line(
-                        0, y-screenOffset.y,
-                        windowWidth, y-screenOffset.y
-                    );
-            }
-        }
     pop();
 }
 

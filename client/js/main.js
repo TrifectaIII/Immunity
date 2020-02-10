@@ -25,7 +25,28 @@ function join_game() {
 
     state = 'load'
 
-    socket = io();
+    socket = io({
+        reconnection:false,
+    });
+
+    //capture socket errors
+    socket.on('connect_error', function () {
+        console.log('connect_error');
+    })
+
+    socket.on('connect_timeout', function () {
+        console.log('connect_timeout');
+    })
+
+    socket.on('error', function () {
+        console.log('error');
+    })
+
+    socket.on('disconnect', function (reason) {
+        console.log('disconnect');
+        console.log(reason)
+        state = 'serverMenu'
+    })
 
     socket.emit('join_game', roomId, name);
 
