@@ -13,21 +13,6 @@ var screenOffset = {
 // hold time of death
 var deathStart;
 
-//minimap settings
-var minimap = {};
-
-//set up minimap settings based on game and screen size
-function minimapSetup () {
-    minimap.width = Math.min(200, Math.max(windowWidth/6, windowHeight/6));
-    minimap.height = (minimap.width/game.width) * game.height;
-    minimap.overflow = 3;
-    minimap.offset = {
-        x:minimap.overflow + 3,
-        y:windowHeight - minimap.height - minimap.overflow - 3,
-    }
-    minimap.pip_size = 5;
-}
-
 //conglomerate draw function for game objects
 function drawGame () {
     if (socket.id in players) {
@@ -386,15 +371,25 @@ function drawHealthbar (player) {
 
 //draws minimap 
 function drawMinimap () {
+    //settings for the minimap
+    let minimapWidth = Math.min(250, Math.max(windowWidth/6, windowHeight/6));
+    let minimapHeight = (minimapWidth/game.width) * game.height;
+    let minimapOverflow = 3;
+    let minimapOffset = {
+        x:minimapOverflow + 3,
+        y:windowHeight - minimapHeight - minimapOverflow - 3,
+    }
+    let minimapPipSize = 5;
+
     push();
     //draw minimap background
     strokeWeight(0);
     fill(0, 150);
     rect(
-        minimap.offset.x - minimap.overflow,
-        minimap.offset.y - minimap.overflow, 
-        minimap.width + minimap.overflow*2, 
-        minimap.height + minimap.overflow*2
+        minimapOffset.x - minimapOverflow,
+        minimapOffset.y - minimapOverflow, 
+        minimapWidth + minimapOverflow*2, 
+        minimapHeight + minimapOverflow*2
     );
 
     //draw other player pips
@@ -403,9 +398,9 @@ function drawMinimap () {
             let player = players[id];
             fill(game.colorPairs[player.color][0]);
             ellipse(
-                (player.x/game.width)*minimap.width + minimap.offset.x,
-                (player.y/game.height)*minimap.height + minimap.offset.y,
-                minimap.pip_size, minimap.pip_size,
+                (player.x/game.width)*minimapWidth+minimapOffset.x,
+                (player.y/game.height)*minimapHeight + minimapOffset.y,
+                minimapPipSize, minimapPipSize,
             );
         }
     }
@@ -416,9 +411,9 @@ function drawMinimap () {
     stroke('#FFF1E8');
     fill(game.colorPairs[player.color][0]);
     ellipse(
-        (player.x/game.width)*minimap.width + minimap.offset.x,
-        (player.y/game.height)*minimap.height + minimap.offset.y,
-        minimap.pip_size*1.25, minimap.pip_size*1.25,
+        (player.x/game.width)*minimapWidth + minimapOffset.x,
+        (player.y/game.height)*minimapHeight + minimapOffset.y,
+        minimapPipSize*1.25, minimapPipSize*1.25,
     );
     pop();
 }
@@ -431,7 +426,7 @@ function drawRoomId (player) {
     strokeWeight(0);
     textSize(30);
     fill(game.colorPairs[player.color][1]);
-    text('Room Code: '+roomId, 15, 20);
+    text('Game Code: '+roomId, 15, 20);
 
     text('Players: '+Object.keys(players).length.toString()+'/'+game.roomCap, 15, 60)
     pop();

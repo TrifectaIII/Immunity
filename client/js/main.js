@@ -46,9 +46,6 @@ function join_game() {
         //update settings object
         game = settings;
 
-        //set up minimap settings from game.js
-        minimapSetup();
-
         //Start shoot eventListener from shoot.js
         start_shoot(canv.elt);
 
