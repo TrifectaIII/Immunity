@@ -16,13 +16,14 @@ function drawMenuGrid () {
     background('#FFF1E8');
     strokeWeight(1);
     stroke('#C2C3C7');
-    for (let x = 100; x < windowWidth; x+=100) {
+
+    for (let x = (windowWidth%100)/2; x < windowWidth; x+=100) {
         line(
             x, 0,
             x, windowHeight
         );
     }
-    for (let y = 100; y < windowHeight; y+=100) {
+    for (let y = (windowHeight%100)/2; y < windowHeight; y+=100) {
         line(
             0, y,
             windowWidth, y
