@@ -4,7 +4,6 @@
 //game state
 var state = 'nameMenu';
 
-
 //socket object
 var socket;
 
@@ -26,26 +25,35 @@ function join_game() {
     state = 'load'
 
     socket = io({
-        reconnection:false,
+        // reconnection:false,
     });
 
     //capture socket errors
     socket.on('connect_error', function () {
         console.log('connect_error');
+        errors.displayError('Server Connection Error',5000);
+        state = 'serverMenu';
+        socket.close();
     })
 
     socket.on('connect_timeout', function () {
         console.log('connect_timeout');
+        errors.displayError('Server Connection Timeout',5000);
+        state = 'serverMenu';
+        socket.close();
     })
 
     socket.on('error', function () {
         console.log('error');
+        errors.displayError('Socket Error',5000);
     })
 
     socket.on('disconnect', function (reason) {
         console.log('disconnect');
         console.log(reason)
-        state = 'serverMenu'
+        errors.displayError('Server Disconnected: '+reason,5000);
+        state = 'serverMenu';
+        socket.close();
     })
 
     socket.emit('join_game', roomId, name);
@@ -138,6 +146,9 @@ function draw () {
             drawNameMenu();
             break;
     }
+
+    //no matter state, draw error if active
+    errors.drawError();
 }
 
 //look for button clicks during menus
