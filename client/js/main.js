@@ -25,43 +25,45 @@ function join_game() {
     state = 'load'
 
     socket = io({
-        // reconnection:false,
+        reconnection:false,
     });
 
     //capture socket errors
-    socket.on('connect_error', function () {
-        console.log('connect_error');
+    socket.on('connect_error', function (error) {
+        console.log('connect_error', error);
         errors.displayError('Server Connection Error',5000);
         state = 'serverMenu';
         socket.close();
     })
 
-    socket.on('connect_timeout', function () {
-        console.log('connect_timeout');
+    socket.on('connect_timeout', function (timeout) {
+        console.log('connect_timeout', timeout);
         errors.displayError('Server Connection Timeout',5000);
         state = 'serverMenu';
         socket.close();
     })
 
-    socket.on('error', function () {
-        console.log('error');
+    socket.on('error', function (error) {
+        console.log('error', error);
         errors.displayError('Socket Error',5000);
     })
 
+    //return to server menu if disconnected and display error
     socket.on('disconnect', function (reason) {
-        console.log('disconnect');
+        console.log('disconnect', reason);
         console.log(reason)
-        errors.displayError('Server Disconnected: '+reason,5000);
+        errors.displayError('Server Disconnected',5000);
         state = 'serverMenu';
         socket.close();
     })
 
     socket.emit('join_game', roomId, name);
 
-    //reset if no space in room
+    //return to server menu if no space in room and display error
     socket.once('room_full', function () {
-        socket.close();
+        errors.displayError('Game Full',5000);
         state = 'serverMenu';
+        socket.close();
     });
 
     //confirm room joining

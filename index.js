@@ -1,4 +1,4 @@
-// SETUP
+// NODE SETUP
 ///////////////////////////////////////////////////
 
 const express = require('express'); // load express package
@@ -22,30 +22,26 @@ app.get('/',function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 
-// GAME
+// GAME ROOMS
 ///////////////////////////////////////////////////
 
 //include gameRoom constructor from gameRoom.js
 const gameRoom = require('./gameRoom.js');
 
-
-// SOCKET HANDLING
-///////////////////////////////////////////////////
-
 //object to hold individual game rooms
 var gameRooms = {};
 
-
 //generates new, currently-unused roomId
 function generateRoomId(gameRooms) {
-    let roomIdCounter = 101
+    let roomIdCounter = 101;
     while (roomIdCounter.toString() in gameRooms) {
         roomIdCounter += 1;
     }
     return roomIdCounter.toString();
 }
 
-//NEW SOCKET
+// HANDLE NEW SOCKETS
+///////////////////////////////////////////////////
 io.sockets.on('connection', function (socket) {
 
 
@@ -56,8 +52,10 @@ io.sockets.on('connection', function (socket) {
 	console.log('NEW USER. ID: ',socket.id);
     console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
-    //log a disconnect
+    
     socket.once('disconnect', function () {
+
+        //log a disconnect
         console.log('USER DC. ID: ',socket.id);
         console.log("Total Players:", Object.keys(io.sockets.connected).length);
 
@@ -67,8 +65,7 @@ io.sockets.on('connection', function (socket) {
             if (gameRooms[socket.roomId].isEmpty()) {
                 delete gameRooms[socket.roomId];
             }
-            // console.log(gameRooms);
-        }        
+        }     
     })
 
     // JOIN ROOM
@@ -107,7 +104,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 // MAIN GAME LOOP
-////////////////////////////////////////////////////////
+///////////////////////////////////////////////////
 
 setInterval(function () {
     //update each room in turn and emit results to players

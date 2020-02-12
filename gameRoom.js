@@ -30,7 +30,7 @@ var game = {
     //lifespan of shots (in ticks)
     shotLifespan: 40,
 
-    //lifespan of full spread
+    //lifespan of full spread (in ticks)
     fullSpreadLifespan: 15,
 
     //number of shots per full spread
@@ -211,6 +211,7 @@ Room.prototype.addSocket = function (socket) {
         spawnSocket(socket, game);
 
         //SET UP LISTENERS
+        /////////////////////////////////
 
         //save room context for listeners
         let room = this;
@@ -260,10 +261,8 @@ Room.prototype.addSocket = function (socket) {
                 }
 
                 //boundaries
-                socket.x = Math.max(socket.x, 0);
-                socket.x = Math.min(socket.x, game.width);
-                socket.y = Math.max(socket.y, 0);
-                socket.y = Math.min(socket.y, game.height);
+                socket.x = Math.min(Math.max(socket.x, 0), game.width);
+                socket.y = Math.min(Math.max(socket.y, 0), game.height);
             }
         });
 

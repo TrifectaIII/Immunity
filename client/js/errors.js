@@ -33,5 +33,5 @@ var errors = {
         }
     }
 }
-
+// EXAMPLE ERROR EMIT
 // errors.displayError('Testing Testing 123',3000);

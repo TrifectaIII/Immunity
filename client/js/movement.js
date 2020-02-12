@@ -6,6 +6,18 @@ var left = false;
 var up = false;
 var down = false;
 
+//executes func after 100ms
+// x = setTimeout(func, 100);
+
+//executes func every 100ms
+// y = setInterval(func, 100);
+
+//stops a timeout from executing
+// clearTimeout(x);
+
+//stops an interval from continuing to execute
+// clearInterval(y);
+
 //track key downs
 document.addEventListener('keydown', function (event) {
     switch (event.keyCode) {
