@@ -93,7 +93,7 @@ function Room (roomId) {
     this.players = {};
     this.shots = {};
     //enemies not implemented yet
-    this.enemies = {};
+    // this.enemies = {};
 }
 
 // ROOM UPDATE
@@ -240,15 +240,15 @@ Room.prototype.addSocket = function (socket) {
                         break;
                 }
 
-                //Loop through each enemy player after moving
-                for (let id in room.players) {
-                    if (id != socket.id) {
-                        let enemySocket = room.players[id];
-                        //DO BALL COLLISION HERE
-                        //use game.playerRadius to access radius
+                // //Loop through each enemy player after moving
+                // for (let id in room.players) {
+                //     if (id != socket.id) {
+                //         let enemySocket = room.players[id];
+                //         //DO BALL COLLISION HERE
+                //         //use game.playerRadius to access radius
                         
-                    }
-                }
+                //     }
+                // }
 
                 //boundaries
                 socket.x = Math.min(Math.max(socket.x, 0), game.width);
