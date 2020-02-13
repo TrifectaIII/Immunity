@@ -84,22 +84,6 @@ function velocity(ang) {
     };
 }
 
-//function which spawns or respawns a socket
-function spawnSocket(socket,game) {
-    //give random position in world
-    socket.x = randint(100,game.width-100);
-    socket.y = randint(100,game.height-100);
-
-    //give max health
-    socket.health = game.maxHealth;
-
-    //reset killstreak
-    socket.killStreak = 0;
-
-    //set to alive
-    socket.alive = true;
-}
-
 // ROOM CONSTRUCTOR
 ///////////////////////////////////////////
 
@@ -108,9 +92,12 @@ function Room (roomId) {
     this.roomId = roomId;
     this.players = {};
     this.shots = {};
+    //enemies not implemented yet
+    this.enemies = {};
 }
 
-//updates room for update loop
+// ROOM UPDATE
+///////////////////////////////////////////
 Room.prototype.update = function () {
 
     //handle shots
@@ -137,9 +124,11 @@ Room.prototype.update = function () {
                         enemy.alive = enemy.health > 0;
                         if (!enemy.alive) {
                             this.players[shot.socketId].killStreak += 1;
+                            //save room context to variable
+                            let room = this;
                             setTimeout(function () {
-                                spawnSocket(enemy, game);
-                            }, game.respawnTime)
+                                room.spawnSocket(enemy);
+                            }, game.respawnTime);
                         }
                     }
             } 
@@ -185,7 +174,8 @@ Room.prototype.update = function () {
     }
 }
 
-//add a socket if space available
+// ADD SOCKET TO ROOM AND SET IT UP
+///////////////////////////////////////////
 Room.prototype.addSocket = function (socket) {
     if (this.getPop() < game.roomCap) {
 
@@ -208,7 +198,7 @@ Room.prototype.addSocket = function (socket) {
         socket.color = Object.keys(game.colorPairs)[randint(0, Object.keys(game.colorPairs).length-1)];
 
         //spawn socket for first time
-        spawnSocket(socket, game);
+        this.spawnSocket(socket);
 
         //SET UP LISTENERS
         /////////////////////////////////
@@ -313,11 +303,30 @@ Room.prototype.addSocket = function (socket) {
     }
 }
 
+// OTHER ROOM METHODS
+///////////////////////////////////////////
+
 //remove socket if socket exists in room
 Room.prototype.removeSocket = function (socket) {
     if (socket.id in this.players) {
         delete this.players[socket.id];
     }
+}
+
+//spawns or respawns a player
+Room.prototype.spawnSocket = function (socket) {
+    //give random position in world
+    socket.x = randint(100,game.width-100);
+    socket.y = randint(100,game.height-100);
+
+    //give max health
+    socket.health = game.maxHealth;
+
+    //reset killstreak
+    socket.killStreak = 0;
+
+    //set to alive
+    socket.alive = true;
 }
 
 //get current population of room
@@ -336,8 +345,9 @@ Room.prototype.isEmpty = function () {
 }
 
 
-//allow for import into index.js
+// EXPORTS TO index.js
+///////////////////////////////////////////
 module.exports = {
-    Room:Room,
-    settings:game,
+    Room:Room, // room objects
+    settings:game, // game settings
 }

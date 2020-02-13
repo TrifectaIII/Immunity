@@ -1,10 +1,16 @@
+// Error Message System
+
 var errors = {
+    //switch for whether or not error is shown
     active: false,
 
+    //shown error message
     message: "",
 
+    //Timeout object to shut off Message
     timer: undefined,
 
+    //sets error to display with certain message for certain ms
     displayError: function (msg, time) {
         if (time > 0) {
             this.active = true;
@@ -16,6 +22,13 @@ var errors = {
         }
     },
 
+    // hides error message early
+    hideError: function () {
+        clearTimeout(this.timer);
+        this.active = false;
+    },
+
+    //draws error on screen
     drawError: function () {
         if (this.active) {
             push();
@@ -31,7 +44,8 @@ var errors = {
             );
             pop();
         }
-    }
+    },
 }
+
 // EXAMPLE ERROR EMIT
 // errors.displayError('Testing Testing 123',3000);

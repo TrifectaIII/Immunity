@@ -80,16 +80,17 @@ function join_game() {
         //Start shoot eventListener from shoot.js
         start_shoot(canv.elt);
 
+        //change state
+        state = 'game';
+
+        //remove error message if shown
+        errors.hideError();
+
         //recieve player info from server
         socket.on ('game_update', function (game_info) {
             //save to objects in game.js
             players = game_info.player_info;
             shots = game_info.shot_info;
-
-            //change state
-            if (state != 'game') {
-                state = 'game';
-            }
         });
     });
 }
