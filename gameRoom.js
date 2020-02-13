@@ -36,8 +36,8 @@ var game = {
     //number of shots per full spread
     fullSpreadCount: 3,
 
-    //angle between each shot of full spread
-    fullSpreadAngle: Math.PI/16,
+    //angle between edge shots in full spread
+    fullSpreadAngle: Math.PI/4,
 
     //colors for each player to tell them apart
     colorPairs:{
@@ -286,7 +286,8 @@ Room.prototype.addSocket = function (socket) {
                             socket.x, socket.y, 
                             dest_x, dest_y
                         ) 
-                        + (i - game.fullSpreadCount/2 + 0.5) * game.fullSpreadAngle
+                        + (i - game.fullSpreadCount/2 + 0.5) 
+                        * (game.fullSpreadAngle/game.fullSpreadCount)
                     );
 
                     var id = Math.random();
