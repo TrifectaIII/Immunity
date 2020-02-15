@@ -101,22 +101,22 @@ function Room (roomId) {
 
     this.roomId = roomId;
 
+    //hold info about game objects
     this.players = {};
     this.shots = {};
     this.pickups = {};
+    // this.enemies = {}; //enemies not implemented yet
 
     //spawn a health every X ms
     this.pickupSpawner = setInterval(
         this.spawnPickups.bind(this), //bind to room scope
-        game.pickupTime
+        game.pickupTime //interval from game settings
     );
-
-    //enemies not implemented yet
-    // this.enemies = {};
 }
 
 // ROOM UPDATE
 ///////////////////////////////////////////
+//called every game.tickRate ms in index.js
 Room.prototype.update = function () {
 
     //handle shots
@@ -227,6 +227,7 @@ Room.prototype.addSocket = function (socket) {
         socket.on('move', function (direction) {
             if (socket.alive) {
                 switch (direction) {
+                    //diagonal movements use component speed
                     case 'rightup':
                         socket.x += game.playerSpeedAngle;
                         socket.y -= game.playerSpeedAngle;
@@ -243,6 +244,7 @@ Room.prototype.addSocket = function (socket) {
                         socket.x -= game.playerSpeedAngle;
                         socket.y += game.playerSpeedAngle;
                         break;
+                    //cardinal movements use raw speed
                     case 'right':
                         socket.x += game.playerSpeed;
                         break;
@@ -374,6 +376,7 @@ Room.prototype.spawnSocket = function (socket) {
     socket.alive = true;
 }
 
+//spawns pickups into the room based on # of players
 Room.prototype.spawnPickups = function () {
     for (
         let i=0; 

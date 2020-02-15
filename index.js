@@ -80,7 +80,7 @@ io.sockets.on('connection', function (socket) {
         socket.name = name.substring(0,6);
 
         //create new room on request
-        if (roomId == 'new_game' || !(roomId in gameRooms)) {
+        if (roomId == 'new_game') {
             //generate new room id
             let newRoomId = generateRoomId(gameRooms);
             
@@ -97,8 +97,13 @@ io.sockets.on('connection', function (socket) {
         }
 
         //reject socket if room full
-        else {
+        else if (roomId in gameRooms) {
             socket.emit('room_full');
+        }
+
+        //reject socket if no such room
+        else {
+            socket.emit('no_such_room');
         }
     });
 });
