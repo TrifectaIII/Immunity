@@ -9,8 +9,8 @@ var game = {
     tickRate: 20,
 
     //size of game area
-    width: 300,
-    height: 300,
+    width: 1000,
+    height: 1000,
 
     // starting health for players
     maxHealth: 10,
