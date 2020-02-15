@@ -9,8 +9,8 @@ var game = {
     tickRate: 20,
 
     //size of game area
-    width: 3000,
-    height: 3000,
+    width: 300,
+    height: 300,
 
     // starting health for players
     maxHealth: 10,
@@ -39,6 +39,12 @@ var game = {
     //angle between edge shots in full spread
     fullSpreadAngle: Math.PI/6,
 
+    //time between spawns of pickups in ms
+    pickupTime: 5000,
+
+    //max pickups in the world at a time, per player
+    pickupMax: 4,
+
     //colors for each player to tell them apart
     colorPairs:{
         'blue':['#29ADFF','#1D2B53'],
@@ -63,11 +69,11 @@ function randint(low,high) {
     return Math.floor(Math.random()*(low+1-high) +high);
 }
 
-//calculates distance
-function distance(socket, shot) {
+//calculates distance between 2 objects with x and y attributes
+function distance(obj1, obj2) {
     return Math.sqrt(
-        Math.pow(socket.x-shot.x, 2) + 
-        Math.pow(socket.y-shot.y ,2)
+        Math.pow(obj1.x-obj2.x, 2) + 
+        Math.pow(obj1.y-obj2.y ,2)
     );
 }
 
@@ -89,11 +95,18 @@ function velocity(ang) {
 
 //constructor for room objects
 function Room (roomId) {
+
     this.roomId = roomId;
+
     this.players = {};
     this.shots = {};
     this.pickups = {};
-    this.pickupCounter = 0;
+
+    //spawn a health every X ms
+    this.pickupSpawner = setInterval(function () {
+        this.spawnPickup('health');
+    }.bind(this), game.pickupTime);
+
     //enemies not implemented yet
     // this.enemies = {};
 }
@@ -120,17 +133,17 @@ Room.prototype.update = function () {
             if (enemy.alive && 
                 enemy.id != shot.socketId && 
                 distance(enemy, shot) < game.playerRadius) {
+                    //remove health
                     if (enemy.health > 0) {
                         enemy.health -= 1;
                         destroyed = true;
+                        //if enemy dead, set to respawn
                         enemy.alive = enemy.health > 0;
                         if (!enemy.alive) {
                             this.players[shot.socketId].killStreak += 1;
-                            //save room context to variable
-                            let room = this;
                             setTimeout(function () {
-                                room.spawnSocket(enemy);
-                            }, game.respawnTime);
+                                this.spawnSocket(enemy);
+                            }.bind(this), game.respawnTime);
                         }
                     }
             } 
@@ -167,21 +180,6 @@ Room.prototype.update = function () {
             name: player.name,
             killStreak: player.killStreak,
         };
-    }
-
-    // increase pickup counter
-    this.pickupCounter++;
-
-    // create pickup if counter hits threshold
-    if (this.pickupCounter >= 100) {
-        let id = Math.random();
-        this.pickups[id] = {
-            type: "health",
-            x: randint(100, game.width-100),
-            y: randint(100, game.height-100),
-        }
-        //reset counter
-        this.pickupCounter = 0;
     }
 
     //return player and shot object for emit to players
@@ -221,9 +219,6 @@ Room.prototype.addSocket = function (socket) {
         //SET UP LISTENERS
         /////////////////////////////////
 
-        //save room context for listeners
-        let room = this;
-
         //lets player move 
         socket.on('move', function (direction) {
             if (socket.alive) {
@@ -259,9 +254,9 @@ Room.prototype.addSocket = function (socket) {
                 }
 
                 // //Loop through each enemy player after moving
-                // for (let id in room.players) {
+                // for (let id in this.players) {
                 //     if (id != socket.id) {
-                //         let enemySocket = room.players[id];
+                //         let enemySocket = this.players[id];
                 //         //DO BALL COLLISION HERE
                 //         //use game.playerRadius to access radius
                         
@@ -272,7 +267,7 @@ Room.prototype.addSocket = function (socket) {
                 socket.x = Math.min(Math.max(socket.x, 0), game.width);
                 socket.y = Math.min(Math.max(socket.y, 0), game.height);
             }
-        });
+        }.bind(this));
 
         //handle shooting
         socket.on('shoot', function (dest_x, dest_y) {
@@ -282,15 +277,15 @@ Room.prototype.addSocket = function (socket) {
 
                 //create new shot object
                 var id = Math.random();
-                room.shots[id] = {};
-                room.shots[id].x = socket.x;
-                room.shots[id].y = socket.y;
-                room.shots[id].color = socket.color;
-                room.shots[id].socketId = socket.id;
-                room.shots[id].velocity = vel;
-                room.shots[id].lifespan = game.shotLifespan;
+                this.shots[id] = {};
+                this.shots[id].x = socket.x;
+                this.shots[id].y = socket.y;
+                this.shots[id].color = socket.color;
+                this.shots[id].socketId = socket.id;
+                this.shots[id].velocity = vel;
+                this.shots[id].lifespan = game.shotLifespan;
             }
-        });
+        }.bind(this));
 
         //handle full spread
         socket.on('full_spread', function (dest_x, dest_y) {
@@ -309,16 +304,16 @@ Room.prototype.addSocket = function (socket) {
                     );
 
                     var id = Math.random();
-                    room.shots[id] = {};
-                    room.shots[id].x = socket.x;
-                    room.shots[id].y = socket.y;
-                    room.shots[id].color = socket.color;
-                    room.shots[id].socketId = socket.id;
-                    room.shots[id].velocity = vel;
-                    room.shots[id].lifespan = game.fullSpreadLifespan;
+                    this.shots[id] = {};
+                    this.shots[id].x = socket.x;
+                    this.shots[id].y = socket.y;
+                    this.shots[id].color = socket.color;
+                    this.shots[id].socketId = socket.id;
+                    this.shots[id].velocity = vel;
+                    this.shots[id].lifespan = game.fullSpreadLifespan;
                 }
             }
-        });
+        }.bind(this));
     }
 }
 
@@ -346,6 +341,23 @@ Room.prototype.spawnSocket = function (socket) {
 
     //set to alive
     socket.alive = true;
+}
+
+Room.prototype.spawnPickup = function (type) {
+    //max pickups is population * pickupMax
+    if (Object.keys(this.pickups).length < this.getPop() * game.pickupMax){
+        let id = Math.random();
+        this.pickups[id] = {
+            type: type,
+            x: randint(100, game.width-100),
+            y: randint(100, game.height-100),
+        }
+    }
+}
+
+//stops timing events for the room
+Room.prototype.shutdownRoom = function () {
+    clearInterval(this.pickupSpawner);
 }
 
 //get current population of room

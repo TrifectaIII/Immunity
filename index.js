@@ -62,7 +62,9 @@ io.sockets.on('connection', function (socket) {
         //remove from room if in one
         if ('roomId' in socket) {
             gameRooms[socket.roomId].removeSocket(socket);
+            //shut down and delete room if empty
             if (gameRooms[socket.roomId].isEmpty()) {
+                gameRooms[socket.roomId].shutdownRoom();
                 delete gameRooms[socket.roomId];
             }
         }     
