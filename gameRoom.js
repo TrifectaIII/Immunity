@@ -45,6 +45,9 @@ var game = {
     //max pickups in the world at a time, per player
     pickupMax: 4,
 
+    //different types of pickups
+    pickupTypes: ['health'],
+
     //colors for each player to tell them apart
     colorPairs:{
         'blue':['#29ADFF','#1D2B53'],
@@ -103,9 +106,10 @@ function Room (roomId) {
     this.pickups = {};
 
     //spawn a health every X ms
-    this.pickupSpawner = setInterval(function () {
-        this.spawnPickups('health');
-    }.bind(this), game.pickupTime);
+    this.pickupSpawner = setInterval(
+        this.spawnPickups.bind(this), //bind to room scope
+        game.pickupTime
+    );
 
     //enemies not implemented yet
     // this.enemies = {};
@@ -267,7 +271,7 @@ Room.prototype.addSocket = function (socket) {
                 socket.x = Math.min(Math.max(socket.x, 0), game.width);
                 socket.y = Math.min(Math.max(socket.y, 0), game.height);
             }
-        }.bind(this));
+        }.bind(this));//bind to room scope
 
         //handle shooting
         socket.on('shoot', function (dest_x, dest_y) {
@@ -285,7 +289,7 @@ Room.prototype.addSocket = function (socket) {
                 this.shots[id].velocity = vel;
                 this.shots[id].lifespan = game.shotLifespan;
             }
-        }.bind(this));
+        }.bind(this));//bind to room scope
 
         //handle full spread
         socket.on('full_spread', function (dest_x, dest_y) {
@@ -313,7 +317,7 @@ Room.prototype.addSocket = function (socket) {
                     this.shots[id].lifespan = game.fullSpreadLifespan;
                 }
             }
-        }.bind(this));
+        }.bind(this));//bind to room scope
 
         //handle pickup command 
         socket.on('pickup', function () {
@@ -370,17 +374,18 @@ Room.prototype.spawnSocket = function (socket) {
     socket.alive = true;
 }
 
-Room.prototype.spawnPickups = function (type) {
+Room.prototype.spawnPickups = function () {
     for (
         let i=0; 
         //try to make 1 for every current player
         i < this.getPop() && 
-        //loop should break if cap (population * pickupMax) is hit
-        (Object.keys(this.pickups).length < this.getPop() * game.pickupMax);
+        //loop should break if cap is hit (population * pickupMax)
+        Object.keys(this.pickups).length < this.getPop() * game.pickupMax;
         i++) {
             let id = Math.random();
             this.pickups[id] = {
-                type: type,
+                //choose a random type from the settings list
+                type: game.pickupTypes[randint(0, game.pickupTypes.length-1)],
                 x: randint(100, game.width-100),
                 y: randint(100, game.height-100),
             }
