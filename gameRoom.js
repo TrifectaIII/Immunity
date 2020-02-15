@@ -381,7 +381,8 @@ Room.prototype.spawnPickups = function (type) {
                 x: randint(100, game.width-100),
                 y: randint(100, game.height-100),
             }
-        }
+        } 
+        else {break;}
     }
 }
 

@@ -192,31 +192,33 @@ function drawPickups() {
             pickup.x-screenOffset.x < windowWidth + 50 &&
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
-                //draw rect
-                rect(
-                    pickup.x-screenOffset.x - 20,
-                    pickup.y-screenOffset.y - 20,
-                    40,
-                    40
-                )
-                //draw cross
-                push();
-                fill('#FFF1E8');
-                strokeWeight(0);
-                rect(
-                    pickup.x-screenOffset.x - 10,
-                    pickup.y-screenOffset.y - 3,
-                    20,
-                    6
-                )
-                rect(
-                    pickup.x-screenOffset.x - 3,
-                    pickup.y-screenOffset.y - 10,
-                    6,
-                    20
-                )
-                pop();
-
+                if (pickup.type == 'health') {
+                    fill('#FF004D');
+                    //draw rect
+                    rect(
+                        pickup.x-screenOffset.x - 20,
+                        pickup.y-screenOffset.y - 20,
+                        40,
+                        40
+                    )
+                    //draw cross
+                    push();
+                    fill('#FFF1E8');
+                    strokeWeight(0);
+                    rect(
+                        pickup.x-screenOffset.x - 10,
+                        pickup.y-screenOffset.y - 3,
+                        20,
+                        6
+                    )
+                    rect(
+                        pickup.x-screenOffset.x - 3,
+                        pickup.y-screenOffset.y - 10,
+                        6,
+                        20
+                    )
+                    pop();
+                }
         }
     }
     pop();
