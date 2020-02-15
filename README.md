@@ -1,2 +1,2 @@
 # Multiplayer-Game
-A browser-based multiplayer game with a [Node.js](https://nodejs.org/en/) backend using [Express](https://expressjs.com/) and [socket.io](https://Socket.IO/), with [p5.js](https://p5js.org/) for client-side rendering.
+A browser-based multiplayer game with a [Node.js](https://nodejs.org/en/) backend using [Express](https://expressjs.com/) and [Socket.IO](https://socket.io/), with [p5.js](https://p5js.org/) for client-side rendering.
