@@ -1,8 +1,11 @@
 //player info from server
-var players = {}
+var players = {};
 
 //shots info from server
-var shots = {}
+var shots = {};
+
+//pickups info from server
+var pickups = {};
 
 //object to hold info re: screen offset based on player position
 var screenOffset = {
@@ -20,8 +23,8 @@ function drawGame () {
 
         push();
 
-        //send movement data only if alive
-        if (player.health > 0) {
+        //send movement data from movement.js only if alive and playing
+        if (player.health > 0 && state == 'game') {
             sendMove();
         }
 
@@ -44,6 +47,9 @@ function drawGame () {
         if (player.health <= 0) {
             drawPlayer(player);
         }
+
+        //draw pickups
+        drawPickups();
 
         //draw all shots
         drawShots();
@@ -85,7 +91,6 @@ function drawGame () {
 
         // draw crosshair
         drawCrosshair(player);
-
 
         pop();
     }
@@ -171,6 +176,48 @@ function drawBorders () {
             0, game.height - screenOffset.y, 
             windowWidth, windowHeight
         )
+    }
+    pop();
+}
+
+//draws pickup-able objects
+function drawPickups() {
+    push();
+    fill('#FF004D');
+    stroke('black');
+    strokeWeight(4);
+    for (let id in pickups) {
+        let pickup = pickups[id];
+        if (pickup.x-screenOffset.x > -50 &&
+            pickup.x-screenOffset.x < windowWidth + 50 &&
+            pickup.y-screenOffset.y > -50 &&
+            pickup.y-screenOffset.y < windowHeight + 50) {
+                //draw rect
+                rect(
+                    pickup.x-screenOffset.x - 20,
+                    pickup.y-screenOffset.y - 20,
+                    40,
+                    40
+                )
+                //draw cross
+                push();
+                fill('#FFF1E8');
+                strokeWeight(0);
+                rect(
+                    pickup.x-screenOffset.x - 10,
+                    pickup.y-screenOffset.y - 3,
+                    20,
+                    6
+                )
+                rect(
+                    pickup.x-screenOffset.x - 3,
+                    pickup.y-screenOffset.y - 10,
+                    6,
+                    20
+                )
+                pop();
+
+        }
     }
     pop();
 }

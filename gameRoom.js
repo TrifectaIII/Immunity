@@ -92,6 +92,8 @@ function Room (roomId) {
     this.roomId = roomId;
     this.players = {};
     this.shots = {};
+    this.pickups = {};
+    this.pickupCounter = 0;
     //enemies not implemented yet
     // this.enemies = {};
 }
@@ -167,10 +169,26 @@ Room.prototype.update = function () {
         };
     }
 
+    // increase pickup counter
+    this.pickupCounter++;
+
+    // create pickup if counter hits threshold
+    if (this.pickupCounter >= 100) {
+        let id = Math.random();
+        this.pickups[id] = {
+            type: "health",
+            x: randint(100, game.width-100),
+            y: randint(100, game.height-100),
+        }
+        //reset counter
+        this.pickupCounter = 0;
+    }
+
     //return player and shot object for emit to players
     return {
         player_info: player_info,
         shot_info: shot_info,
+        pickup_info: this.pickups,
     }
 }
 

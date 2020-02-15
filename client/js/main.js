@@ -91,6 +91,7 @@ function join_game() {
             //save to objects in game.js
             players = game_info.player_info;
             shots = game_info.shot_info;
+            pickups = game_info.pickup_info;
         });
     });
 }
