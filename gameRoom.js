@@ -371,19 +371,20 @@ Room.prototype.spawnSocket = function (socket) {
 }
 
 Room.prototype.spawnPickups = function (type) {
-    //try to make 1 pickup for every current player
-    for (let i=0; i < this.getPop(); i++) {
-        //max pickups is population * pickupMax
-        if (Object.keys(this.pickups).length < this.getPop() * game.pickupMax){
+    for (
+        let i=0; 
+        //try to make 1 for every current player
+        i < this.getPop() && 
+        //loop should break if cap (population * pickupMax) is hit
+        (Object.keys(this.pickups).length < this.getPop() * game.pickupMax);
+        i++) {
             let id = Math.random();
             this.pickups[id] = {
                 type: type,
                 x: randint(100, game.width-100),
                 y: randint(100, game.height-100),
             }
-        } 
-        else {break;}
-    }
+    } 
 }
 
 //stops timing events for the room
