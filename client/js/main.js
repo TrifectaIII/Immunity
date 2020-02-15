@@ -77,8 +77,8 @@ function join_game() {
         //update settings object
         game = settings;
 
-        //Start shoot eventListener from shoot.js
-        start_shoot(canv.elt);
+        //Start controls from controls.js
+        startControls();
 
         //change state
         state = 'game';

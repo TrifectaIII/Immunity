@@ -1,8 +1,17 @@
 // adds listeners for shooting
-function start_shoot (canvas_element) {
+function startControls () {
+
+    //execute move emits from movement.js
+    setInterval(function () {
+        if (state == "game" && 
+            socket.id in players && 
+            players[socket.id].health > 0) {
+                sendMove();
+        }
+    },game.tickRate);//use games tickRate
 
     //shoot on click
-    canvas_element.addEventListener('click', function (event) {
+    canv.elt.addEventListener('click', function (event) {
         event.preventDefault();
         if (state == "game" && 
             socket.id in players && 

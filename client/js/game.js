@@ -23,11 +23,6 @@ function drawGame () {
 
         push();
 
-        //send movement data from movement.js only if alive and playing
-        if (player.health > 0 && state == 'game') {
-            sendMove();
-        }
-
         //refresh screen
         clear()
 

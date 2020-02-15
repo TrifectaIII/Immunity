@@ -55,6 +55,8 @@ document.addEventListener('keyup', function (event) {
 });
 
 //move based on currently pressed keys
+
+//NOTE: this is called in a setInterval in controls.js
 function sendMove () {
     if (right && !left && up && !down) {
         socket.emit('move','rightup');
