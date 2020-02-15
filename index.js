@@ -101,8 +101,6 @@ io.sockets.on('connection', function (socket) {
             socket.emit('room_full');
         }
     });
-
-    
 });
 
 // MAIN GAME LOOP

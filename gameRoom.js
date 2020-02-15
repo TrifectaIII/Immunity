@@ -314,6 +314,34 @@ Room.prototype.addSocket = function (socket) {
                 }
             }
         }.bind(this));
+
+        //handle pickup command 
+        socket.on('pickup', function () {
+            console.log('picking up!')
+            if (socket.alive) {
+                //loop through pickups and find closest
+                let closestDistance = Infinity;
+                let closestId = 0;
+                for (let id in this.pickups) {
+                    let thisDistance = distance(this.pickups[id], socket);
+                    if (thisDistance < closestDistance) {
+                        closestDistance = thisDistance;
+                        closestId = id;
+                    }
+                }
+                //if pickup is close enough, consume it.
+                if (closestDistance <= game.playerRadius + 10) {
+                    switch (this.pickups[closestId].type) {
+                        //health pickup gives 5 hp, up to max
+                        case "health":
+                            socket.health = Math.min(game.maxHealth, socket.health + 5);
+                            break;
+                    }
+                    //delete after use
+                    delete this.pickups[closestId];
+                }
+            }
+        }.bind(this));
     }
 }
 
