@@ -104,7 +104,7 @@ function Room (roomId) {
 
     //spawn a health every X ms
     this.pickupSpawner = setInterval(function () {
-        this.spawnPickup('health');
+        this.spawnPickups('health');
     }.bind(this), game.pickupTime);
 
     //enemies not implemented yet
@@ -370,14 +370,17 @@ Room.prototype.spawnSocket = function (socket) {
     socket.alive = true;
 }
 
-Room.prototype.spawnPickup = function (type) {
-    //max pickups is population * pickupMax
-    if (Object.keys(this.pickups).length < this.getPop() * game.pickupMax){
-        let id = Math.random();
-        this.pickups[id] = {
-            type: type,
-            x: randint(100, game.width-100),
-            y: randint(100, game.height-100),
+Room.prototype.spawnPickups = function (type) {
+    //try to make 1 pickup for every current player
+    for (let i=0; i < this.getPop(); i++) {
+        //max pickups is population * pickupMax
+        if (Object.keys(this.pickups).length < this.getPop() * game.pickupMax){
+            let id = Math.random();
+            this.pickups[id] = {
+                type: type,
+                x: randint(100, game.width-100),
+                y: randint(100, game.height-100),
+            }
         }
     }
 }
