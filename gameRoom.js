@@ -317,7 +317,6 @@ Room.prototype.addSocket = function (socket) {
 
         //handle pickup command 
         socket.on('pickup', function () {
-            console.log('picking up!')
             if (socket.alive) {
                 //loop through pickups and find closest
                 let closestDistance = Infinity;
