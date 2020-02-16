@@ -25,6 +25,19 @@ app.use('/client',express.static(__dirname + '/client'));
 // GAME ROOMS
 ///////////////////////////////////////////////////
 
+//copy game settings to serve to client folder
+require('fs').copyFile(
+    './gameSettings.js', 
+    './client/js/gameSettings.js', 
+    function (error) {
+        if (error) {throw error};
+        console.log('copied gameSettings.js to /client/js folder');
+    }
+)
+
+//include gameSettings.js
+const gameSettings = require('./gameSettings.js');
+
 //include gameRoom constructor from gameRoom.js
 const gameRoom = require('./gameRoom.js');
 
@@ -64,7 +77,7 @@ io.sockets.on('connection', function (socket) {
             gameRooms[socket.roomId].removeSocket(socket);
             //shut down and delete room if empty
             if (gameRooms[socket.roomId].isEmpty()) {
-                gameRooms[socket.roomId].shutdownRoom();
+                gameRooms[socket.roomId].shutdown();
                 delete gameRooms[socket.roomId];
             }
         }     
@@ -85,7 +98,7 @@ io.sockets.on('connection', function (socket) {
             let newRoomId = generateRoomId(gameRooms);
             
             //create room object
-            gameRooms[newRoomId] = new gameRoom.Room(newRoomId);
+            gameRooms[newRoomId] = new gameRoom(newRoomId);
 
             //place socket into room
             gameRooms[newRoomId].addSocket(socket);
@@ -117,5 +130,5 @@ setInterval(function () {
         let game_info = gameRooms[roomId].update();
         io.to(roomId).emit('game_update', game_info);
     }
-//frequency set by game settings in gameRoom.js
-}, gameRoom.settings.tickRate);
+//frequency set by game settings in gameSettings.js
+}, gameSettings.tickRate);

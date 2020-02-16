@@ -73,6 +73,49 @@ Button.prototype.draw = function () {
     pop();
 }
 
+// Loading Screen
+///////////////////////////////////////
+
+var loadingProg = 0;
+var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
+
+
+function drawLoading () {
+    push();
+    textAlign(CENTER, CENTER);
+
+    //refresh screen
+    clear()
+
+    //draw background
+    drawMenuGrid();
+
+    //draw text
+    stroke('black');
+    strokeWeight(2);
+    fill('black');
+    textSize(40);
+    text("Loading...", windowWidth/2, windowHeight/2);
+
+    loadingProg -= 0.1;
+    stroke(loadingColors[Math.floor(-(loadingProg/loadingColors.length)%loadingColors.length)]);
+    strokeWeight(10);
+    let spokes = 3;
+    let spokeLength = 25;
+    for (let i=1; i<=spokes; i++) {
+        line(
+            windowWidth/2 - Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength, 
+            windowHeight/3*2 - Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            windowWidth/2 + Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            windowHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
+        );
+    }
+    
+    drawMenuCrosshair();
+
+    pop();
+}
+
 // Server Menu
 ///////////////////////////////////////
 
@@ -239,45 +282,5 @@ function clickNameMenu () {
     return setNameButton.mouseOver();
 }
 
-// Loading Screen
+// Class Menu
 ///////////////////////////////////////
-
-var loadingProg = 0;
-var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
-
-
-function drawLoading () {
-    push();
-    textAlign(CENTER, CENTER);
-
-    //refresh screen
-    clear()
-
-    //draw background
-    drawMenuGrid();
-
-    //draw text
-    stroke('black');
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("Loading...", windowWidth/2, windowHeight/2);
-
-    loadingProg -= 0.1;
-    stroke(loadingColors[Math.floor(-(loadingProg/loadingColors.length)%loadingColors.length)]);
-    strokeWeight(10);
-    let spokes = 3;
-    let spokeLength = 25;
-    for (let i=1; i<=spokes; i++) {
-        line(
-            windowWidth/2 - Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength, 
-            windowHeight/3*2 - Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            windowWidth/2 + Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            windowHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-        );
-    }
-    
-    drawMenuCrosshair();
-
-    pop();
-}

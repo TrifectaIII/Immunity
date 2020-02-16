@@ -1,65 +1,7 @@
-//Global Server Settings
+//Global Server Settings from gameSettings.js
 ///////////////////////////////////////////
 
-var game = {
-    //max players per room
-    roomCap: 6,
-
-    //space between server updates in MS
-    tickRate: 20,
-
-    //size of game area
-    width: 1000,
-    height: 1000,
-
-    // starting health for players
-    maxHealth: 10,
-
-    // time in MS to respawn players
-    respawnTime: 3000,
-
-    //players speed
-    playerSpeed: 5,
-
-    //size of player
-    playerRadius: 25,
-
-    //speed of shots + full spread
-    shotSpeed: 15,
-
-    //lifespan of shots (in ticks)
-    shotLifespan: 40,
-
-    //lifespan of full spread (in ticks)
-    fullSpreadLifespan: 15,
-
-    //number of shots per full spread
-    fullSpreadCount: 3,
-
-    //angle between edge shots in full spread
-    fullSpreadAngle: Math.PI/6,
-
-    //time between spawns of pickups in ms
-    pickupTime: 5000,
-
-    //max pickups in the world at a time, per player
-    pickupMax: 4,
-
-    //different types of pickups
-    pickupTypes: ['health'],
-
-    //colors for each player to tell them apart
-    colorPairs:{
-        'blue':['#29ADFF','#1D2B53'],
-        'yellow':['#FFEC27','#AB5236'],
-        'pink':['#FF77A8','#7E2553'],
-        'green':['#00E436','#008751'],
-    },
-}
-
-//players component speed when moving @ angle
-game.playerSpeedAngle = game.playerSpeed/(Math.sqrt(2));
-
+const gameSettings = require('./gameSettings.js');
 
 // Helper Functions
 ///////////////////////////////////////////
@@ -88,8 +30,8 @@ function angle(x, y, dest_x, dest_y) {
 //calculates component velocities of shot based on velocity and angle
 function velocity(ang) {
     return {
-        x:Math.sin(ang) * game.shotSpeed,
-        y:Math.cos(ang) * game.shotSpeed,
+        x:Math.sin(ang) * gameSettings.shotSpeed,
+        y:Math.cos(ang) * gameSettings.shotSpeed,
     };
 }
 
@@ -110,13 +52,13 @@ function Room (roomId) {
     //spawn a health every X ms
     this.pickupSpawner = setInterval(
         this.spawnPickups.bind(this), //bind to room scope
-        game.pickupTime //interval from game settings
+        gameSettings.pickupTime //interval from game settings
     );
 }
 
 // ROOM UPDATE
 ///////////////////////////////////////////
-//called every game.tickRate ms in index.js
+//called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
     //handle shots
@@ -136,7 +78,7 @@ Room.prototype.update = function () {
             let enemy = this.players[id];
             if (enemy.alive && 
                 enemy.id != shot.socketId && 
-                distance(enemy, shot) < game.playerRadius) {
+                distance(enemy, shot) < gameSettings.playerRadius) {
                     //remove health
                     if (enemy.health > 0) {
                         enemy.health -= 1;
@@ -147,7 +89,7 @@ Room.prototype.update = function () {
                             this.players[shot.socketId].killStreak += 1;
                             setTimeout(function () {
                                 this.spawnSocket(enemy);
-                            }.bind(this), game.respawnTime);
+                            }.bind(this), gameSettings.respawnTime);
                         }
                     }
             } 
@@ -197,7 +139,7 @@ Room.prototype.update = function () {
 // ADD SOCKET TO ROOM AND SET IT UP
 ///////////////////////////////////////////
 Room.prototype.addSocket = function (socket) {
-    if (this.getPop() < game.roomCap) {
+    if (this.getPop() < gameSettings.roomCap) {
 
         //add to players object
         this.players[socket.id] = socket;
@@ -208,14 +150,11 @@ Room.prototype.addSocket = function (socket) {
         //set roomId to socket
         socket.roomId = this.roomId;
 
-        //confirm join with server
-        socket.emit('joined',this.roomId);
-
         //relay game settings to socket
-        socket.emit('game_settings', game)
+        // socket.emit('game_settings', gameSettings)
 
         //give socket a random color
-        socket.color = Object.keys(game.colorPairs)[randint(0, Object.keys(game.colorPairs).length-1)];
+        socket.color = Object.keys(gameSettings.colorPairs)[randint(0, Object.keys(gameSettings.colorPairs).length-1)];
 
         //spawn socket for first time
         this.spawnSocket(socket);
@@ -229,33 +168,33 @@ Room.prototype.addSocket = function (socket) {
                 switch (direction) {
                     //diagonal movements use component speed
                     case 'rightup':
-                        socket.x += game.playerSpeedAngle;
-                        socket.y -= game.playerSpeedAngle;
+                        socket.x += gameSettings.playerSpeedAngle;
+                        socket.y -= gameSettings.playerSpeedAngle;
                         break;
                     case 'leftup':
-                        socket.x -= game.playerSpeedAngle;
-                        socket.y -= game.playerSpeedAngle;
+                        socket.x -= gameSettings.playerSpeedAngle;
+                        socket.y -= gameSettings.playerSpeedAngle;
                         break;
                     case 'rightdown':
-                        socket.x += game.playerSpeedAngle;
-                        socket.y += game.playerSpeedAngle;
+                        socket.x += gameSettings.playerSpeedAngle;
+                        socket.y += gameSettings.playerSpeedAngle;
                         break;
                     case 'leftdown':
-                        socket.x -= game.playerSpeedAngle;
-                        socket.y += game.playerSpeedAngle;
+                        socket.x -= gameSettings.playerSpeedAngle;
+                        socket.y += gameSettings.playerSpeedAngle;
                         break;
                     //cardinal movements use raw speed
                     case 'right':
-                        socket.x += game.playerSpeed;
+                        socket.x += gameSettings.playerSpeed;
                         break;
                     case 'left':
-                        socket.x -= game.playerSpeed;
+                        socket.x -= gameSettings.playerSpeed;
                         break;
                     case 'up':
-                        socket.y -= game.playerSpeed;
+                        socket.y -= gameSettings.playerSpeed;
                         break;
                     case 'down':
-                        socket.y += game.playerSpeed;
+                        socket.y += gameSettings.playerSpeed;
                         break;
                 }
 
@@ -264,14 +203,14 @@ Room.prototype.addSocket = function (socket) {
                 //     if (id != socket.id) {
                 //         let enemySocket = this.players[id];
                 //         //DO BALL COLLISION HERE
-                //         //use game.playerRadius to access radius
+                //         //use gameSettings.playerRadius to access radius
                         
                 //     }
                 // }
 
                 //boundaries
-                socket.x = Math.min(Math.max(socket.x, 0), game.width);
-                socket.y = Math.min(Math.max(socket.y, 0), game.height);
+                socket.x = Math.min(Math.max(socket.x, 0), gameSettings.width);
+                socket.y = Math.min(Math.max(socket.y, 0), gameSettings.height);
             }
         }.bind(this));//bind to room scope
 
@@ -289,7 +228,7 @@ Room.prototype.addSocket = function (socket) {
                 this.shots[id].color = socket.color;
                 this.shots[id].socketId = socket.id;
                 this.shots[id].velocity = vel;
-                this.shots[id].lifespan = game.shotLifespan;
+                this.shots[id].lifespan = gameSettings.shotLifespan;
             }
         }.bind(this));//bind to room scope
 
@@ -298,15 +237,15 @@ Room.prototype.addSocket = function (socket) {
             if (socket.alive) {
                 //calculate velocity for each shot in spread, based on 
                 // pellet count and angle
-                for (let i = 0; i < game.fullSpreadCount; i++) {
+                for (let i = 0; i < gameSettings.fullSpreadCount; i++) {
 
                     let vel = velocity(
                         angle(
                             socket.x, socket.y, 
                             dest_x, dest_y
                         ) 
-                        + (i - game.fullSpreadCount/2 + 0.5) 
-                        * (game.fullSpreadAngle/(game.fullSpreadCount-1))
+                        + (i - gameSettings.fullSpreadCount/2 + 0.5) 
+                        * (gameSettings.fullSpreadAngle/(gameSettings.fullSpreadCount-1))
                     );
 
                     var id = Math.random();
@@ -316,7 +255,7 @@ Room.prototype.addSocket = function (socket) {
                     this.shots[id].color = socket.color;
                     this.shots[id].socketId = socket.id;
                     this.shots[id].velocity = vel;
-                    this.shots[id].lifespan = game.fullSpreadLifespan;
+                    this.shots[id].lifespan = gameSettings.fullSpreadLifespan;
                 }
             }
         }.bind(this));//bind to room scope
@@ -335,11 +274,11 @@ Room.prototype.addSocket = function (socket) {
                     }
                 }
                 //if pickup is close enough, consume it.
-                if (closestDistance <= game.playerRadius + 10) {
+                if (closestDistance <= gameSettings.playerRadius + 10) {
                     switch (this.pickups[closestId].type) {
                         //health pickup gives 5 hp, up to max
                         case "health":
-                            socket.health = Math.min(game.maxHealth, socket.health + 5);
+                            socket.health = Math.min(gameSettings.maxHealth, socket.health + 5);
                             break;
                     }
                     //delete after use
@@ -347,6 +286,9 @@ Room.prototype.addSocket = function (socket) {
                 }
             }
         }.bind(this));
+
+        //confirm join with server after socket totally set up
+        socket.emit('joined',this.roomId);
     }
 }
 
@@ -363,11 +305,11 @@ Room.prototype.removeSocket = function (socket) {
 //spawns or respawns a player
 Room.prototype.spawnSocket = function (socket) {
     //give random position in world
-    socket.x = randint(100,game.width-100);
-    socket.y = randint(100,game.height-100);
+    socket.x = randint(100,gameSettings.width-100);
+    socket.y = randint(100,gameSettings.height-100);
 
     //give max health
-    socket.health = game.maxHealth;
+    socket.health = gameSettings.maxHealth;
 
     //reset killstreak
     socket.killStreak = 0;
@@ -383,20 +325,20 @@ Room.prototype.spawnPickups = function () {
         //try to make 1 for every current player
         i < this.getPop() && 
         //loop should break if cap is hit (population * pickupMax)
-        Object.keys(this.pickups).length < this.getPop() * game.pickupMax;
+        Object.keys(this.pickups).length < this.getPop() * gameSettings.pickupMax;
         i++) {
             let id = Math.random();
             this.pickups[id] = {
                 //choose a random type from the settings list
-                type: game.pickupTypes[randint(0, game.pickupTypes.length-1)],
-                x: randint(100, game.width-100),
-                y: randint(100, game.height-100),
+                type: gameSettings.pickupTypes[randint(0, gameSettings.pickupTypes.length-1)],
+                x: randint(100, gameSettings.width-100),
+                y: randint(100, gameSettings.height-100),
             }
     } 
 }
 
 //stops timing events for the room
-Room.prototype.shutdownRoom = function () {
+Room.prototype.shutdown = function () {
     clearInterval(this.pickupSpawner);
 }
 
@@ -407,7 +349,7 @@ Room.prototype.getPop = function () {
 
 //checks if room has space
 Room.prototype.hasSpace = function () {
-    return this.getPop() < game.roomCap;
+    return this.getPop() < gameSettings.roomCap;
 }
 
 //checks if room is empty
@@ -416,9 +358,6 @@ Room.prototype.isEmpty = function () {
 }
 
 
-// EXPORTS TO index.js
+// EXPORTS CONSTRCTOR TO index.js
 ///////////////////////////////////////////
-module.exports = {
-    Room:Room, // room objects
-    settings:game, // game settings
-}
+module.exports = Room;

@@ -75,14 +75,12 @@ function join_game() {
 
     //confirm room joining
     socket.once('joined', function (newId) {
-        roomId = newId;
-    });
 
-    // setup game when receive settings
-    socket.once('game_settings', function (settings) {
+        //set new id if different
+        roomId = newId;
 
         //update settings object
-        game = settings;
+        game = gameSettings;
 
         //Start controls from controls.js
         startControls();
