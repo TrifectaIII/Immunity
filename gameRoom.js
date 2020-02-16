@@ -9,9 +9,9 @@ const gameSettings = require('./gameSettings.js');
 //returns random integer between low and high, inclusive
 function randint(low,high) {
     if (high > low) {
-        return Math.floor(Math.random()*(high-low+1)+low);
+        return Math.floor(Math.random() * (high - low + 1) + low);
     }
-    return Math.floor(Math.random()*(low+1-high) +high);
+    return Math.floor(Math.random() * (low - high + 1) + high);
 }
 
 //calculates distance between 2 objects with x and y attributes
@@ -49,7 +49,7 @@ function Room (roomId) {
     this.pickups = {};
     // this.enemies = {}; //enemies not implemented yet
 
-    //spawn a health every X ms
+    //spawn pickups
     this.pickupSpawner = setInterval(
         this.spawnPickups.bind(this), //bind to room scope
         gameSettings.pickupTime //interval from game settings
@@ -81,12 +81,12 @@ Room.prototype.update = function () {
                 distance(enemy, shot) < gameSettings.playerRadius) {
                     //remove health
                     if (enemy.health > 0) {
-                        enemy.health -= 1;
+                        enemy.health--;
                         destroyed = true;
                         //if enemy dead, set to respawn
                         enemy.alive = enemy.health > 0;
                         if (!enemy.alive) {
-                            this.players[shot.socketId].killStreak += 1;
+                            this.players[shot.socketId].killStreak++;
                             setTimeout(function () {
                                 this.spawnSocket(enemy);
                             }.bind(this), gameSettings.respawnTime);
@@ -96,7 +96,7 @@ Room.prototype.update = function () {
         }
 
         //destroy if end of life
-        shot.lifespan -= 1;
+        shot.lifespan--;
         destroyed = destroyed || shot.lifespan <= 1;
         
         if (destroyed) {
@@ -173,25 +173,26 @@ Room.prototype.addSocket = function (socket, className) {
 
                 //speed is set by class
                 let speed = gameSettings.classes[socket.class].speed;
+                let speedComponent = speed/(Math.sqrt(2));
 
                 //move based on direction sent by client
                 switch (direction) {
                     //diagonal movements use component speed
                     case 'rightup':
-                        socket.x += speed/(Math.sqrt(2));
-                        socket.y -= speed/(Math.sqrt(2));
+                        socket.x += speedComponent;
+                        socket.y -= speedComponent;
                         break;
                     case 'leftup':
-                        socket.x -= speed/(Math.sqrt(2));
-                        socket.y -= speed/(Math.sqrt(2));
+                        socket.x -= speedComponent;
+                        socket.y -= speedComponent;
                         break;
                     case 'rightdown':
-                        socket.x += speed/(Math.sqrt(2));
-                        socket.y += speed/(Math.sqrt(2));
+                        socket.x += speedComponent;
+                        socket.y += speedComponent;
                         break;
                     case 'leftdown':
-                        socket.x -= speed/(Math.sqrt(2));
-                        socket.y += speed/(Math.sqrt(2));
+                        socket.x -= speedComponent;
+                        socket.y += speedComponent;
                         break;
                     //cardinal movements use raw speed
                     case 'right':
@@ -325,8 +326,8 @@ Room.prototype.removeSocket = function (socket) {
 //spawns or respawns a player
 Room.prototype.spawnSocket = function (socket) {
     //give random position in world
-    socket.x = randint(100,gameSettings.width-100);
-    socket.y = randint(100,gameSettings.height-100);
+    socket.x = randint(100, gameSettings.width - 100);
+    socket.y = randint(100, gameSettings.height - 100);
 
     //give max health based on class
     socket.health = gameSettings.classes[socket.class].maxHealth;
