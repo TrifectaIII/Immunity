@@ -33,17 +33,24 @@ function drawMenuGrid () {
 }
 
 //button objects
-function Button (text, x, y, width, height, colorOff, colorOn) {
+function Button (text, colorOff, colorOn) {
     this.text = text;
+    this.colorOn = colorOn;
+    this.colorOff = colorOff;
+    this.x = 0;
+    this.y = 0;
+    this.width = 0;
+    this.height = 0;
+}
+
+Button.prototype.update = function (x,y,width,height) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.colorOn = colorOn;
-    this.colorOff = colorOff;
 }
 
-//checks if mouse os over the button
+//checks if mouse is over the button
 Button.prototype.mouseOver = function () {
     return (mouseX > this.x - this.width/2 &&
         mouseX < this.x + this.width/2 &&
@@ -74,11 +81,10 @@ Button.prototype.draw = function () {
 }
 
 // Loading Screen
-///////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 var loadingProg = 0;
 var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
-
 
 function drawLoading () {
     push();
@@ -116,8 +122,8 @@ function drawLoading () {
     pop();
 }
 
-// Server Menu
-///////////////////////////////////////
+// SERVER MENU
+//////////////////////////////////////////////////////////////////////////////
 
 //input element to type in game code
 var codeInput;
@@ -139,33 +145,10 @@ function hideCodeInput () {
     codeInput.hide();
 }
 
-var createGameButton;
-var joinButton;
+var createGameButton = new Button( "New Game", '#1D2B53', '#29ADFF');
+var joinButton = new Button( "Join", '#008751', '#00E436');
 
 function drawServerMenu () {
-
-    if (!createGameButton) {
-        createGameButton = new Button(
-            "New Game", 
-            windowWidth/2, windowHeight/4, 
-            250, 100, 
-            '#1D2B53', '#29ADFF'
-        );
-    }
-    createGameButton.x = windowWidth/2;
-    createGameButton.y = windowHeight/4;
-
-    if(!joinButton) {
-        joinButton = new Button(
-            "Join",
-            windowWidth/2, windowHeight*5/6,
-            150, 100,
-            '#008751', '#00E436'
-        );
-    }
-    joinButton.x = windowWidth/2;
-    joinButton.y = windowHeight*5/6;
-
     push();
     textAlign(CENTER, CENTER);
 
@@ -175,8 +158,12 @@ function drawServerMenu () {
     //draw background
     drawMenuGrid();
 
-    //draw create game button
+    //update and draw buttons
+    createGameButton.update(windowWidth/2, windowHeight/4, 250, 100);
+    joinButton.update(windowWidth/2, windowHeight*5/6, 150, 100);
+
     createGameButton.draw();
+    joinButton.draw();
 
     //draw text for code entry
     stroke('black');
@@ -186,9 +173,7 @@ function drawServerMenu () {
     text("- OR -", windowWidth/2, windowHeight*17/40);
     text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
 
-    //draw create game button
-    joinButton.draw();
-
+    //draw the crosshair
     drawMenuCrosshair();
 
     //display input for game code
@@ -207,12 +192,13 @@ function clickServerMenu () {
     if (joinButton.mouseOver()) {
         return "join";
     }
+    return false;
 }
 
-// Name Menu
-///////////////////////////////////////
+// NAME MENU
+//////////////////////////////////////////////////////////////////////////////
 
-//input element to type in game code
+//input element to type in name
 var nameInput;
 
 function setupNameInput (canv) {
@@ -224,7 +210,7 @@ function setupNameInput (canv) {
     nameInput.class('gameInput');
 }
 
-//gets value of codeInput 
+//gets value of nameInput 
 function getNameInput () {
     return nameInput.elt.value.trim();
 }
@@ -233,21 +219,9 @@ function hideNameInput () {
     nameInput.hide();
 }
 
-var setNameButton;
+var setNameButton = new Button("SUBMIT", '#AB5236', '#FFEC27');
 
 function drawNameMenu () {
-
-    if (!setNameButton) {
-        setNameButton = new Button(
-            "SUBMIT", 
-            windowWidth/2, windowHeight*2/3, 
-            250, 100, 
-            '#AB5236', '#FFEC27'
-        );
-    }
-    setNameButton.x = windowWidth/2;
-    setNameButton.y = windowHeight*2/3;
-
     push();
     textAlign(CENTER, CENTER);
 
@@ -257,7 +231,8 @@ function drawNameMenu () {
     //draw background
     drawMenuGrid();
 
-    //draw create game button
+    //update and draw set name button
+    setNameButton.update(windowWidth/2, windowHeight*2/3, 250, 100);
     setNameButton.draw();
 
     //draw text for code entry
@@ -269,7 +244,7 @@ function drawNameMenu () {
 
     drawMenuCrosshair();
 
-    //display input for game code
+    //display input for name entry
     nameInput.position(
         nameInput.canv.position().x + windowWidth/2 - nameInput.size().width/2,
         nameInput.canv.position().y + windowHeight/2 - nameInput.size().height/2
@@ -282,5 +257,60 @@ function clickNameMenu () {
     return setNameButton.mouseOver();
 }
 
-// Class Menu
-///////////////////////////////////////
+// CLASS MENU
+//////////////////////////////////////////////////////////////////////////////
+
+var classButtons = {};
+
+for (let className in gameSettings.classes) {
+    classButtons[className] = new Button(
+        className.toUpperCase(),
+        gameSettings.classes[className].colors[1],
+        gameSettings.classes[className].colors[0]
+    )
+}
+
+var classCount = Object.keys(classButtons).length;
+
+function drawClassMenu () {
+    push();
+    textAlign(CENTER, CENTER);
+
+    //refresh screen
+    clear();
+
+    //draw background
+    drawMenuGrid();
+
+    //update and draw buttons
+    let counter = 1;
+    for (let className in classButtons) {
+        let button = classButtons[className];
+        button.update(
+            windowWidth/2, 
+            windowHeight*counter/(1+classCount), 
+            windowWidth/2,
+            windowHeight/(4+classCount)
+        );
+        button.draw();
+        counter++;
+    }
+
+    //draw text for code entry
+    stroke('black');
+    strokeWeight(2);
+    fill('black');
+    textSize(40);
+    text("Choose a Class:", windowWidth/2, windowHeight/12);
+
+    drawMenuCrosshair();
+}
+
+function clickClassMenu () {
+    for (let className in classButtons) {
+        if (classButtons[className].mouseOver()) {
+            return className;
+        }
+    }
+    return false;
+}

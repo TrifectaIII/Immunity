@@ -87,7 +87,7 @@ io.sockets.on('connection', function (socket) {
     ////////////////////////////////
 
     //connect socket to room
-    socket.once ('join_game', function (roomId, name) {
+    socket.once ('join_game', function (roomId, name, className) {
 
         //set name of socket
         socket.name = name.substring(0,6);
@@ -101,12 +101,12 @@ io.sockets.on('connection', function (socket) {
             gameRooms[newRoomId] = new gameRoom(newRoomId);
 
             //place socket into room
-            gameRooms[newRoomId].addSocket(socket);
+            gameRooms[newRoomId].addSocket(socket, className);
         }
 
         //add to room if room exists and has space
         else if (roomId in gameRooms && gameRooms[roomId].hasSpace()) {
-            gameRooms[roomId].addSocket(socket);
+            gameRooms[roomId].addSocket(socket, className);
         }
 
         //reject socket if room full

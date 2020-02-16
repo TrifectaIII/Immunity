@@ -20,7 +20,7 @@ var name;
 var game;
 
 //function to join the game
-function join_game() {
+function joinGame(className) {
 
     //switch state
     state = 'load'
@@ -59,7 +59,7 @@ function join_game() {
     })
 
     //attempt to join game
-    socket.emit('join_game', roomId, name);
+    socket.emit('join_game', roomId, name, className);
 
     //return to server menu if no space in room and display error
     socket.once('room_full', function () {
@@ -137,14 +137,15 @@ function windowResized() {
 // p5 drawing
 function draw () {
     switch (state) {
-        //draw game from game.js
-        case 'game':
-            drawGame();
-            break;
 
         //draw loading screen from menu.js
         case 'load':
             drawLoading();
+            break;
+
+        //draw name menu from menu.js
+        case 'nameMenu':
+            drawNameMenu();
             break;
 
         //draw server menu from menu.js
@@ -152,9 +153,13 @@ function draw () {
             drawServerMenu();
             break;
 
-        //draw name menu from menu.js
-        case 'nameMenu':
-            drawNameMenu();
+        case 'classMenu':
+            drawClassMenu();
+            break;
+        
+        //draw game from game.js
+        case 'game':
+            drawGame();
             break;
     }
 
@@ -165,27 +170,35 @@ function draw () {
 //look for button clicks during menus
 function mouseClicked () {
     switch (state) {
-        case 'serverMenu':
-            switch (clickServerMenu()) {
-                case 'new game':
-                    hideCodeInput();
-                    roomId = 'new_game'
-                    join_game();
-                    break;
-                case 'join':
-                    if (getCodeInput() != '') {
-                        hideCodeInput();
-                        roomId = getCodeInput();
-                        join_game();
-                    }
-                    break;
-            }
-            break;
+
         case 'nameMenu':
             if (clickNameMenu() && getNameInput() != '') {
                 name = getNameInput();
                 hideNameInput();
                 state = 'serverMenu';
+            }
+            break;
+        
+        case 'serverMenu':
+            switch (clickServerMenu()) {
+                case 'new game':
+                    hideCodeInput();
+                    roomId = 'new_game';
+                    state = 'classMenu';
+                    break;
+                case 'join':
+                    if (getCodeInput() != '') {
+                        hideCodeInput();
+                        roomId = getCodeInput();
+                        state = 'classMenu';
+                    }
+                    break;
+            }
+            break;
+
+        case 'classMenu':
+            if (clickClassMenu()) {
+                joinGame(clickClassMenu());
             }
             break;
     }
@@ -194,22 +207,24 @@ function mouseClicked () {
 //look for enter presses on menu
 function keyPressed () {
     switch (state) {
-        case 'serverMenu':
-            if (keyCode == ENTER) {
-                if (getCodeInput() != '') {
-                    hideCodeInput();
-                    roomId = getCodeInput();
-                    join_game();
-                }
-                return false;
-            }
-            break;
+
         case 'nameMenu':
             if (keyCode == ENTER) {
                 if (getNameInput() != '') {
                     name = getNameInput();
                     hideNameInput();
                     state = 'serverMenu';
+                }
+                return false;
+            }
+            break;
+
+        case 'serverMenu':
+            if (keyCode == ENTER) {
+                if (getCodeInput() != '') {
+                    hideCodeInput();
+                    roomId = getCodeInput();
+                    state = 'classMenu';
                 }
                 return false;
             }

@@ -9,7 +9,7 @@ const gameSettings = require('./gameSettings.js');
 //returns random integer between low and high, inclusive
 function randint(low,high) {
     if (high > low) {
-        return Math.floor(Math.random()*(high+1-low) +low);
+        return Math.floor(Math.random()*(high-low+1)+low);
     }
     return Math.floor(Math.random()*(low+1-high) +high);
 }
@@ -108,7 +108,7 @@ Room.prototype.update = function () {
             shot_info[id] = {
                 x: shot.x,
                 y: shot.y,
-                color: shot.color,
+                class: shot.class,
             };
         }
     }
@@ -121,7 +121,7 @@ Room.prototype.update = function () {
         player_info[id] = {
             x: player.x,
             y: player.y,
-            color: player.color,
+            class: player.class,
             health: player.health,
             name: player.name,
             killStreak: player.killStreak,
@@ -138,7 +138,7 @@ Room.prototype.update = function () {
 
 // ADD SOCKET TO ROOM AND SET IT UP
 ///////////////////////////////////////////
-Room.prototype.addSocket = function (socket) {
+Room.prototype.addSocket = function (socket, className) {
     if (this.getPop() < gameSettings.roomCap) {
 
         //add to players object
@@ -150,8 +150,15 @@ Room.prototype.addSocket = function (socket) {
         //set roomId to socket
         socket.roomId = this.roomId;
 
-        //give socket a random color
-        socket.color = Object.keys(gameSettings.colorPairs)[randint(0, Object.keys(gameSettings.colorPairs).length-1)];
+        //set sockets class
+        if (className in gameSettings.classes) {
+            socket.class = className;
+        } 
+        //reject socket if cannot find class
+        else {
+            this.removeSocket(socket),
+            socket.emit('room_full');
+        }
 
         //spawn socket for first time
         this.spawnSocket(socket);
@@ -161,37 +168,43 @@ Room.prototype.addSocket = function (socket) {
 
         //lets player move 
         socket.on('move', function (direction) {
+
             if (socket.alive) {
+
+                //speed is set by class
+                let speed = gameSettings.classes[socket.class].speed;
+
+                //move based on direction sent by client
                 switch (direction) {
                     //diagonal movements use component speed
                     case 'rightup':
-                        socket.x += gameSettings.playerSpeedAngle;
-                        socket.y -= gameSettings.playerSpeedAngle;
+                        socket.x += speed/(Math.sqrt(2));
+                        socket.y -= speed/(Math.sqrt(2));
                         break;
                     case 'leftup':
-                        socket.x -= gameSettings.playerSpeedAngle;
-                        socket.y -= gameSettings.playerSpeedAngle;
+                        socket.x -= speed/(Math.sqrt(2));
+                        socket.y -= speed/(Math.sqrt(2));
                         break;
                     case 'rightdown':
-                        socket.x += gameSettings.playerSpeedAngle;
-                        socket.y += gameSettings.playerSpeedAngle;
+                        socket.x += speed/(Math.sqrt(2));
+                        socket.y += speed/(Math.sqrt(2));
                         break;
                     case 'leftdown':
-                        socket.x -= gameSettings.playerSpeedAngle;
-                        socket.y += gameSettings.playerSpeedAngle;
+                        socket.x -= speed/(Math.sqrt(2));
+                        socket.y += speed/(Math.sqrt(2));
                         break;
                     //cardinal movements use raw speed
                     case 'right':
-                        socket.x += gameSettings.playerSpeed;
+                        socket.x += speed;
                         break;
                     case 'left':
-                        socket.x -= gameSettings.playerSpeed;
+                        socket.x -= speed;
                         break;
                     case 'up':
-                        socket.y -= gameSettings.playerSpeed;
+                        socket.y -= speed;
                         break;
                     case 'down':
-                        socket.y += gameSettings.playerSpeed;
+                        socket.y += speed;
                         break;
                 }
 
@@ -213,50 +226,56 @@ Room.prototype.addSocket = function (socket) {
 
         //handle shooting
         socket.on('shoot', function (dest_x, dest_y) {
+
             if (socket.alive) {
-                //calculate velocity based on shot speed and where the player clicked
-                vel = velocity(
-                    angle(socket.x, socket.y, dest_x, dest_y), 
-                    gameSettings.shotSpeed
-                );
+                
+                //each class shoots differently
+                let myClass = gameSettings.classes[socket.class];
 
-                //create new shot object
-                var id = Math.random();
-                this.shots[id] = {};
-                this.shots[id].x = socket.x;
-                this.shots[id].y = socket.y;
-                this.shots[id].color = socket.color;
-                this.shots[id].socketId = socket.id;
-                this.shots[id].velocity = vel;
-                this.shots[id].lifespan = gameSettings.shotLifespan;
-            }
-        }.bind(this));//bind to room scope
-
-        //handle full spread
-        socket.on('full_spread', function (dest_x, dest_y) {
-            if (socket.alive) {
-                //calculate velocity for each shot in spread, based on 
-                // pellet count and angle
-                for (let i = 0; i < gameSettings.fullSpreadCount; i++) {
-
-                    let vel = velocity(
-                        angle(
-                            socket.x, socket.y, 
-                            dest_x, dest_y
-                        ) 
-                        + (i - gameSettings.fullSpreadCount/2 + 0.5) 
-                        * (gameSettings.fullSpreadAngle/(gameSettings.fullSpreadCount-1)),
-                        gameSettings.shotSpeed
+                //single-shot classes
+                if (myClass.shotCount == 1) {
+                    //calculate velocity based on shot speed and where the player clicked
+                    vel = velocity(
+                        angle(socket.x, socket.y, dest_x, dest_y), 
+                        myClass.shotSpeed
                     );
 
+                    //create new shot object
                     var id = Math.random();
-                    this.shots[id] = {};
-                    this.shots[id].x = socket.x;
-                    this.shots[id].y = socket.y;
-                    this.shots[id].color = socket.color;
-                    this.shots[id].socketId = socket.id;
-                    this.shots[id].velocity = vel;
-                    this.shots[id].lifespan = gameSettings.fullSpreadLifespan;
+                    this.shots[id] = {
+                        x: socket.x,
+                        y: socket.y,
+                        class: socket.class,
+                        socketId: socket.id,
+                        velocity: vel,
+                        lifespan: myClass.shotLifespan,
+                    };
+                }
+
+                //multi-shot (shotgun) classes
+                else {
+                    for (let i = 0; i < myClass.shotCount; i++) {
+
+                        let vel = velocity(
+                            angle(
+                                socket.x, socket.y, 
+                                dest_x, dest_y
+                            ) 
+                            + (i - myClass.shotCount/2 + 0.5) 
+                            * (myClass.shotAngle/(myClass.shotCount-1)),
+                            myClass.shotSpeed
+                        );
+    
+                        var id = Math.random();
+                        this.shots[id] = {
+                            x: socket.x,
+                            y: socket.y,
+                            class: socket.class,
+                            socketId: socket.id,
+                            velocity: vel,
+                            lifespan: myClass.shotLifespan,
+                        };
+                    }
                 }
             }
         }.bind(this));//bind to room scope
@@ -279,7 +298,7 @@ Room.prototype.addSocket = function (socket) {
                     switch (this.pickups[closestId].type) {
                         //health pickup gives 5 hp, up to max
                         case "health":
-                            socket.health = Math.min(gameSettings.maxHealth, socket.health + 5);
+                            socket.health = Math.min(gameSettings.classes[socket.class].maxHealth, socket.health + 5);
                             break;
                     }
                     //delete after use
@@ -309,8 +328,8 @@ Room.prototype.spawnSocket = function (socket) {
     socket.x = randint(100,gameSettings.width-100);
     socket.y = randint(100,gameSettings.height-100);
 
-    //give max health
-    socket.health = gameSettings.maxHealth;
+    //give max health based on class
+    socket.health = gameSettings.classes[socket.class].maxHealth;
 
     //reset killstreak
     socket.killStreak = 0;
