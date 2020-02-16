@@ -16,9 +16,6 @@ var canv;
 //players name
 var name;
 
-//game settings from server
-var game;
-
 //function to join the game
 function joinGame(className) {
 
