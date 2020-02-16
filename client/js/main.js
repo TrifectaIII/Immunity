@@ -51,7 +51,9 @@ function join_game() {
     //return to server menu if disconnected
     socket.on('disconnect', function (reason) {
         console.log('disconnect', reason);
-        // errors.displayError('Server Disconnected',5000);
+        if(!errors.active) {
+            errors.displayError('Server Disconnected',5000);
+        }
         state = 'serverMenu';
         socket.close();
     })
