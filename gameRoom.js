@@ -27,11 +27,11 @@ function angle(x, y, dest_x, dest_y) {
     return Math.atan2(dest_x - x, dest_y - y);
 }
 
-//calculates component velocities of shot based on velocity and angle
-function velocity(ang) {
+//calculates component velocities of shot based on angle and net speed
+function velocity(ang, speed) {
     return {
-        x:Math.sin(ang) * gameSettings.shotSpeed,
-        y:Math.cos(ang) * gameSettings.shotSpeed,
+        x:Math.sin(ang) * speed,
+        y:Math.cos(ang) * speed,
     };
 }
 
@@ -150,9 +150,6 @@ Room.prototype.addSocket = function (socket) {
         //set roomId to socket
         socket.roomId = this.roomId;
 
-        //relay game settings to socket
-        // socket.emit('game_settings', gameSettings)
-
         //give socket a random color
         socket.color = Object.keys(gameSettings.colorPairs)[randint(0, Object.keys(gameSettings.colorPairs).length-1)];
 
@@ -218,7 +215,10 @@ Room.prototype.addSocket = function (socket) {
         socket.on('shoot', function (dest_x, dest_y) {
             if (socket.alive) {
                 //calculate velocity based on shot speed and where the player clicked
-                vel = velocity(angle(socket.x, socket.y, dest_x, dest_y));
+                vel = velocity(
+                    angle(socket.x, socket.y, dest_x, dest_y), 
+                    gameSettings.shotSpeed
+                );
 
                 //create new shot object
                 var id = Math.random();
@@ -245,7 +245,8 @@ Room.prototype.addSocket = function (socket) {
                             dest_x, dest_y
                         ) 
                         + (i - gameSettings.fullSpreadCount/2 + 0.5) 
-                        * (gameSettings.fullSpreadAngle/(gameSettings.fullSpreadCount-1))
+                        * (gameSettings.fullSpreadAngle/(gameSettings.fullSpreadCount-1)),
+                        gameSettings.shotSpeed
                     );
 
                     var id = Math.random();
