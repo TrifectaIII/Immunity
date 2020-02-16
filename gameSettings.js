@@ -6,8 +6,8 @@ var gameSettings = {
     tickRate: 20,
 
     //size of game area
-    width: 1000,
-    height: 1000,
+    width: 2000,
+    height: 2000,
 
     // time in MS to respawn players
     respawnTime: 3000,
