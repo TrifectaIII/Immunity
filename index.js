@@ -13,33 +13,28 @@ const io = require('socket.io')(serv); // connect socket.io to server
 //Start Server
 serv.listen(process.env.PORT || 8000); // specified port or 8k as backup
 
-//route main page in index
-app.get('/',function(req, res) {
+//route main page to index.html
+app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/client/index.html');
 });
 
-//Serve static files
+//Serve client files
 app.use('/client',express.static(__dirname + '/client'));
+
+//Serve gameSettings.js file
+app.get('/gameSettings.js', function (req, res) {
+    res.sendFile(__dirname + '/gameSettings.js');
+});
 
 
 // GAME ROOMS
 ///////////////////////////////////////////////////
 
-//copy game settings to serve to client folder
-require('fs').copyFile(
-    './gameSettings.js', 
-    './client/js/gameSettings.js', 
-    function (error) {
-        if (error) {throw error};
-        console.log('copied gameSettings.js to /client/js folder');
-    }
-)
-
 //include gameSettings.js
-const gameSettings = require('./gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 //include gameRoom constructor from gameRoom.js
-const gameRoom = require('./gameRoom.js');
+const gameRoom = require(__dirname + '/gameRoom.js');
 
 //object to hold individual game rooms
 var gameRooms = {};
@@ -52,6 +47,7 @@ function generateRoomId(gameRooms) {
     }
     return roomIdCounter.toString();
 }
+
 
 // HANDLE NEW SOCKETS
 ///////////////////////////////////////////////////
@@ -82,6 +78,7 @@ io.sockets.on('connection', function (socket) {
             }
         }     
     })
+
 
     // JOIN ROOM
     ////////////////////////////////
@@ -120,6 +117,7 @@ io.sockets.on('connection', function (socket) {
         }
     });
 });
+
 
 // MAIN GAME LOOP
 ///////////////////////////////////////////////////

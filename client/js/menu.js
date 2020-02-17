@@ -265,8 +265,8 @@ var classButtons = {};
 for (let className in gameSettings.classes) {
     classButtons[className] = new Button(
         className.toUpperCase(),
-        gameSettings.classes[className].colors[1],
-        gameSettings.classes[className].colors[0]
+        gameSettings.classes[className].colors.dark,
+        gameSettings.classes[className].colors.light
     )
 }
 

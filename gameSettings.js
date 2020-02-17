@@ -32,7 +32,10 @@ var gameSettings = {
         heavy: {
             maxHealth: 20,
             speed: 3,
-            colors: ['#00E436','#008751'],//green
+            colors: { //green
+                light: '#00E436',
+                dark: '#008751',
+            },
             shotCount: 5,
             shotSpeed: 15,
             shotAngle: Math.PI/4,
@@ -41,7 +44,10 @@ var gameSettings = {
         engineer: {
             maxHealth: 15,
             speed: 5,
-            colors: ['#FFEC27','#AB5236'],//yellow
+            colors: { //yellow
+                light: '#FFEC27',
+                dark: '#AB5236',
+            },
             shotCount: 3,
             shotSpeed: 15,
             shotAngle: Math.PI/6,
@@ -50,7 +56,10 @@ var gameSettings = {
         sniper: {
             maxHealth: 10,
             speed: 7,
-            colors: ['#FF77A8','#7E2553'],//pink
+            colors: { //pink
+                light: '#FF77A8',
+                dark: '#7E2553',
+            },
             shotCount: 1,
             shotSpeed: 25,
             shotAngle: 0,
@@ -59,7 +68,10 @@ var gameSettings = {
         soldier: {
             maxHealth: 15,
             speed: 5,
-            colors: ['#29ADFF','#1D2B53'],//blue
+            colors: { //blue
+                light: '#29ADFF',
+                dark: '#1D2B53',
+            },
             shotCount: 1,
             shotSpeed: 15,
             shotAngle: 0,

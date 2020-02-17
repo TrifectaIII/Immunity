@@ -229,8 +229,8 @@ function drawShots() {
             shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
             shot.y-screenOffset.y < windowHeight) {
-                fill(gameSettings.classes[shot.class].colors[0]);
-                stroke(gameSettings.classes[shot.class].colors[1]);
+                fill(gameSettings.classes[shot.class].colors.light);
+                stroke(gameSettings.classes[shot.class].colors.dark);
                 ellipse(shot.x-screenOffset.x, shot.y-screenOffset.y, 10, 10);
         }
     }
@@ -249,9 +249,9 @@ function drawDead () {
                 player.y-screenOffset.y > -50 &&
                 player.y-screenOffset.y < windowHeight + 50) {
                     //draw player as transparent
-                    let fillcolor = color(gameSettings.classes[player.class].colors[0]);
+                    let fillcolor = color(gameSettings.classes[player.class].colors.light);
                     fillcolor.setAlpha(100);
-                    let strokecolor = color(gameSettings.classes[player.class].colors[1]);
+                    let strokecolor = color(gameSettings.classes[player.class].colors.dark);
                     strokecolor.setAlpha(100)
                     fill(fillcolor);
                     stroke(strokecolor);
@@ -291,8 +291,8 @@ function drawLiving () {
                 player.y-screenOffset.y > -50 &&
                 player.y-screenOffset.y < windowHeight + 50) {
                     //draw player
-                    fill(gameSettings.classes[player.class].colors[0]);
-                    stroke(gameSettings.classes[player.class].colors[1]);
+                    fill(gameSettings.classes[player.class].colors.light);
+                    stroke(gameSettings.classes[player.class].colors.dark);
                     strokeWeight(2);
                     ellipse(
                         player.x-screenOffset.x, player.y-screenOffset.y, 
@@ -307,7 +307,7 @@ function drawLiving () {
                     if (player.y-screenOffset.y > windowHeight - 50) {
                         y_offset = -35;
                     }
-                    stroke(gameSettings.classes[player.class].colors[1]);
+                    stroke(gameSettings.classes[player.class].colors.dark);
                     strokeWeight(2);
                     fill('black');
                     rect(
@@ -315,7 +315,7 @@ function drawLiving () {
                         x_offset*2, 5*(y_offset/y_offset_abs),
                     );
                     strokeWeight(0);
-                    fill(gameSettings.classes[player.class].colors[0]);
+                    fill(gameSettings.classes[player.class].colors.light);
                     rect(
                         player.x - x_offset-screenOffset.x, player.y + y_offset-screenOffset.y, 
                         x_offset*2*(player.health/gameSettings.classes[player.class].maxHealth), 5*(y_offset/y_offset_abs),
@@ -329,8 +329,8 @@ function drawLiving () {
 //draw client's player
 function drawPlayer (player) {
     push();
-    fill(gameSettings.classes[player.class].colors[0]);
-    stroke(gameSettings.classes[player.class].colors[1]);
+    fill(gameSettings.classes[player.class].colors.light);
+    stroke(gameSettings.classes[player.class].colors.dark);
     strokeWeight(2);
     ellipse(
         player.x-screenOffset.x, 
@@ -360,7 +360,7 @@ function deathMsg (player) {
         push();
         textAlign(CENTER, CENTER);
         background(0, 200);
-        fill(gameSettings.classes[player.class].colors[0]);
+        fill(gameSettings.classes[player.class].colors.light);
         stroke('black');
         strokeWeight(3);
         textSize(40);
@@ -372,7 +372,7 @@ function deathMsg (player) {
 //draw cosshair
 function drawCrosshair (player) {
     push();
-    stroke(gameSettings.classes[player.class].colors[1]);
+    stroke(gameSettings.classes[player.class].colors.dark);
     strokeWeight(2);
     fill(0,0);
     ellipse(mouseX, mouseY, 30, 30);
@@ -392,7 +392,7 @@ function drawMainbar (player, prog) {
         windowWidth/4-2, windowHeight - 27,
         windowWidth/2+4, 24,
     );
-    fill(gameSettings.classes[player.class].colors[0]);
+    fill(gameSettings.classes[player.class].colors.light);
     rect(
         windowWidth/4, windowHeight - 25,
         windowWidth/2*(prog), 20
@@ -440,7 +440,7 @@ function drawMinimap () {
     for (let id in players) {
         if (id != socket.id && players[id].health > 0) {
             let player = players[id];
-            fill(gameSettings.classes[player.class].colors[0]);
+            fill(gameSettings.classes[player.class].colors.light);
             ellipse(
                 (player.x/gameSettings.width)*minimapWidth+minimapOffset.x,
                 (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
@@ -453,7 +453,7 @@ function drawMinimap () {
     let player = players[socket.id];
     strokeWeight(1);
     stroke('#FFF1E8');
-    fill(gameSettings.classes[player.class].colors[0]);
+    fill(gameSettings.classes[player.class].colors.light);
     ellipse(
         (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
         (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
@@ -469,7 +469,7 @@ function drawRoomId (player) {
     stroke('black');
     strokeWeight(0);
     textSize(30);
-    fill(gameSettings.classes[player.class].colors[1]);
+    fill(gameSettings.classes[player.class].colors.dark);
     text('Game Code: '+roomId, 15, 20);
 
     text('Players: '+Object.keys(players).length.toString()+'/'+gameSettings.roomCap, 15, 60)
@@ -487,7 +487,7 @@ function drawPlayerInfo () {
     for (let id in players) {
         //draw name and killstreak
         let player = players[id];
-        fill(gameSettings.classes[player.class].colors[1]);
+        fill(gameSettings.classes[player.class].colors.dark);
         text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
         
         //draw healthbar
@@ -495,14 +495,14 @@ function drawPlayerInfo () {
         let barHeight = 6;
         let barOffset = 15;
         fill('black');
-        stroke(gameSettings.classes[player.class].colors[1]);
+        stroke(gameSettings.classes[player.class].colors.dark);
         strokeWeight(2);
         rect(
             windowWidth-(barWidth+barOffset), 40+counter*50, 
             windowWidth-(barOffset), 40+counter*50 + barHeight
         );
         strokeWeight(0);
-        fill(gameSettings.classes[player.class].colors[0]);
+        fill(gameSettings.classes[player.class].colors.light);
         rect(
             windowWidth-barOffset - barWidth*(player.health/gameSettings.classes[player.class].maxHealth), 40+counter*50, 
             windowWidth-(barOffset), 40+counter*50 + barHeight
