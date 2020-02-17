@@ -6,6 +6,9 @@ const app = express(); //create express app
 const serv = require('http').Server(app); //serve http over app
 const io = require('socket.io')(serv); // connect socket.io to server
 
+//compress and minify files
+// app.use(require('compression')());
+// app.use(require('express-minify')());
 
 // HTTP SERVER
 ///////////////////////////////////////////////////
