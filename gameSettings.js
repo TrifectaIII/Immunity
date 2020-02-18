@@ -12,9 +12,6 @@ var gameSettings = {
     // time in MS to respawn players
     respawnTime: 3000,
 
-    //players speed
-    playerSpeed: 5,
-
     //size of player
     playerRadius: 25,
 
@@ -22,69 +19,89 @@ var gameSettings = {
     pickupTime: 5000,
 
     //max pickups in the world at a time, per player
-    pickupMax: 4,
+    pickupMax: 1,
 
     //different types of pickups
     pickupTypes: ['health'],
 
     //info specific to each class
     classes: {
+
         heavy: {
+
             maxHealth: 20,
             speed: 3,
+
             colors: { //green
                 light: '#00E436',
                 dark: '#008751',
             },
-            shotCount: 5,
-            shotSpeed: 15,
-            shotAngle: Math.PI/4,
-            shotRange: 250,//multiple of shotSpeed
+
+            shots: {
+                count: 5,
+                speed: 15,
+                angle:Math.PI/4,
+                range: 250,
+            },
         },
+
         engineer: {
+
             maxHealth: 15,
             speed: 5,
+
             colors: { //yellow
                 light: '#FFEC27',
                 dark: '#AB5236',
             },
-            shotCount: 3,
-            shotSpeed: 15,
-            shotAngle: Math.PI/6,
-            shotRange: 300,
+
+            shots: {
+                count: 3,
+                speed: 15,
+                angle:Math.PI/6,
+                range: 300,
+            },
         },
         sniper: {
+
             maxHealth: 10,
             speed: 7,
+
             colors: { //pink
                 light: '#FF77A8',
                 dark: '#7E2553',
             },
-            shotCount: 1,
-            shotSpeed: 25,
-            shotAngle: 0,
-            shotRange: 800,
+
+            shots: {
+                count: 1,
+                speed: 25,
+                angle: 0,
+                range: 800,
+            },
         },
+
         soldier: {
+
             maxHealth: 15,
             speed: 5,
+
             colors: { //blue
                 light: '#29ADFF',
                 dark: '#1D2B53',
             },
-            shotCount: 1,
-            shotSpeed: 15,
-            shotAngle: 0,
-            shotRange: 600,
+
+            shots: {
+                count: 1,
+                speed: 15,
+                angle: 0,
+                range: 600,
+            },
         },
     },
 }
 
-// EXPORT only if server side
+// EXPORT only if node.js
 ///////////////////////////////////////////
-try{
+if (typeof module != 'undefined') {
     module.exports = gameSettings;
-}
-catch {
-    // console.log('this is the client!')
 }

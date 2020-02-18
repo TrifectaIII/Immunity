@@ -96,7 +96,7 @@ Room.prototype.update = function () {
         }
 
         //remove range based on speed
-        shot.range -= gameSettings.classes[shot.class].shotSpeed;
+        shot.range -= gameSettings.classes[shot.class].shots.speed;
         
         //destroy if out of range
         destroyed = destroyed || shot.range <= 1;
@@ -236,11 +236,11 @@ Room.prototype.addSocket = function (socket, className) {
                 let myClass = gameSettings.classes[socket.class];
 
                 //single-shot classes
-                if (myClass.shotCount == 1) {
+                if (myClass.shots.count == 1) {
                     //calculate velocity based on shot speed and where the player clicked
                     vel = velocity(
                         angle(socket.x, socket.y, dest_x, dest_y), 
-                        myClass.shotSpeed
+                        myClass.shots.speed
                     );
 
                     //create new shot object
@@ -251,22 +251,22 @@ Room.prototype.addSocket = function (socket, className) {
                         class: socket.class,
                         socketId: socket.id,
                         velocity: vel,
-                        range: myClass.shotRange,
+                        range: myClass.shots.range,
                     };
                 }
 
                 //multi-shot (shotgun) classes
                 else {
-                    for (let i = 0; i < myClass.shotCount; i++) {
+                    for (let i = 0; i < myClass.shots.count; i++) {
 
                         let vel = velocity(
                             angle(
                                 socket.x, socket.y, 
                                 dest_x, dest_y
                             ) 
-                            + (i - myClass.shotCount/2 + 0.5) 
-                            * (myClass.shotAngle/(myClass.shotCount-1)),
-                            myClass.shotSpeed
+                            + (i - myClass.shots.count/2 + 0.5) 
+                            * (myClass.shots.angle/(myClass.shots.count-1)),
+                            myClass.shots.speed
                         );
     
                         var id = Math.random();
@@ -276,7 +276,7 @@ Room.prototype.addSocket = function (socket, className) {
                             class: socket.class,
                             socketId: socket.id,
                             velocity: vel,
-                            range: myClass.shotRange,
+                            range: myClass.shots.range,
                         };
                     }
                 }
