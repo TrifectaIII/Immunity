@@ -39,7 +39,7 @@ var gameSettings = {
             shotCount: 5,
             shotSpeed: 15,
             shotAngle: Math.PI/4,
-            shotLifespan: 15,
+            shotRange: 250,//multiple of shotSpeed
         },
         engineer: {
             maxHealth: 15,
@@ -51,7 +51,7 @@ var gameSettings = {
             shotCount: 3,
             shotSpeed: 15,
             shotAngle: Math.PI/6,
-            shotLifespan: 20,
+            shotRange: 300,
         },
         sniper: {
             maxHealth: 10,
@@ -63,7 +63,7 @@ var gameSettings = {
             shotCount: 1,
             shotSpeed: 25,
             shotAngle: 0,
-            shotLifespan: 60,
+            shotRange: 800,
         },
         soldier: {
             maxHealth: 15,
@@ -75,7 +75,7 @@ var gameSettings = {
             shotCount: 1,
             shotSpeed: 15,
             shotAngle: 0,
-            shotLifespan: 35,
+            shotRange: 600,
         },
     },
 }

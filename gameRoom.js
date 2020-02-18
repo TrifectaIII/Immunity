@@ -95,9 +95,11 @@ Room.prototype.update = function () {
             } 
         }
 
-        //destroy if end of life
-        shot.lifespan--;
-        destroyed = destroyed || shot.lifespan <= 1;
+        //remove range based on speed
+        shot.range -= gameSettings.classes[shot.class].shotSpeed;
+        
+        //destroy if out of range
+        destroyed = destroyed || shot.range <= 1;
         
         if (destroyed) {
             delete this.shots[id];
@@ -249,7 +251,7 @@ Room.prototype.addSocket = function (socket, className) {
                         class: socket.class,
                         socketId: socket.id,
                         velocity: vel,
-                        lifespan: myClass.shotLifespan,
+                        range: myClass.shotRange,
                     };
                 }
 
@@ -274,7 +276,7 @@ Room.prototype.addSocket = function (socket, className) {
                             class: socket.class,
                             socketId: socket.id,
                             velocity: vel,
-                            lifespan: myClass.shotLifespan,
+                            range: myClass.shotRange,
                         };
                     }
                 }
