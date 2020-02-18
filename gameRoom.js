@@ -211,15 +211,7 @@ Room.prototype.addSocket = function (socket, className) {
                         break;
                 }
 
-                // //Loop through each enemy player after moving
-                // for (let id in this.players) {
-                //     if (id != socket.id) {
-                //         let enemySocket = this.players[id];
-                //         //DO BALL COLLISION HERE
-                //         //use gameSettings.playerRadius to access radius
-                        
-                //     }
-                // }
+                //DO PLAYER COLLISION HERE
 
                 //boundaries
                 socket.x = Math.min(Math.max(socket.x, 0), gameSettings.width);
@@ -308,7 +300,7 @@ Room.prototype.addSocket = function (socket, className) {
                     delete this.pickups[closestId];
                 }
             }
-        }.bind(this));
+        }.bind(this));//bind to room scope
 
         //confirm join with server after socket totally set up
         socket.emit('joined',this.roomId);
