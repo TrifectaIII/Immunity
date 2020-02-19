@@ -140,7 +140,6 @@ function drawNameMenu (canvas) {
 
     // set up nameInput if not setup yet
     if (nameInput == null) {
-        console.log('doing it!')
         nameInput = new gameInput(canvas, 6);
     }
 
