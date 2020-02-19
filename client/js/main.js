@@ -2,19 +2,13 @@
 /////////////////////////////
 
 //game state
-var state = 'nameMenu';
+var state = 'menu';
 
 //socket object
 var socket;
 
-//current game code
-var roomId;
-
 //p5 canvas
-var canv;
-
-//players name
-var name;
+var canvas;
 
 //function to join the game
 function joinGame(className) {
@@ -51,7 +45,7 @@ function joinGame(className) {
         if(!errors.active) {
             errors.displayError('Server Disconnected',5000);
         }
-        state = 'serverMenu';
+        restartMenus();
         socket.close();
     })
 
@@ -61,14 +55,14 @@ function joinGame(className) {
     //return to server menu if no space in room and display error
     socket.once('room_full', function () {
         errors.displayError('Game Full', 5000);
-        state = 'serverMenu';
+        restartMenus();
         socket.close();
     });
 
     //return to server menu if no room with that id exists and display error
     socket.once('no_such_room', function () {
         errors.displayError('Game Does Not Exist', 5000);
-        state = 'serverMenu';
+        restartMenus();
         socket.close();
     });
 
@@ -78,11 +72,8 @@ function joinGame(className) {
         //set new id if different
         roomId = newId;
 
-        //update settings object
-        game = gameSettings;
-
         //Start controls from controls.js
-        startControls();
+        startControls(canvas);
 
         //change state
         state = 'game';
@@ -112,27 +103,21 @@ function preload () {
 
 // p5 setup
 function setup () {
-    canv = createCanvas(windowWidth, windowHeight);
-    canv.parent('canvas-hold');
+    canvas = createCanvas(windowWidth, windowHeight);
+    canvas.parent('canvas-hold');
 
     textFont(homespunFont);
     textAlign(CENTER,CENTER);
-
-    //setup input for server menu
-    setupCodeInput(canv);
-
-    //setup input for name menu
-    setupNameInput(canv);
-
 }
 
-//resize canvas to always match window size
+//resize canvasas to always match window size
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+    resizeCanvas(windowWidth, windowHeight);
 }
 
 // p5 drawing
 function draw () {
+
     switch (state) {
 
         //draw loading screen from menu.js
@@ -140,18 +125,9 @@ function draw () {
             drawLoading();
             break;
 
-        //draw name menu from menu.js
-        case 'nameMenu':
-            drawNameMenu();
-            break;
-
-        //draw server menu from menu.js
-        case 'serverMenu':
-            drawServerMenu();
-            break;
-
-        case 'classMenu':
-            drawClassMenu();
+        //draw menus from menu.js
+        case 'menu':
+            drawMenus(canvas);
             break;
         
         //draw game from game.js
@@ -166,65 +142,14 @@ function draw () {
 
 //look for button clicks during menus
 function mouseClicked () {
-    switch (state) {
-
-        case 'nameMenu':
-            if (clickNameMenu() && getNameInput() != '') {
-                name = getNameInput();
-                hideNameInput();
-                state = 'serverMenu';
-            }
-            break;
-        
-        case 'serverMenu':
-            switch (clickServerMenu()) {
-                case 'new game':
-                    hideCodeInput();
-                    roomId = 'new_game';
-                    state = 'classMenu';
-                    break;
-                case 'join':
-                    if (getCodeInput() != '') {
-                        hideCodeInput();
-                        roomId = getCodeInput();
-                        state = 'classMenu';
-                    }
-                    break;
-            }
-            break;
-
-        case 'classMenu':
-            if (clickClassMenu()) {
-                joinGame(clickClassMenu());
-            }
-            break;
+    if (state == 'menu') {
+        menuMouseClicked();
     }
 }
 
 //look for enter presses on menu
 function keyPressed () {
-    switch (state) {
-
-        case 'nameMenu':
-            if (keyCode == ENTER) {
-                if (getNameInput() != '') {
-                    name = getNameInput();
-                    hideNameInput();
-                    state = 'serverMenu';
-                }
-                return false;
-            }
-            break;
-
-        case 'serverMenu':
-            if (keyCode == ENTER) {
-                if (getCodeInput() != '') {
-                    hideCodeInput();
-                    roomId = getCodeInput();
-                    state = 'classMenu';
-                }
-                return false;
-            }
-            break;
+    if (state == 'menu') {
+        menuKeyPressed(keyCode);
     }
 }
