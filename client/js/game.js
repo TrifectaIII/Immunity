@@ -1,11 +1,11 @@
 //player info from server
-var players = {};
+var playerData = {};
 
-//shots info from server
-var shots = {};
+//shotData info from server
+var shotData = {};
 
-//pickups info from server
-var pickups = {};
+//pickupData info from server
+var pickupData = {};
 
 //object to hold info re: screen offset based on player position
 var screenOffset = {
@@ -18,8 +18,8 @@ var deathStart;
 
 //conglomerate draw function for game objects
 function drawGame () {
-    if (socket.id in players) {
-        let player = players[socket.id];
+    if (socket.id in playerData) {
+        let player = playerData[socket.id];
 
         push();
 
@@ -46,7 +46,7 @@ function drawGame () {
         //draw pickups
         drawPickups();
 
-        //draw all shots
+        //draw shots
         drawShots();
 
         //draw living players
@@ -81,7 +81,7 @@ function drawGame () {
         //draw info about the current gameRoom
         drawRoomId(player);
 
-        //draw names of players
+        //draw names of playerData
         drawPlayerInfo();
 
         // draw crosshair
@@ -181,8 +181,8 @@ function drawPickups() {
     fill('#FF004D');
     stroke('black');
     strokeWeight(4);
-    for (let id in pickups) {
-        let pickup = pickups[id];
+    for (let id in pickupData) {
+        let pickup = pickupData[id];
         if (pickup.x-screenOffset.x > -50 &&
             pickup.x-screenOffset.x < windowWidth + 50 &&
             pickup.y-screenOffset.y > -50 &&
@@ -219,12 +219,12 @@ function drawPickups() {
     pop();
 }
 
-//draw all shots
+//draw all shotData
 function drawShots() {
     push();
     strokeWeight(2);
-    for (let id in shots) {
-        let shot = shots[id];
+    for (let id in shotData) {
+        let shot = shotData[id];
         if (shot.x-screenOffset.x > 0 &&
             shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
@@ -237,12 +237,12 @@ function drawShots() {
     pop();
 }
 
-//draw dead players 
+//draw dead playerData 
 function drawDead () {
     push();
-    for (let id in players) {
+    for (let id in playerData) {
         if (id != socket.id) {
-            let player = players[id];
+            let player = playerData[id];
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -279,12 +279,12 @@ function drawDead () {
     pop();
 }
 
-//draw living players
+//draw living playerData
 function drawLiving () {
     push();
-    for (let id in players) {
+    for (let id in playerData) {
         if (id != socket.id) {
-            let player = players[id];
+            let player = playerData[id];
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -400,7 +400,7 @@ function drawMainbar (player, prog) {
     pop();
 }
 
-//draw client players healthbar
+//draw client playerData healthbar
 function drawHealthbar (player) {
     push();
     textAlign(CENTER, CENTER);
@@ -437,9 +437,9 @@ function drawMinimap () {
     );
 
     //draw other player pips
-    for (let id in players) {
-        if (id != socket.id && players[id].health > 0) {
-            let player = players[id];
+    for (let id in playerData) {
+        if (id != socket.id && playerData[id].health > 0) {
+            let player = playerData[id];
             fill(gameSettings.classes[player.class].colors.light);
             ellipse(
                 (player.x/gameSettings.width)*minimapWidth+minimapOffset.x,
@@ -450,7 +450,7 @@ function drawMinimap () {
     }
 
     //draw client player pip with outline indicator + larger
-    let player = players[socket.id];
+    let player = playerData[socket.id];
     strokeWeight(1);
     stroke('#FFF1E8');
     fill(gameSettings.classes[player.class].colors.light);
@@ -472,7 +472,7 @@ function drawRoomId (player) {
     fill(gameSettings.classes[player.class].colors.dark);
     text('Game Code: '+roomId, 15, 20);
 
-    text('Players: '+Object.keys(players).length.toString()+'/'+gameSettings.roomCap, 15, 60)
+    text('playerData: '+Object.keys(playerData).length.toString()+'/'+gameSettings.roomCap, 15, 60)
     pop();
 }
 
@@ -484,9 +484,9 @@ function drawPlayerInfo () {
     strokeWeight(0);
     textSize(30);
     let counter = 0;
-    for (let id in players) {
+    for (let id in playerData) {
         //draw name and killstreak
-        let player = players[id];
+        let player = playerData[id];
         fill(gameSettings.classes[player.class].colors.dark);
         text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
         

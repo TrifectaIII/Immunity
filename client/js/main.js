@@ -1,23 +1,24 @@
 //SOCKET.IO
 /////////////////////////////
 
-//game state
+// global game state
 var state = 'menu';
 
-//socket object
+// current roomId
+var roomId;
+
+// socket object
 var socket;
 
-//p5 canvas
-var canvas;
-
-//function to join the game
-function joinGame() {
+// function to join the game
+function joinGame(menuChoices) {
 
     //switch state
     state = 'load'
 
-    //connect socket to server w/ no reconnection allowed
+    //connect socket to server
     socket = io({
+        //no reconnection allowed
         reconnection:false,
     });
 
@@ -50,7 +51,12 @@ function joinGame() {
     })
 
     //attempt to join game
-    socket.emit('join_game', roomId, name, className);
+    socket.emit(
+        'join_game', 
+        menuChoices.roomId, 
+        menuChoices.name, 
+        menuChoices.className
+    );
 
     //return to server menu if no space in room and display error
     socket.once('room_full', function () {
@@ -69,10 +75,10 @@ function joinGame() {
     //confirm room joining
     socket.once('joined', function (newId) {
 
-        //set new id if different
+        //set global roomId
         roomId = newId;
 
-        //Start controls from controls.js
+        //Start controls (controls.js)
         startControls(canvas);
 
         //change state
@@ -82,11 +88,11 @@ function joinGame() {
         errors.hideError();
 
         //recieve player info from server
-        socket.on ('game_update', function (game_info) {
-            //save to objects in game.js
-            players = game_info.player_info;
-            shots = game_info.shot_info;
-            pickups = game_info.pickup_info;
+        socket.on ('game_update', function (serverData) {
+            //save to objects (game.js)
+            playerData = serverData.player_info;
+            shotData = serverData.shot_info;
+            pickupData = serverData.pickup_info;
         });
     });
 }
@@ -94,6 +100,10 @@ function joinGame() {
 //p5.js
 /////////////////////////////
 
+//p5 canvas
+var canvas;
+
+//font loaded from ttf file
 var homespunFont;
 
 //p5 preload
@@ -120,36 +130,36 @@ function draw () {
 
     switch (state) {
 
-        //draw loading screen from menu.js
+        //draw loading screen (menu.js)
         case 'load':
             drawLoading();
             break;
 
-        //draw menus from menu.js
+        //draw menus (menu.js)
         case 'menu':
             drawMenus(canvas);
             break;
         
-        //draw game from game.js
+        //draw game (game.js)
         case 'game':
             drawGame();
             break;
     }
 
-    //no matter state, draw error if active
+    //no matter state, draw error if active (error.js)
     errors.drawError();
 }
 
 //look for button clicks during menus
 function mouseClicked () {
     if (state == 'menu') {
-        menuMouseClicked();
+        menuMouseClicked(); //(menu.js)
     }
 }
 
 //look for enter presses on menu
 function keyPressed () {
     if (state == 'menu') {
-        menuKeyPressed(keyCode);
+        menuKeyPressed(keyCode); //(menu.js)
     }
 }

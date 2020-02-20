@@ -7,8 +7,8 @@ function startControls (canvas) {
     clearInterval(moveInterval);
     moveInterval = setInterval(function () {
         if (state == "game" && 
-            socket.id in players && 
-            players[socket.id].health > 0) {
+            socket.id in playerData && 
+            playerData[socket.id].health > 0) {
                 sendMove();
         }
     }, gameSettings.tickRate);//use games tickRate
@@ -17,8 +17,8 @@ function startControls (canvas) {
     canvas.elt.addEventListener('click', function (event) {
         event.preventDefault();
         if (state == "game" && 
-            socket.id in players && 
-            players[socket.id].health > 0) {
+            socket.id in playerData && 
+            playerData[socket.id].health > 0) {
                 socket.emit(
                     'shoot', 
                     mouseX+screenOffset.x, mouseY+screenOffset.y //x and y of mouse in game world
@@ -30,8 +30,8 @@ function startControls (canvas) {
     document.addEventListener('keypress', function (event) {
         if (event.keyCode == 69 || event.keyCode == 101) {//e key
             if (state == "game" && 
-                socket.id in players &&
-                players[socket.id].health > 0) {
+                socket.id in playerData &&
+                playerData[socket.id].health > 0) {
                     socket.emit('pickup');
             }
         }
