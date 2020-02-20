@@ -56,13 +56,18 @@ function generateRoomId(gameRooms) {
 
 //logs current rooms and their populations
 function showRooms (gameRooms) {
-    console.log("ROOM STATUS #############");
-    for (let roomId in gameRooms) {
-        console.log(
-            `Game Room ${roomId}: ${gameRooms[roomId].getPop()} Players`
-        );
+    if (Object.keys(gameRooms).length > 0) {
+        console.log("\nROOM STATUS #############");
+        for (let roomId in gameRooms) {
+            console.log(
+                `Game Room ${roomId}: ${gameRooms[roomId].getPop()} Players`
+            );
+        }
+        console.log("#########################\n");
     }
-    console.log("#########################");
+    else {
+        console.log("\nROOM STATUS: No Rooms Active\n");
+    }
 }
  
 
