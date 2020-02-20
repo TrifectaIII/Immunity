@@ -6,7 +6,13 @@ function startControls (canvas) {
     //execute direction emits from movement.js
     clearInterval(moveInterval);
     moveInterval = setInterval(
-        sendDirection, 
+        function () {
+            if (state == "game" && 
+                socket.id in playerData && 
+                playerData[socket.id].health > 0) {
+                    sendDirection();
+            }
+        },
         gameSettings.tickRate/2 //uses half of games tickRate
     );
 
