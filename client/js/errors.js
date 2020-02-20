@@ -36,7 +36,7 @@ var errors = {
             textSize(40);
             strokeWeight(2);
             stroke('black');
-            fill('#FF004D');
+            fill(gameSetting.colors.red);
             text(
                 this.message, 
                 windowWidth/2, 

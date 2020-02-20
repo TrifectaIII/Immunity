@@ -98,6 +98,25 @@ var gameSettings = {
             },
         },
     },
+
+    colors: {
+        black:"#000000",
+        brown:"#AB5236",
+        red:"#FF004D",
+        blue:"#29ADFF",
+        darkblue:"#1D2B53",
+        darkgrey:"#5F574F",
+        mango:"#FFA300",
+        purple:"#83769C",
+        darkpink:"#7E2553",
+        grey:"#C2C3C7",
+        yellow:"#FFEC27",
+        pink:"#FF77A8",
+        darkgreen:"#008751",
+        white:"#FFF1E8",
+        green:"#00E436",
+        tan:"#FFCCAA",
+    }
 }
 
 // EXPORT only if node.js

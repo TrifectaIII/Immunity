@@ -75,12 +75,17 @@ Button.prototype.draw = function () {
     if (this.mouseOver()) {
         fill(this.colorOn);
     }
-    rect(this.x-this.width/2,this.y-this.height/2, this.width, this.height);
+    rect(
+        this.x-this.width/2,
+        this.y-this.height/2, 
+        this.width, 
+        this.height
+    );
 
     //draw text
     stroke('black');
     strokeWeight(4);
-    fill('#FFF1E8');
+    fill(gameSettings.colors.white);
     textSize(40);
     text(this.text, this.x, this.y);
     pop();
@@ -126,10 +131,19 @@ TextInput.prototype.showAt = function (x, y, w, h) {
 //////////////////////////////////////////////////////////////////////////////
 
 //button to go to previous menu
-var backButton = new Button("BACK","#7E2553","#FF004D");
+var backButton = new Button(
+    "BACK",
+    gameSettings.colors.darkpink,
+    gameSettings.colors.red
+);
 
 function drawBackButton() {
-    backButton.update(100, windowHeight - 100, windowHeight/8, windowHeight/8);
+    backButton.update(
+        100, 
+        windowHeight - 100, 
+        windowHeight/8, 
+        windowHeight/8
+    );
     backButton.draw();
 }
 
@@ -141,7 +155,11 @@ function drawBackButton() {
 var nameInput;
 
 //button to submit name
-var setNameButton = new Button("SUBMIT", '#AB5236', '#FFEC27');
+var setNameButton = new Button(
+    "SUBMIT", 
+    gameSettings.colors.brown, 
+    gameSettings.colors.yellow
+);
 
 function drawNameMenu (canvas) {
 
@@ -160,7 +178,12 @@ function drawNameMenu (canvas) {
     drawMenuGrid();
 
     //update and draw set name button
-    setNameButton.update(windowWidth/2, windowHeight*2/3, windowWidth/4, windowHeight/8);
+    setNameButton.update(
+        windowWidth/2,
+        windowHeight*2/3, 
+        windowWidth/4, 
+        windowHeight/8
+    );
     setNameButton.draw();
 
     //draw text for code entry
@@ -176,7 +199,12 @@ function drawNameMenu (canvas) {
     drawMenuCrosshair();
 
     //display input for name entry
-    nameInput.showAt(windowWidth/2, windowHeight/2, windowWidth/3, 75);
+    nameInput.showAt(
+        windowWidth/2, 
+        windowHeight/2, 
+        windowWidth/3, 
+        75
+    );
 
     pop();
 }
@@ -191,9 +219,17 @@ function clickNameMenu () {
 //input element to type in game code
 var codeInput;
 
-var createGameButton = new Button( "NEW GAME", '#1D2B53', '#29ADFF');
+var createGameButton = new Button( 
+    "NEW GAME", 
+    gameSettings.colors.darkblue, 
+    gameSettings.colors.blue
+);
 
-var joinButton = new Button( "JOIN", '#008751', '#00E436');
+var joinButton = new Button( 
+    "JOIN", 
+    gameSettings.colors.darkgreen, 
+    gameSettings.colors.green
+);
 
 function drawServerMenu (canvas) {
 
@@ -212,8 +248,18 @@ function drawServerMenu (canvas) {
     drawMenuGrid();
 
     //update and draw buttons
-    createGameButton.update(windowWidth/2, windowHeight/4, windowWidth/4, windowHeight/8);
-    joinButton.update(windowWidth/2, windowHeight*5/6, windowWidth/5, windowHeight/8);
+    createGameButton.update(
+        windowWidth/2, 
+        windowHeight/4, 
+        windowWidth/4, 
+        windowHeight/8
+    );
+    joinButton.update(
+        windowWidth/2, 
+        windowHeight*5/6, 
+        windowWidth/5, 
+        windowHeight/8
+    );
 
     createGameButton.draw();
     joinButton.draw();
@@ -231,7 +277,12 @@ function drawServerMenu (canvas) {
     drawMenuCrosshair();
 
     //display input for game code
-    codeInput.showAt(windowWidth/2, windowHeight*2/3, windowWidth/4 ,75);
+    codeInput.showAt(
+        windowWidth/2, 
+        windowHeight*2/3,
+        windowWidth/4,
+        75
+    );
     pop();
 }
 
@@ -309,7 +360,11 @@ function clickClassMenu () {
 //////////////////////////////////////////////////////////////////////////////
 
 var loadingProg = 0;
-var loadingColors = ['#29ADFF', '#FFEC27', '#FF77A8', '#00E436'];
+var loadingColors = [];
+
+for (let className in gameSettings.classes) {
+    loadingColors.push(gameSettings.classes[className].colors.light);
+}
 
 function drawLoading () {
     push();

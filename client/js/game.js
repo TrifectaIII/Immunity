@@ -118,8 +118,8 @@ function calcOffset (player) {
 function drawGrid () {
     push();
     strokeWeight(1);
-    stroke('#C2C3C7');
-    background('#FFF1E8');
+    stroke(gameSettings.colors.grey);
+    background(gameSettings.colors.white);
     for (let x = 100; x < gameSettings.width; x+=100) {
         if (x-screenOffset.x > 0 &&
             x-screenOffset.x < windowWidth) {
@@ -145,7 +145,7 @@ function drawGrid () {
 function drawBorders () {
     push();
     strokeWeight(0);
-    fill('#C2C3C7');
+    fill(gameSettings.colors.grey);
     rectMode(CORNERS);
     //left
     if (screenOffset.x < 0) {
@@ -181,7 +181,7 @@ function drawBorders () {
 //draws pickup-able objects
 function drawPickups() {
     push();
-    fill('#FF004D');
+    fill(gameSettings.colors.red);
     stroke('black');
     strokeWeight(4);
     for (let id in pickupData) {
@@ -191,7 +191,7 @@ function drawPickups() {
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
                 if (pickup.type == 'health') {
-                    fill('#FF004D');
+                    fill(gameSettings.colors.red);
                     //draw rect
                     rect(
                         pickup.x-screenOffset.x - 20,
@@ -201,7 +201,7 @@ function drawPickups() {
                     )
                     //draw cross
                     push();
-                    fill('#FFF1E8');
+                    fill(gameSettings.colors.white);
                     strokeWeight(0);
                     rect(
                         pickup.x-screenOffset.x - 10,
@@ -267,7 +267,7 @@ function drawDead () {
 
                     //draw death cross
                     strokeWeight(5);
-                    stroke('#FF004D');
+                    stroke(gameSettings.colors.red);
                     line(player.x-screenOffset.x+25,
                         player.y-screenOffset.y+25,
                         player.x-screenOffset.x-25,
@@ -344,7 +344,7 @@ function drawPlayer (player) {
     //draw death cross if dead
     if (player.health <= 0) {
         strokeWeight(5);
-        stroke('#FF004D');
+        stroke(gameSettings.colors.red);
         line(player.x-screenOffset.x+25,
              player.y-screenOffset.y+25,
              player.x-screenOffset.x-25,
@@ -411,7 +411,7 @@ function drawHealthbar (player) {
     stroke('black');
     strokeWeight(4);
     textSize(20);
-    fill('#FFF1E8');
+    fill(gameSettings.colors.white);
     text(player.health.toString()+' / '+gameSettings.classes[player.class].maxHealth.toString() ,windowWidth/2,windowHeight-17);
     pop();
 }
@@ -455,7 +455,7 @@ function drawMinimap () {
     //draw client player pip with outline indicator + larger
     let player = playerData[socket.id];
     strokeWeight(1);
-    stroke('#FFF1E8');
+    stroke(gameSettings.colors.white);
     fill(gameSettings.classes[player.class].colors.light);
     ellipse(
         (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
