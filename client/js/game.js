@@ -84,6 +84,9 @@ function drawGame () {
         //draw names of playerData
         drawPlayerInfo();
 
+        //draw fps counter
+        drawFPS(player);
+
         // draw crosshair
         drawCrosshair(player);
 
@@ -476,6 +479,7 @@ function drawRoomId (player) {
     pop();
 }
 
+//draw name, killstreak, and healthbar for each player
 function drawPlayerInfo () {
     push();
     rectMode(CORNERS);
@@ -510,5 +514,20 @@ function drawPlayerInfo () {
 
         counter++;
     }
+    pop();
+}
+
+//draw framerate
+function drawFPS (player) {
+    push();
+    textAlign(RIGHT, CENTER);
+    textSize(30);
+    strokeWeight(0);
+    fill(gameSettings.classes[player.class].colors.dark);
+    //get fps from p5 and draw
+    text(
+        `FPS: ${Math.round(frameRate())}`, 
+        windowWidth-15, 
+        windowHeight-30);
     pop();
 }
