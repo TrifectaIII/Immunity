@@ -209,15 +209,8 @@ Room.prototype.addSocket = function (socket, className) {
         //give default direction
         socket.direction = 'none';
 
-        //set sockets class
-        if (className in gameSettings.classes) {
-            socket.class = className;
-        } 
-        //reject socket if cannot find class
-        else {
-            this.removeSocket(socket),
-            socket.emit('room_full');
-        }
+        //give socket it's selected class
+        socket.class = className;
 
         //spawn socket for first time
         this.spawnSocket(socket);

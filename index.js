@@ -112,10 +112,25 @@ io.sockets.on('connection', function (socket) {
     socket.once ('join_game', function (roomId, name, className) {
 
         //set name of socket
-        socket.name = name.substring(0,6);
+        socket.name = name.trim().substring(0,6);
+
+        //reject socket if chosen class is non-existent
+        if (!(className in gameSettings.classes)) {
+            socket.emit('rejection', 'Invalid Class');
+        }
+
+        //reject socket if room full
+        else if (roomId in gameRooms && !gameRooms[roomId].hasSpace()) {
+            socket.emit('rejection', 'Game Full');
+        }
+
+        //reject socket if room does not exist
+        else if (!(roomId in gameRooms) && roomId != 'new_game') {
+            socket.emit('rejection', 'Game Does Not Exist');
+        }
 
         //create new room on request
-        if (roomId == 'new_game') {
+        else if (roomId == 'new_game') {
             //generate new room id
             let newRoomId = generateRoomId(gameRooms);
             
@@ -130,7 +145,7 @@ io.sockets.on('connection', function (socket) {
         }
 
         //add to room if room exists and has space
-        else if (roomId in gameRooms && gameRooms[roomId].hasSpace()) {
+        else if (roomId in gameRooms) {
 
             gameRooms[roomId].addSocket(socket, className);
 
@@ -138,14 +153,9 @@ io.sockets.on('connection', function (socket) {
             showRooms(gameRooms);
         }
 
-        //reject socket if room full
-        else if (roomId in gameRooms) {
-            socket.emit('room_full');
-        }
-
-        //reject socket if room does not exist
+        //reject if any other situation
         else {
-            socket.emit('no_such_room');
+            socket.emit('rejection', 'Reason Unknown');
         }
     });
 });
