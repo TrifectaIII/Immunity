@@ -117,11 +117,63 @@ Room.prototype.update = function () {
         }
     }
 
-    //collect info on players from sockets
+    //handle players
     var player_info = {};
 
     for (let id in this.players) {
         let player = this.players[id];
+        
+        //move player based on direction
+        if (player.alive) {
+
+            //speed is set by class
+            let speed = gameSettings.classes[player.class].speed;
+            let speedComponent = speed/(Math.sqrt(2));
+
+            //move based on direction sent by client
+            switch (player.direction) {
+                case 'none':
+                    break;
+                //diagonal movements use component speed
+                case 'rightup':
+                    player.x += speedComponent;
+                    player.y -= speedComponent;
+                    break;
+                case 'leftup':
+                    player.x -= speedComponent;
+                    player.y -= speedComponent;
+                    break;
+                case 'rightdown':
+                    player.x += speedComponent;
+                    player.y += speedComponent;
+                    break;
+                case 'leftdown':
+                    player.x -= speedComponent;
+                    player.y += speedComponent;
+                    break;
+                //cardinal movements use raw speed
+                case 'right':
+                    player.x += speed;
+                    break;
+                case 'left':
+                    player.x -= speed;
+                    break;
+                case 'up':
+                    player.y -= speed;
+                    break;
+                case 'down':
+                    player.y += speed;
+                    break;
+            }
+
+            //DO PLAYER COLLISION HERE
+
+            //boundaries
+            player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
+            player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
+        }
+        
+        //collect info on players
         player_info[id] = {
             x: player.x,
             y: player.y,
@@ -132,7 +184,7 @@ Room.prototype.update = function () {
         };
     }
 
-    //return player and shot object for emit to players
+    //return player and shot object for emit to room
     return {
         player_info: player_info,
         shot_info: shot_info,
@@ -154,6 +206,9 @@ Room.prototype.addSocket = function (socket, className) {
         //set roomId to socket
         socket.roomId = this.roomId;
 
+        //give default direction
+        socket.direction = 'none';
+
         //set sockets class
         if (className in gameSettings.classes) {
             socket.class = className;
@@ -170,55 +225,11 @@ Room.prototype.addSocket = function (socket, className) {
         //SET UP LISTENERS
         /////////////////////////////////
 
-        //lets player move 
-        socket.on('move', function (direction) {
+        //switch player direction
+        socket.on('direction', function (direction) {
 
-            if (socket.alive) {
+            socket.direction = direction;
 
-                //speed is set by class
-                let speed = gameSettings.classes[socket.class].speed;
-                let speedComponent = speed/(Math.sqrt(2));
-
-                //move based on direction sent by client
-                switch (direction) {
-                    //diagonal movements use component speed
-                    case 'rightup':
-                        socket.x += speedComponent;
-                        socket.y -= speedComponent;
-                        break;
-                    case 'leftup':
-                        socket.x -= speedComponent;
-                        socket.y -= speedComponent;
-                        break;
-                    case 'rightdown':
-                        socket.x += speedComponent;
-                        socket.y += speedComponent;
-                        break;
-                    case 'leftdown':
-                        socket.x -= speedComponent;
-                        socket.y += speedComponent;
-                        break;
-                    //cardinal movements use raw speed
-                    case 'right':
-                        socket.x += speed;
-                        break;
-                    case 'left':
-                        socket.x -= speed;
-                        break;
-                    case 'up':
-                        socket.y -= speed;
-                        break;
-                    case 'down':
-                        socket.y += speed;
-                        break;
-                }
-
-                //DO PLAYER COLLISION HERE
-
-                //boundaries
-                socket.x = Math.min(Math.max(socket.x, 0), gameSettings.width);
-                socket.y = Math.min(Math.max(socket.y, 0), gameSettings.height);
-            }
         }.bind(this));//bind to room scope
 
         //handle shooting

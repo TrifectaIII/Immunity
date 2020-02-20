@@ -3,15 +3,12 @@ var moveInterval;
 // adds listeners for shooting
 function startControls (canvas) {
 
-    //execute move emits from movement.js
+    //execute direction emits from movement.js
     clearInterval(moveInterval);
-    moveInterval = setInterval(function () {
-        if (state == "game" && 
-            socket.id in playerData && 
-            playerData[socket.id].health > 0) {
-                sendMove();
-        }
-    }, gameSettings.tickRate);//use games tickRate
+    moveInterval = setInterval(
+        sendDirection, 
+        gameSettings.tickRate/2 //uses half of games tickRate
+    );
 
     //shoot on click
     canvas.elt.addEventListener('click', function (event) {

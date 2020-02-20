@@ -6,6 +6,8 @@ var left = false;
 var up = false;
 var down = false;
 
+var direction = 'none';
+
 //executes func after 100ms
 // x = setTimeout(func, 100);
 
@@ -57,29 +59,39 @@ document.addEventListener('keyup', function (event) {
 //move based on currently pressed keys
 
 //NOTE: this is called in a setInterval in controls.js
-function sendMove () {
+function sendDirection () {
+
+    let newDirection = 'none';
+
     if (right && !left && up && !down) {
-        socket.emit('move','rightup');
+        newDirection = ('rightup');
     }
     else if (!right && left && up && !down) {
-        socket.emit('move','leftup');
+        newDirection = ('leftup');
     }
     else if (right && !left && !up && down) {
-        socket.emit('move','rightdown');
+        newDirection = ('rightdown');
     }
     else if (!right && left && !up && down) {
-        socket.emit('move','leftdown');
+        newDirection = ('leftdown');
     }
     else if (right && !left) {
-        socket.emit('move','right');
+        newDirection = ('right');
     }
     else if (!right && left) {
-        socket.emit('move','left');
+        newDirection = ('left');
     }
     else if (up && !down) {
-        socket.emit('move','up');
+        newDirection = ('up');
     }
     else if (!up && down) {
-        socket.emit('move','down');
+        newDirection = ('down');
     }
+
+    //if any change, send to server
+    if (newDirection != direction) {
+        socket.emit('direction', newDirection);
+        direction = newDirection;
+    }
+    
 }
