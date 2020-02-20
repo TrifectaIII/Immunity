@@ -83,10 +83,12 @@ Room.prototype.update = function () {
                     if (enemy.health > 0) {
                         enemy.health--;
                         destroyed = true;
-                        //if enemy dead, set to respawn
+                        //if enemy dead, set to respawn and increase killcounter
                         enemy.alive = enemy.health > 0;
                         if (!enemy.alive) {
-                            this.players[shot.socketId].killStreak++;
+                            if (shot.socketId in this.players) {
+                                this.players[shot.socketId].killStreak++;
+                            }
                             setTimeout(function () {
                                 this.spawnSocket(enemy);
                             }.bind(this), gameSettings.respawnTime);

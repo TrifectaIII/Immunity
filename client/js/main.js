@@ -11,7 +11,7 @@ var socket;
 var canvas;
 
 //function to join the game
-function joinGame(className) {
+function joinGame() {
 
     //switch state
     state = 'load'

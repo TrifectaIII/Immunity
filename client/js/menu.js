@@ -36,7 +36,7 @@ function drawMenuGrid () {
     pop();
 }
 
-//button objects
+//Button Object Constructor
 //////////////////////////////////////////////////////////////////////////////
 
 function Button (text, colorOff, colorOn) {
@@ -86,28 +86,34 @@ Button.prototype.draw = function () {
     pop();
 }
 
-// Input Object Constructor
+// TextInput Object Constructor
 //////////////////////////////////////////////////////////////////////////////
 
-function gameInput (canvas, maxLength) {
+function TextInput (canvas, maxLength) {
     this.element = createElement('input');
-    //hide bny default
+    //hide by default
     this.element.hide();
     this.canvas = canvas;
     this.element.elt.maxLength = maxLength;
     this.element.class('gameInput');
 }
 
-gameInput.prototype.getValue = function () {
+// returns value of the input
+TextInput.prototype.getValue = function () {
     return this.element.elt.value.trim();
 }
 
-gameInput.prototype.hide = function () {
+// hides input
+TextInput.prototype.hide = function () {
     this.element.hide();
+}
+
+TextInput.prototype.clear = function () {
     this.element.elt.value = '';
 }
 
-gameInput.prototype.showAt = function (x, y, w, h) {
+//shows input at certain location and size
+TextInput.prototype.showAt = function (x, y, w, h) {
     this.element.size(w,h);
     this.element.position(
         this.canvas.position().x + x - w/2,
@@ -119,10 +125,11 @@ gameInput.prototype.showAt = function (x, y, w, h) {
 //Back Button
 //////////////////////////////////////////////////////////////////////////////
 
+//button to go to previous menu
 var backButton = new Button("BACK","#7E2553","#FF004D");
 
 function drawBackButton() {
-    backButton.update(windowWidth/6, windowHeight/2, 100, 100);
+    backButton.update(100, windowHeight - 100, windowHeight/8, windowHeight/8);
     backButton.draw();
 }
 
@@ -140,7 +147,7 @@ function drawNameMenu (canvas) {
 
     // set up nameInput if not setup yet
     if (nameInput == null) {
-        nameInput = new gameInput(canvas, 6);
+        nameInput = new TextInput(canvas, 6);
     }
 
     push();
@@ -184,15 +191,15 @@ function clickNameMenu () {
 //input element to type in game code
 var codeInput;
 
-var createGameButton = new Button( "New Game", '#1D2B53', '#29ADFF');
+var createGameButton = new Button( "NEW GAME", '#1D2B53', '#29ADFF');
 
-var joinButton = new Button( "Join", '#008751', '#00E436');
+var joinButton = new Button( "JOIN", '#008751', '#00E436');
 
 function drawServerMenu (canvas) {
 
     //setup codeInput if not setup yet
     if (codeInput == null) {
-        codeInput = new gameInput(canvas, 6);
+        codeInput = new TextInput(canvas, 6);
     }
 
     push();
@@ -229,9 +236,6 @@ function drawServerMenu (canvas) {
 }
 
 function clickServerMenu () {
-    if (backButton.mouseOver()) {
-        return "back";
-    }
     if (createGameButton.mouseOver()) {
         return "new_game";
     }
@@ -293,9 +297,6 @@ function drawClassMenu () {
 }
 
 function clickClassMenu () {
-    if (backButton.mouseOver()) {
-        return "back";
-    }
     for (let className in classButtons) {
         if (classButtons[className].mouseOver()) {
             return className;
@@ -346,90 +347,116 @@ function drawLoading () {
     pop();
 }
 
-var menuState = 'nameMenu';
+// Menu State Machine
+//////////////////////////////////////////////////////////////////////////////
 
+var menuChoices = {
+    name: '',
+    roomId: '',
+    class: '',
+}
+
+//list of menu progression (first to last)
+const menuList = ['name', 'server', 'class'];
+
+//tracks which menu we are on, starts at first
+var menuIndex = 0;
+
+
+//draws each menu
 function drawMenus (canvas) {
-    switch (menuState) {
+    switch (menuList[menuIndex]) {
         //draw name menu
-        case 'nameMenu':
+        case 'name':
             drawNameMenu(canvas);
             break;
 
         //draw server menu
-        case 'serverMenu':
+        case 'server':
             drawServerMenu(canvas);
             break;
 
         //draw class menu
-        case 'classMenu':
+        case 'class':
             drawClassMenu();
             break;
     }
 }
 
+//checks for clicks when menu is active
 function menuMouseClicked () {
-    switch (menuState) {
-        case 'nameMenu':
+
+    //go back 1 if button clicked
+    if (backButton.mouseOver() && menuIndex > 0) {
+        menuIndex-= 1;
+        nameInput.hide();
+        codeInput.hide();
+        return;
+    }
+
+    //otherwise, menu specific
+    switch (menuList[menuIndex]) {
+        case 'name':
             if (clickNameMenu() && nameInput.getValue() != '') {
                 name = nameInput.getValue();
                 nameInput.hide();
-                menuState = 'serverMenu';
+                menuIndex += 1;
             }
             break;
         
-        case 'serverMenu':
+        case 'server':
             switch (clickServerMenu()) {
-                case 'back':
-                    codeInput.hide();
-                    menuState = 'nameMenu';
-                    break;
                 case 'new_game':
-                    codeInput.hide();
                     roomId = 'new_game';
-                    menuState = 'classMenu';
+                    codeInput.hide();
+                    menuIndex += 1;
                     break;
                 case 'join':
                     if (codeInput.getValue() != '') {
-                        codeInput.hide();
                         roomId = codeInput.getValue();
-                        menuState = 'classMenu';
+                        codeInput.hide();
+                        menuIndex += 1;
                     }
                     break;
             }
             break;
 
-        case 'classMenu':
-            if (clickClassMenu() == 'back') {
-                menuState = 'serverMenu';
-            }
-            else if(clickClassMenu()) {
+        case 'class':
+            if (clickClassMenu()) {
                 //join game once class selected
-                joinGame(clickClassMenu());
+                className = clickClassMenu();
+                menuIndex += 1;
             }
             break;
     }
+
+    //if at the end of menus, go to game
+    if (menuIndex == menuList.length) {
+        joinGame();
+    }
 }
 
+//checks for key presses when menu is active
 function menuKeyPressed (keyCode) {
-    switch (menuState) {
+    switch (menuList[menuIndex]) {
 
-        case 'nameMenu':
+        case 'name':
             if (keyCode == ENTER) {
                 if (nameInput.getValue() != '') {
                     name = nameInput.getValue();
                     nameInput.hide();
-                    menuState = 'serverMenu';
+                    menuIndex += 1;
                 }
                 return false;
             }
             break;
 
-        case 'serverMenu':
+        case 'server':
             if (keyCode == ENTER) {
                 if (codeInput.getValue() != '') {
-                    codeInput.hide();
                     roomId = codeInput.getValue();
-                    menuState = 'classMenu';
+                    codeInput.hide();
+                    menuIndex += 1;
                 }
                 return false;
             }
@@ -437,7 +464,15 @@ function menuKeyPressed (keyCode) {
     }
 }
 
+
+//resets state to first menu
 function restartMenus () {
+    //change global state to menu
     state = 'menu';
-    menuState = 'nameMenu';
+
+    //remove game code input contents
+    codeInput.clear();
+
+    //set index to first menu in list
+    menuIndex = 0;
 }
