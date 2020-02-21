@@ -303,10 +303,14 @@ Room.prototype.addSocket = function (socket, className) {
                     }
                 }
                 //if pickup is close enough, consume it.
-                if (collisions.collide(
-                    socket, gameSettings.playerRadius,
-                    this.pickups[closestId], gameSettings.pickupRadius
-                )) {
+                if (closestDistance < Infinity &&
+                    collisions.collide(
+                        socket, 
+                        gameSettings.playerRadius,
+                        this.pickups[closestId], 
+                        gameSettings.pickupRadius
+                    )
+                    ) {
                     switch (this.pickups[closestId].type) {
                         //health pickup gives 5 hp, up to max
                         case "health":
