@@ -3,6 +3,11 @@
 
 const gameSettings = require('./gameSettings.js');
 
+//Collision Functions from collisions.js
+///////////////////////////////////////////
+
+const collisions = require('./collisions.js');
+
 // Helper Functions
 ///////////////////////////////////////////
 
@@ -12,14 +17,6 @@ function randint(low,high) {
         return Math.floor(Math.random() * (high - low + 1) + low);
     }
     return Math.floor(Math.random() * (low - high + 1) + high);
-}
-
-//calculates distance between 2 objects with x and y attributes
-function distance(obj1, obj2) {
-    return Math.sqrt(
-        Math.pow(obj1.x-obj2.x, 2) + 
-        Math.pow(obj1.y-obj2.y ,2)
-    );
 }
 
 //calculates angle of vector between player position and shot destination
@@ -78,7 +75,10 @@ Room.prototype.update = function () {
             let enemy = this.players[id];
             if (enemy.alive && 
                 enemy.id != shot.socketId && 
-                distance(enemy, shot) < gameSettings.playerRadius) {
+                collisions.collide(
+                    enemy, gameSettings.playerRadius, 
+                    shot, 0
+                )) {
                     //remove health
                     if (enemy.health > 0) {
                         enemy.health--;
@@ -166,7 +166,15 @@ Room.prototype.update = function () {
                     break;
             }
 
-            //DO PLAYER COLLISION HERE
+            //check for collisions with other players
+            for (let eid in this.players) {
+                if (player.id != eid && this.players[eid].alive) {
+                    collisions.collideAndDisplace(
+                        player, gameSettings.playerRadius,
+                        this.players[eid], gameSettings.playerRadius
+                    );
+                }
+            }
 
             //boundaries
             player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
@@ -288,14 +296,17 @@ Room.prototype.addSocket = function (socket, className) {
                 let closestDistance = Infinity;
                 let closestId = 0;
                 for (let id in this.pickups) {
-                    let thisDistance = distance(this.pickups[id], socket);
+                    let thisDistance = collisions.distance(this.pickups[id], socket);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = id;
                     }
                 }
                 //if pickup is close enough, consume it.
-                if (closestDistance <= gameSettings.playerRadius + 10) {
+                if (collisions.collide(
+                    socket, gameSettings.playerRadius,
+                    this.pickups[closestId], gameSettings.pickupRadius
+                )) {
                     switch (this.pickups[closestId].type) {
                         //health pickup gives 5 hp, up to max
                         case "health":

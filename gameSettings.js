@@ -24,6 +24,9 @@ var gameSettings = {
     //different types of pickups
     pickupTypes: ['health'],
 
+    //radius of pickup objects
+    pickupRadius: 18,
+
     //info specific to each class
     classes: {
 

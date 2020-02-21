@@ -181,8 +181,8 @@ function drawBorders () {
 //draws pickup-able objects
 function drawPickups() {
     push();
-    fill(gameSettings.colors.red);
-    stroke('black');
+    fill(gameSettings.colors.white);
+    stroke(gameSettings.colors.black);
     strokeWeight(4);
     for (let id in pickupData) {
         let pickup = pickupData[id];
@@ -191,29 +191,29 @@ function drawPickups() {
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
                 if (pickup.type == 'health') {
-                    fill(gameSettings.colors.red);
-                    //draw rect
-                    rect(
-                        pickup.x-screenOffset.x - 20,
-                        pickup.y-screenOffset.y - 20,
-                        40,
-                        40
+                    //draw circle
+                    ellipse(
+                        pickup.x-screenOffset.x,
+                        pickup.y-screenOffset.y,
+                        gameSettings.pickupRadius*2,
+                        gameSettings.pickupRadius*2,
                     )
                     //draw cross
                     push();
-                    fill(gameSettings.colors.white);
+                    fill(gameSettings.colors.red);
                     strokeWeight(0);
+                    rectMode(CENTER);
                     rect(
-                        pickup.x-screenOffset.x - 10,
-                        pickup.y-screenOffset.y - 3,
-                        20,
+                        pickup.x-screenOffset.x,
+                        pickup.y-screenOffset.y,
+                        gameSettings.pickupRadius,
                         6
                     )
                     rect(
-                        pickup.x-screenOffset.x - 3,
-                        pickup.y-screenOffset.y - 10,
+                        pickup.x-screenOffset.x,
+                        pickup.y-screenOffset.y,
                         6,
-                        20
+                        gameSettings.pickupRadius
                     )
                     pop();
                 }
