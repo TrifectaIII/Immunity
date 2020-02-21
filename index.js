@@ -1,17 +1,25 @@
 // NODE SETUP
 ///////////////////////////////////////////////////
 
-const express = require('express'); // load express package
-const app = express(); //create express app
-const serv = require('http').Server(app); //serve http over app
-const io = require('socket.io')(serv); // connect socket.io to server
+// load express package
+const express = require('express'); 
 
-//compress and minify files
+//create express app
+const app = express(); 
 
+//compress files
 app.use(require('compression')());
 
-// dont use minification during testing
+// minify files (dont use minification during testing)
 // app.use(require('express-minify')());
+
+//serve http over app
+const serv = require('http').Server(app);
+
+// connect socket.io to server
+const io = require('socket.io')(serv);
+
+
 
 // HTTP SERVER
 ///////////////////////////////////////////////////
