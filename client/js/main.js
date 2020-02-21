@@ -14,7 +14,7 @@ var socket;
 function joinGame(menuChoices) {
 
     //switch state
-    state = 'load'
+    state = 'load';
 
     //connect socket to server
     socket = io({
@@ -28,17 +28,17 @@ function joinGame(menuChoices) {
         errors.displayError('Server Connection Error', 5000);
         restartMenus();
         socket.close();
-    })
+    });
     socket.once('connect_timeout', function (timeout) {
         console.log('connect_timeout', timeout);
         errors.displayError('Server Connection Timeout', 5000);
         restartMenus();
         socket.close();
-    })
+    });
     socket.on('error', function (error) {
         console.log('error', error);
         errors.displayError('Socket Error', 5000);
-    })
+    });
 
     //return to server menu if disconnected
     socket.once('disconnect', function (reason) {
@@ -107,9 +107,13 @@ function preload () {
 
 // p5 setup
 function setup () {
+    //create canvas at size of window
     canvas = createCanvas(windowWidth, windowHeight);
+
+    //place into div
     canvas.parent('canvas-hold');
 
+    //set up font defaults
     textFont(homespunFont);
     textAlign(CENTER,CENTER);
 }
@@ -122,6 +126,7 @@ function windowResized() {
 // p5 drawing
 function draw () {
 
+    //draw based on current state
     switch (state) {
 
         //draw loading screen (menu.js)
@@ -151,7 +156,7 @@ function mouseClicked () {
     }
 }
 
-//look for enter presses on menu
+//look for enter presses on menus
 function keyPressed () {
     if (state == 'menu') {
         menuKeyPressed(keyCode); //(menu.js)

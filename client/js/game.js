@@ -234,7 +234,11 @@ function drawShots() {
             shot.y-screenOffset.y < windowHeight) {
                 fill(gameSettings.classes[shot.class].colors.light);
                 stroke(gameSettings.classes[shot.class].colors.dark);
-                ellipse(shot.x-screenOffset.x, shot.y-screenOffset.y, 10, 10);
+                ellipse(
+                    shot.x-screenOffset.x, 
+                    shot.y-screenOffset.y, 
+                    10, 10
+                );
         }
     }
     pop();
@@ -260,7 +264,8 @@ function drawDead () {
                     stroke(strokecolor);
                     strokeWeight(2);
                     ellipse(
-                        player.x-screenOffset.x, player.y-screenOffset.y, 
+                        player.x-screenOffset.x, 
+                        player.y-screenOffset.y, 
                         gameSettings.playerRadius*2 - 1, 
                         gameSettings.playerRadius*2 - 1
                     );
@@ -268,14 +273,18 @@ function drawDead () {
                     //draw death cross
                     strokeWeight(5);
                     stroke(gameSettings.colors.red);
-                    line(player.x-screenOffset.x+25,
+                    line(
+                        player.x-screenOffset.x+25,
                         player.y-screenOffset.y+25,
                         player.x-screenOffset.x-25,
-                        player.y-screenOffset.y-25);
-                    line(player.x-screenOffset.x+25,
+                        player.y-screenOffset.y-25
+                    );
+                    line(
+                        player.x-screenOffset.x+25,
                         player.y-screenOffset.y-25,
                         player.x-screenOffset.x-25,
-                        player.y-screenOffset.y+25);
+                        player.y-screenOffset.y+25
+                    );
             }
         }
     }
@@ -298,7 +307,8 @@ function drawLiving () {
                     stroke(gameSettings.classes[player.class].colors.dark);
                     strokeWeight(2);
                     ellipse(
-                        player.x-screenOffset.x, player.y-screenOffset.y, 
+                        player.x-screenOffset.x, 
+                        player.y-screenOffset.y, 
                         gameSettings.playerRadius*2 - 1, 
                         gameSettings.playerRadius*2 - 1
                     );
@@ -314,14 +324,18 @@ function drawLiving () {
                     strokeWeight(2);
                     fill('black');
                     rect(
-                        player.x - x_offset-screenOffset.x, player.y + y_offset-screenOffset.y, 
-                        x_offset*2, 5*(y_offset/y_offset_abs),
+                        player.x - x_offset-screenOffset.x, 
+                        player.y + y_offset-screenOffset.y, 
+                        x_offset*2, 
+                        5*(y_offset/y_offset_abs),
                     );
                     strokeWeight(0);
                     fill(gameSettings.classes[player.class].colors.light);
                     rect(
-                        player.x - x_offset-screenOffset.x, player.y + y_offset-screenOffset.y, 
-                        x_offset*2*(player.health/gameSettings.classes[player.class].maxHealth), 5*(y_offset/y_offset_abs),
+                        player.x - x_offset-screenOffset.x, 
+                        player.y + y_offset-screenOffset.y, 
+                        x_offset*2*(player.health/gameSettings.classes[player.class].maxHealth), 
+                        5*(y_offset/y_offset_abs),
                     );
             }
         }
@@ -345,14 +359,18 @@ function drawPlayer (player) {
     if (player.health <= 0) {
         strokeWeight(5);
         stroke(gameSettings.colors.red);
-        line(player.x-screenOffset.x+25,
-             player.y-screenOffset.y+25,
-             player.x-screenOffset.x-25,
-             player.y-screenOffset.y-25);
-        line(player.x-screenOffset.x+25,
-             player.y-screenOffset.y-25,
-             player.x-screenOffset.x-25,
-             player.y-screenOffset.y+25);
+        line(
+            player.x-screenOffset.x+25,
+            player.y-screenOffset.y+25,
+            player.x-screenOffset.x-25,
+            player.y-screenOffset.y-25
+        );
+        line(
+            player.x-screenOffset.x+25,
+            player.y-screenOffset.y-25,
+            player.x-screenOffset.x-25,
+            player.y-screenOffset.y+25
+        );
     }
     pop();
 }
@@ -528,6 +546,7 @@ function drawFPS (player) {
     text(
         `FPS: ${Math.round(frameRate())}`, 
         windowWidth-15, 
-        windowHeight-30);
+        windowHeight-30
+    );
     pop();
 }
