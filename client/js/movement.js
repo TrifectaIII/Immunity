@@ -56,6 +56,14 @@ document.addEventListener('keyup', function (event) {
     }
 });
 
+//remove all movements when window loses focus
+window.addEventListener('blur', function () {
+    right = false;
+    left = false;
+    up = false;
+    down = false;
+});
+
 //move based on currently pressed keys
 
 //NOTE: this is called in a setInterval in controls.js
@@ -93,5 +101,4 @@ function sendDirection () {
         socket.emit('direction', newDirection);
         direction = newDirection;
     }
-    
 }
