@@ -32,6 +32,7 @@ app.get('/gameSettings.js', function (req, res) {
     res.sendFile(__dirname + '/gameSettings.js');
 });
 
+console.log("SERVER BOOTED SUCCESSFULLY");
 
 // GAME ROOMS
 ///////////////////////////////////////////////////
@@ -56,18 +57,20 @@ function generateRoomId(gameRooms) {
 
 //logs current rooms and their populations
 function showRooms (gameRooms) {
+    console.log('\n');
     if (Object.keys(gameRooms).length > 0) {
-        console.log("\nROOM STATUS #############");
+        console.log("ROOM STATUS #############");
         for (let roomId in gameRooms) {
             console.log(
                 `Game Room ${roomId}: ${gameRooms[roomId].getPop()} Players`
             );
         }
-        console.log("#########################\n");
+        console.log("#########################");
     }
     else {
-        console.log("\nROOM STATUS: No Rooms Active\n");
+        console.log("ROOM STATUS: No Rooms Active");
     }
+    console.log('\n');
 }
  
 
