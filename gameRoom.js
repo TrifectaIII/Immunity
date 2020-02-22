@@ -152,8 +152,7 @@ Room.prototype.updateShots = function () {
 
 Room.prototype.updatePlayers = function () {
 
-    
-
+    //loop through all players
     for (let id in this.players) {
         let player = this.players[id];
         
@@ -215,7 +214,6 @@ Room.prototype.updatePlayers = function () {
             player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
         }
     }
-
 
     //collect info on players
     let player_info = {};
@@ -282,10 +280,17 @@ Room.prototype.updateEnemies = function () {
                     enemy, gameSettings.enemies[enemy.type].radius,
                     player, gameSettings.playerRadius
                 )) {
-                    //do damage to player
-                    player.health -= gameSettings.enemies[enemy.type].attackDamage;
                     //reset enemy cooldown
                     enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
+                    //do damage to player
+                    player.health -= gameSettings.enemies[enemy.type].attackDamage;
+                    //set player to respawn if dead
+                    if (player.health <= 0) {
+                        setTimeout(function () {
+                            this.spawnSocket(player);
+                        }.bind(this), 
+                        gameSettings.respawnTime);
+                    }
             }
         }
 

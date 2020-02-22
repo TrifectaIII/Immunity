@@ -269,7 +269,7 @@ function drawEnemies() {
 
                 //draw healthbar
                 let x_offset = 15
-                let y_offset_abs = 35;
+                let y_offset_abs = gameSettings.enemies[enemy.type].radius + 10;
                 let y_offset = y_offset_abs;
                 if (enemy.y-screenOffset.y > windowHeight - 50) {
                     y_offset = -y_offset_abs;
@@ -367,7 +367,8 @@ function drawLiving () {
 
                     //draw healthbar
                     let x_offset = 15
-                    let y_offset_abs = 35;
+                    let y_offset_abs = gameSettings.playerRadius + 10;
+                let y_offset = y_offset_abs;
                     let y_offset = y_offset_abs;
                     if (player.y-screenOffset.y > windowHeight - 50) {
                         y_offset = -y_offset_abs;
@@ -412,16 +413,16 @@ function drawPlayer (player) {
         strokeWeight(5);
         stroke(gameSettings.colors.red);
         line(
-            player.x-screenOffset.x+25,
-            player.y-screenOffset.y+25,
-            player.x-screenOffset.x-25,
-            player.y-screenOffset.y-25
+            player.x-screenOffset.x+gameSettings.playerRadius,
+            player.y-screenOffset.y+gameSettings.playerRadius,
+            player.x-screenOffset.x-gameSettings.playerRadius,
+            player.y-screenOffset.y-gameSettings.playerRadius
         );
         line(
-            player.x-screenOffset.x+25,
-            player.y-screenOffset.y-25,
-            player.x-screenOffset.x-25,
-            player.y-screenOffset.y+25
+            player.x-screenOffset.x+gameSettings.playerRadius,
+            player.y-screenOffset.y-gameSettings.playerRadius,
+            player.x-screenOffset.x-gameSettings.playerRadius,
+            player.y-screenOffset.y+gameSettings.playerRadius
         );
     }
     pop();

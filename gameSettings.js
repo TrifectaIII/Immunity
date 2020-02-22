@@ -92,7 +92,7 @@ var gameSettings = {
     },
 
     //number of enemies per player per wave
-    enemyMax: 2,
+    enemyMax: 10,
 
     //info specific to each enemy type
     enemies: {
@@ -100,9 +100,9 @@ var gameSettings = {
         normal: {
 
             radius: 25,
-            speed: 3,
+            speed: 5,
             maxHealth: 5,
-            attackCooldown: 1000,//1 attack a second
+            attackCooldown: 500,//1 attack a second
             attackDamage: 1,//damage per attack
 
             colors: {
@@ -110,6 +110,19 @@ var gameSettings = {
                 light: "#FF004D",
             },
         },
+
+        heavy: {
+            radius: 40,
+            speed: 3,
+            maxHealth: 15,
+            attackCooldown: 1000,//1 attack a second
+            attackDamage: 3,//damage per attack
+
+            colors: {
+                dark: "#000000",
+                light: "#FF004D",
+            },
+        }
         
     },
 
