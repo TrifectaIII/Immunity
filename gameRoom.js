@@ -1,15 +1,22 @@
+
+
+
 //Global Server Settings from gameSettings.js
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 const gameSettings = require('./gameSettings.js');
 
+
+
 //Collision Functions from collisions.js
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 const collisions = require('./collisions.js');
 
+
+
 // Helper Functions
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 //returns random integer between low and high, inclusive
 function randint(low,high) {
@@ -32,8 +39,10 @@ function velocity(ang, speed) {
     };
 }
 
+
+
 // ROOM CONSTRUCTOR
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 //constructor for room objects
 function Room (roomId) {
@@ -44,21 +53,37 @@ function Room (roomId) {
     this.players = {};
     this.shots = {};
     this.pickups = {};
-    // this.enemies = {}; //enemies not implemented yet
+    this.enemies = {};
 
     //spawn pickups
     this.pickupSpawner = setInterval(
         this.spawnPickups.bind(this), //bind to room scope
         gameSettings.pickupTime //interval from game settings
     );
+
+    this.waveCount = 0;
 }
 
+
+
 // ROOM UPDATE
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
+    //return game info for emit to room
+    return {
+        player_info: this.updatePlayers(),
+        shot_info: this.updateShots(),
+        pickup_info: this.updatePickups(),
+    }
+}
 
-    //handle shots
+//UPDATE SHOTS 
+/////////////////////////////////////////
+
+Room.prototype.updateShots = function () {
+    
     var shot_info = {};
 
     for (let id in this.shots) {
@@ -117,7 +142,14 @@ Room.prototype.update = function () {
         }
     }
 
-    //handle players
+    return shot_info;
+}
+
+//UPDATE PLAYERS
+/////////////////////////////////////////
+
+Room.prototype.updatePlayers = function () {
+
     var player_info = {};
 
     for (let id in this.players) {
@@ -192,16 +224,76 @@ Room.prototype.update = function () {
         };
     }
 
-    //return player and shot object for emit to room
-    return {
-        player_info: player_info,
-        shot_info: shot_info,
-        pickup_info: this.pickups,
+    return player_info;
+}
+
+//UPDATE PICKUPS
+/////////////////////////////////////////
+
+Room.prototype.updateEnemies = function () {
+
+    let enemy_info = {};
+
+    for (let id in this.enemies) {
+        let enemy = this.enemies[id];
     }
 }
 
+//UPDATE PICKUPS
+/////////////////////////////////////////
+
+Room.prototype.updatePickups = function () {
+
+    for (let id in this.pickups) {
+        let pickup = this.pickups[id];
+
+        //find closest alive player
+        let closestDistance = Infinity;
+        let closestId = 0;
+        for (let pid in this.players) {
+            if (this.players[pid].alive) {
+                let thisDistance = collisions.distance(this.players[pid], pickup);
+                if (thisDistance < closestDistance) {
+                    closestDistance = thisDistance;
+                    closestId = pid;
+                }
+            }
+        }
+        let player = this.players[closestId];
+
+        //if player is close enough
+        if (closestDistance < Infinity &&
+            collisions.collide(
+                player, 
+                gameSettings.playerRadius,
+                pickup, 
+                gameSettings.pickupRadius
+            )
+        ) {
+            switch (pickup.type) {
+                case "health":
+                    //if player not at max health
+                    if (player.health < gameSettings.classes[player.class].maxHealth) {
+                        //give health and delete pickup
+                        player.health = Math.min(
+                            gameSettings.classes[player.class].maxHealth,
+                            player.health + gameSettings.pickupHealthAmount
+                        );
+                        delete this.pickups[id];
+                    }
+                    break;
+            }
+        }
+    }
+
+    return this.pickups;
+}
+
+
+
 // ADD SOCKET TO ROOM AND SET IT UP
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
 Room.prototype.addSocket = function (socket, className) {
     if (this.getPop() < gameSettings.roomCap) {
 
@@ -290,43 +382,45 @@ Room.prototype.addSocket = function (socket, className) {
         }.bind(this));//bind to room scope
 
         //handle pickup command 
-        socket.on('pickup', function () {
-            if (socket.alive) {
-                //loop through pickups and find closest
-                let closestDistance = Infinity;
-                let closestId = 0;
-                for (let id in this.pickups) {
-                    let thisDistance = collisions.distance(this.pickups[id], socket);
-                    if (thisDistance < closestDistance) {
-                        closestDistance = thisDistance;
-                        closestId = id;
-                    }
-                }
-                //if pickup is close enough, consume it.
-                if (closestDistance < Infinity &&
-                    collisions.collide(
-                        socket, 
-                        gameSettings.playerRadius,
-                        this.pickups[closestId], 
-                        gameSettings.pickupRadius
-                    )
-                    ) {
-                    switch (this.pickups[closestId].type) {
-                        //health pickup gives 5 hp, up to max
-                        case "health":
-                            socket.health = Math.min(gameSettings.classes[socket.class].maxHealth, socket.health + 5);
-                            break;
-                    }
-                    //delete after use
-                    delete this.pickups[closestId];
-                }
-            }
-        }.bind(this));//bind to room scope
+        // socket.on('pickup', function () {
+        //     if (socket.alive) {
+        //         //loop through pickups and find closest
+        //         let closestDistance = Infinity;
+        //         let closestId = 0;
+        //         for (let id in this.pickups) {
+        //             let thisDistance = collisions.distance(this.pickups[id], socket);
+        //             if (thisDistance < closestDistance) {
+        //                 closestDistance = thisDistance;
+        //                 closestId = id;
+        //             }
+        //         }
+        //         //if pickup is close enough, consume it.
+        //         if (closestDistance < Infinity &&
+        //             collisions.collide(
+        //                 socket, 
+        //                 gameSettings.playerRadius,
+        //                 this.pickups[closestId], 
+        //                 gameSettings.pickupRadius
+        //             )
+        //             ) {
+        //             switch (this.pickups[closestId].type) {
+        //                 //health pickup gives 5 hp, up to max
+        //                 case "health":
+        //                     socket.health = Math.min(gameSettings.classes[socket.class].maxHealth, socket.health + 5);
+        //                     break;
+        //             }
+        //             //delete after use
+        //             delete this.pickups[closestId];
+        //         }
+        //     }
+        // }.bind(this));//bind to room scope
 
         //confirm join with server after socket totally set up
         socket.emit('joined',this.roomId);
     }
 }
+
+
 
 // OTHER ROOM METHODS
 ///////////////////////////////////////////
@@ -373,6 +467,10 @@ Room.prototype.spawnPickups = function () {
     } 
 }
 
+Room.prototype.spawnWave = function () {
+    this.waveCount += 1;
+}
+
 //stops timing events for the room
 Room.prototype.shutdown = function () {
     clearInterval(this.pickupSpawner);
@@ -394,6 +492,7 @@ Room.prototype.isEmpty = function () {
 }
 
 
+
 // EXPORTS CONSTRCTOR TO index.js
-///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 module.exports = Room;

@@ -15,18 +15,6 @@ var gameSettings = {
     //size of player
     playerRadius: 25,
 
-    //time between spawns of pickups in ms
-    pickupTime: 5000,
-
-    //max pickups in the world at a time, per player
-    pickupMax: 1,
-
-    //different types of pickups
-    pickupTypes: ['health'],
-
-    //radius of pickup objects
-    pickupRadius: 18,
-
     //info specific to each class
     classes: {
 
@@ -101,6 +89,37 @@ var gameSettings = {
             },
         },
     },
+
+    //info specific to each enemy type
+    enemies: {
+
+        normal: {
+
+            radius: 25,
+            speed: 3,
+
+            colors: {
+                inside: "#000000",
+                outside: "#FF004D",
+            },
+        },
+        
+    },
+
+    //time between spawns of pickups in ms
+    pickupTime: 5000,
+
+    //max pickups in the world at a time, per player
+    pickupMax: 1,
+
+    //radius of pickup objects
+    pickupRadius: 18,
+
+    //different types of pickups
+    pickupTypes: ['health'],
+
+    //health pickup value
+    pickupHealthAmount: 5,
 
     colors: {
         black:"#000000",

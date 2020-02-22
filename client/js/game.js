@@ -190,6 +190,8 @@ function drawPickups() {
             pickup.x-screenOffset.x < windowWidth + 50 &&
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
+
+                //health pickups
                 if (pickup.type == 'health') {
                     //draw circle
                     ellipse(
