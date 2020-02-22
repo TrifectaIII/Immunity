@@ -1,13 +1,8 @@
-//player info from server
+//game info from server
+var gameData = {};
 var playerData = {};
-
-//shot info from server
 var shotData = {};
-
-//pickup info from server
 var pickupData = {};
-
-//enemy info from server
 var enemyData = {};
 
 //object to hold info re: screen offset based on player position
@@ -85,7 +80,7 @@ function drawGame () {
         }
 
         //draw info about the current gameRoom
-        drawRoomId(player);
+        drawRoomInfo(player);
 
         //draw names of playerData
         drawPlayerInfo();
@@ -196,16 +191,15 @@ function drawPickups() {
             pickup.x-screenOffset.x < windowWidth + 50 &&
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
-
+                //draw circle
+                ellipse(
+                    pickup.x-screenOffset.x,
+                    pickup.y-screenOffset.y,
+                    gameSettings.pickupRadius*2,
+                    gameSettings.pickupRadius*2,
+                )
                 //health pickups
                 if (pickup.type == 'health') {
-                    //draw circle
-                    ellipse(
-                        pickup.x-screenOffset.x,
-                        pickup.y-screenOffset.y,
-                        gameSettings.pickupRadius*2,
-                        gameSettings.pickupRadius*2,
-                    )
                     //draw cross
                     push();
                     fill(gameSettings.colors.red);
@@ -230,7 +224,7 @@ function drawPickups() {
     pop();
 }
 
-//draw all shotData
+//draw all shots
 function drawShots() {
     push();
     strokeWeight(2);
@@ -302,7 +296,7 @@ function drawEnemies() {
     pop();
 }
 
-//draw dead playerData 
+//draw dead players
 function drawDead () {
     push();
     for (let id in playerData) {
@@ -349,7 +343,7 @@ function drawDead () {
     pop();
 }
 
-//draw living playerData
+//draw living players
 function drawLiving () {
     push();
     for (let id in playerData) {
@@ -528,9 +522,20 @@ function drawMinimap () {
         }
     }
 
+    //draw enemy pips
+    for (let id in enemyData) {
+        let enemy = enemyData[id];
+        fill(gameSettings.enemies[enemy.type].colors.light);
+        ellipse(
+            (enemy.x/gameSettings.width)*minimapWidth+minimapOffset.x,
+            (enemy.y/gameSettings.height)*minimapHeight + minimapOffset.y,
+            minimapPipSize, minimapPipSize,
+        );
+    }
+
     //draw client player pip with outline indicator + larger
     let player = playerData[socket.id];
-    strokeWeight(1);
+    strokeWeight(2);
     stroke(gameSettings.colors.white);
     fill(gameSettings.classes[player.class].colors.light);
     ellipse(
@@ -541,17 +546,19 @@ function drawMinimap () {
     pop();
 }
 
-//display room code so others can join
-function drawRoomId (player) {
+//display room code + info so others can join
+function drawRoomInfo (player) {
     push();
     textAlign(LEFT, CENTER);
     stroke('black');
     strokeWeight(0);
     textSize(30);
     fill(gameSettings.classes[player.class].colors.dark);
-    text('Game Code: '+roomId, 15, 20);
+    text(`Game Code: ${roomId}`, 15, 20);
 
-    text('playerData: '+Object.keys(playerData).length.toString()+'/'+gameSettings.roomCap, 15, 60)
+    text(`Players: ${Object.keys(playerData).length}/${gameSettings.roomCap}`, 15, 60);
+
+    text(`Wave: ${gameData.waveCount}`, 15 ,100);
     pop();
 }
 

@@ -102,6 +102,8 @@ var gameSettings = {
             radius: 25,
             speed: 3,
             maxHealth: 5,
+            attackCooldown: 1000,//1 attack a second
+            attackDamage: 1,//damage per attack
 
             colors: {
                 dark: "#000000",

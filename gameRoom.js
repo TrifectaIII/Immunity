@@ -79,7 +79,7 @@ Room.prototype.update = function () {
         enemy_info: this.updateEnemies(),
 
         game_info: {
-            wave: this.waveCount,
+            waveCount: this.waveCount,
         },
     }
 }
@@ -88,9 +88,8 @@ Room.prototype.update = function () {
 /////////////////////////////////////////
 
 Room.prototype.updateShots = function () {
-    
-    var shot_info = {};
 
+    //loop through all shots
     for (let id in this.shots) {
         let shot = this.shots[id];
 
@@ -99,33 +98,6 @@ Room.prototype.updateShots = function () {
         shot.y += shot.velocity.y;
 
         let destroyed = false;
-
-        // check for collisions with players
-        for (let pid in this.players) {
-            let player = this.players[pid];
-            if (player.alive && 
-                player.id != shot.socketId && 
-                collisions.collide(
-                    player, gameSettings.playerRadius, 
-                    shot, 0
-                )) {
-                    //remove health
-                    if (player.health > 0) {
-                        player.health--;
-                        destroyed = true;
-                        //if player dead, set to respawn and increase killcounter
-                        player.alive = player.health > 0;
-                        if (!player.alive) {
-                            if (shot.socketId in this.players) {
-                                this.players[shot.socketId].killStreak++;
-                            }
-                            setTimeout(function () {
-                                this.spawnSocket(player);
-                            }.bind(this), gameSettings.respawnTime);
-                        }
-                    }
-            } 
-        }
 
         // check for collisions with enemys
         for (let id in this.enemies) {
@@ -154,18 +126,22 @@ Room.prototype.updateShots = function () {
         //destroy if out of range
         destroyed = destroyed || shot.range <= 1;
         
+        //delete if destroyed
         if (destroyed) {
             delete this.shots[id];
         }
+    }
 
-        // collect info on remaining shots
-        else {
-            shot_info[id] = {
-                x: shot.x,
-                y: shot.y,
-                class: shot.class,
-            };
-        }
+    // collect info on remaining shots
+    var shot_info = {};
+    
+    for (let id in this.shots) {
+        let shot = this.shots[id];
+        shot_info[id] = {
+            x: shot.x,
+            y: shot.y,
+            class: shot.class,
+        };
     }
 
     return shot_info;
@@ -176,13 +152,13 @@ Room.prototype.updateShots = function () {
 
 Room.prototype.updatePlayers = function () {
 
-    var player_info = {};
+    
 
     for (let id in this.players) {
         let player = this.players[id];
         
         //move player based on direction
-        if (player.alive) {
+        if (player.health > 0) {
 
             //speed is set by class
             let speed = gameSettings.classes[player.class].speed;
@@ -226,7 +202,7 @@ Room.prototype.updatePlayers = function () {
 
             //check for collisions with other players
             for (let pid in this.players) {
-                if (player.id != pid && this.players[pid].alive) {
+                if (player.id != pid && this.players[pid].health > 0) {
                     collisions.collideAndDisplace(
                         player, gameSettings.playerRadius,
                         this.players[pid], gameSettings.playerRadius
@@ -238,8 +214,14 @@ Room.prototype.updatePlayers = function () {
             player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
             player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
         }
-        
-        //collect info on players
+    }
+
+
+    //collect info on players
+    let player_info = {};
+
+    for (let id in this.players) {
+        let player = this.players[id];
         player_info[id] = {
             x: player.x,
             y: player.y,
@@ -249,7 +231,7 @@ Room.prototype.updatePlayers = function () {
             killStreak: player.killStreak,
         };
     }
-
+    
     return player_info;
 }
 
@@ -263,9 +245,7 @@ Room.prototype.updateEnemies = function () {
         this.spawnWave();
     }
 
-    //move, collide, and collect info about enemies
-    let enemy_info = {};
-
+    //loop through all enemies
     for (let id in this.enemies) {
         let enemy = this.enemies[id];
 
@@ -273,13 +253,18 @@ Room.prototype.updateEnemies = function () {
         let closestDistance = Infinity;
         let closestId = 0;
         for (let pid in this.players) {
-            if (this.players[pid].alive) {
+            if (this.players[pid].health > 0) {
                 let thisDistance = collisions.distance(this.players[pid], enemy);
                 if (thisDistance < closestDistance) {
                     closestDistance = thisDistance;
                     closestId = pid;
                 }
             }
+        }
+
+        //reduce attack cooldown
+        if (enemy.attackCooldown > 0) {
+            enemy.attackCooldown -= gameSettings.tickRate;
         }
 
         if (closestDistance < Infinity) {
@@ -290,6 +275,18 @@ Room.prototype.updateEnemies = function () {
             let vel = velocity(ang, gameSettings.enemies[enemy.type].speed);
             enemy.x += vel.x;
             enemy.y += vel.y;
+
+            //attacking
+            if (enemy.attackCooldown <= 0 &&
+                collisions.collide(
+                    enemy, gameSettings.enemies[enemy.type].radius,
+                    player, gameSettings.playerRadius
+                )) {
+                    //do damage to player
+                    player.health -= gameSettings.enemies[enemy.type].attackDamage;
+                    //reset enemy cooldown
+                    enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
+            }
         }
 
         //check for collisions with other enemies
@@ -302,24 +299,30 @@ Room.prototype.updateEnemies = function () {
             }
         }
 
-        //check for collisions with players
+        //check for collisions with living players
         for (let pid in this.players) {
-            if (this.players[pid].alive) {
+            if (this.players[pid].health > 0) {
                 collisions.collideAndDisplace(
                     enemy, gameSettings.enemies[enemy.type].radius,
                     this.players[pid], gameSettings.playerRadius
                 );
             }
         }
-        
+    }
+
+    //collect info on enemies
+    let enemy_info = {};
+
+    for (let id in this.enemies) {
+        let enemy = this.enemies[id];
         enemy_info[id] = {
             x: enemy.x,
             y: enemy.y,
             type: enemy.type,
             health: enemy.health,
-        }
+        };
     }
-
+    
     return enemy_info;
 }
 
@@ -328,6 +331,7 @@ Room.prototype.updateEnemies = function () {
 
 Room.prototype.updatePickups = function () {
 
+    //loop through all pickups
     for (let id in this.pickups) {
         let pickup = this.pickups[id];
 
@@ -335,7 +339,7 @@ Room.prototype.updatePickups = function () {
         let closestDistance = Infinity;
         let closestId = 0;
         for (let pid in this.players) {
-            if (this.players[pid].alive) {
+            if (this.players[pid].health > 0) {
                 let thisDistance = collisions.distance(this.players[pid], pickup);
                 if (thisDistance < closestDistance) {
                     closestDistance = thisDistance;
@@ -371,7 +375,7 @@ Room.prototype.updatePickups = function () {
     }
 
     //collect info for clients
-    var pickup_info = {};
+    let pickup_info = {};
 
     for (let id in this.pickups) {
         let pickup = this.pickups[id];
@@ -424,7 +428,7 @@ Room.prototype.addSocket = function (socket, className) {
         //handle shooting
         socket.on('shoot', function (dest_x, dest_y) {
 
-            if (socket.alive) {
+            if (socket.health > 0) {
                 
                 //each class shoots differently
                 let myClass = gameSettings.classes[socket.class];
@@ -539,9 +543,6 @@ Room.prototype.spawnSocket = function (socket) {
 
     //reset killstreak
     socket.killStreak = 0;
-
-    //set to alive
-    socket.alive = true;
 }
 
 //spawns pickups into the room based on # of players
@@ -609,6 +610,7 @@ Room.prototype.spawnWave = function () {
             x: x,
             y: y,
             health: gameSettings.enemies[type].maxHealth,
+            attackCooldown: 0,
         }
     }
 }

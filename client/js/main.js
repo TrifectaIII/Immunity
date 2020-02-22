@@ -84,6 +84,7 @@ function joinGame(menuChoices) {
         //recieve player info from server
         socket.on ('game_update', function (serverData) {
             //save to objects (game.js)
+            gameData = serverData.game_info;
             playerData = serverData.player_info;
             shotData = serverData.shot_info;
             pickupData = serverData.pickup_info;
