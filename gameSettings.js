@@ -53,6 +53,7 @@ var gameSettings = {
                 range: 300,
             },
         },
+
         sniper: {
 
             maxHealth: 10,
@@ -90,6 +91,9 @@ var gameSettings = {
         },
     },
 
+    //number of enemies per player per wave
+    enemyMax: 2,
+
     //info specific to each enemy type
     enemies: {
 
@@ -97,10 +101,11 @@ var gameSettings = {
 
             radius: 25,
             speed: 3,
+            maxHealth: 5,
 
             colors: {
-                inside: "#000000",
-                outside: "#FF004D",
+                dark: "#000000",
+                light: "#FF004D",
             },
         },
         

@@ -76,6 +76,11 @@ Room.prototype.update = function () {
         player_info: this.updatePlayers(),
         shot_info: this.updateShots(),
         pickup_info: this.updatePickups(),
+        enemy_info: this.updateEnemies(),
+
+        game_info: {
+            wave: this.waveCount,
+        },
     }
 }
 
@@ -95,28 +100,49 @@ Room.prototype.updateShots = function () {
 
         let destroyed = false;
 
-        // check for collisions with enemies
-        for (let id in this.players) {
-            let enemy = this.players[id];
-            if (enemy.alive && 
-                enemy.id != shot.socketId && 
+        // check for collisions with players
+        for (let pid in this.players) {
+            let player = this.players[pid];
+            if (player.alive && 
+                player.id != shot.socketId && 
                 collisions.collide(
-                    enemy, gameSettings.playerRadius, 
+                    player, gameSettings.playerRadius, 
+                    shot, 0
+                )) {
+                    //remove health
+                    if (player.health > 0) {
+                        player.health--;
+                        destroyed = true;
+                        //if player dead, set to respawn and increase killcounter
+                        player.alive = player.health > 0;
+                        if (!player.alive) {
+                            if (shot.socketId in this.players) {
+                                this.players[shot.socketId].killStreak++;
+                            }
+                            setTimeout(function () {
+                                this.spawnSocket(player);
+                            }.bind(this), gameSettings.respawnTime);
+                        }
+                    }
+            } 
+        }
+
+        // check for collisions with enemys
+        for (let id in this.enemies) {
+            let enemy = this.enemies[id];
+            if (collisions.collide(
+                    enemy, gameSettings.enemies[enemy.type].radius, 
                     shot, 0
                 )) {
                     //remove health
                     if (enemy.health > 0) {
                         enemy.health--;
                         destroyed = true;
-                        //if enemy dead, set to respawn and increase killcounter
-                        enemy.alive = enemy.health > 0;
-                        if (!enemy.alive) {
+                        if (enemy.health <= 0) {
                             if (shot.socketId in this.players) {
                                 this.players[shot.socketId].killStreak++;
                             }
-                            setTimeout(function () {
-                                this.spawnSocket(enemy);
-                            }.bind(this), gameSettings.respawnTime);
+                            delete this.enemies[id];
                         }
                     }
             } 
@@ -199,11 +225,11 @@ Room.prototype.updatePlayers = function () {
             }
 
             //check for collisions with other players
-            for (let eid in this.players) {
-                if (player.id != eid && this.players[eid].alive) {
+            for (let pid in this.players) {
+                if (player.id != pid && this.players[pid].alive) {
                     collisions.collideAndDisplace(
                         player, gameSettings.playerRadius,
-                        this.players[eid], gameSettings.playerRadius
+                        this.players[pid], gameSettings.playerRadius
                     );
                 }
             }
@@ -227,16 +253,74 @@ Room.prototype.updatePlayers = function () {
     return player_info;
 }
 
-//UPDATE PICKUPS
+//UPDATE ENEMIES
 /////////////////////////////////////////
 
 Room.prototype.updateEnemies = function () {
 
+    //spawn new wave if all enemies dead
+    if (this.enemyCount() <= 0) {
+        this.spawnWave();
+    }
+
+    //move, collide, and collect info about enemies
     let enemy_info = {};
 
     for (let id in this.enemies) {
         let enemy = this.enemies[id];
+
+        //find closest player
+        let closestDistance = Infinity;
+        let closestId = 0;
+        for (let pid in this.players) {
+            if (this.players[pid].alive) {
+                let thisDistance = collisions.distance(this.players[pid], enemy);
+                if (thisDistance < closestDistance) {
+                    closestDistance = thisDistance;
+                    closestId = pid;
+                }
+            }
+        }
+
+        if (closestDistance < Infinity) {
+            let player = this.players[closestId];
+
+            //move in direction of closest player
+            let ang = angle(enemy.x, enemy.y, player.x, player.y);
+            let vel = velocity(ang, gameSettings.enemies[enemy.type].speed);
+            enemy.x += vel.x;
+            enemy.y += vel.y;
+        }
+
+        //check for collisions with other enemies
+        for (let eid in this.enemies) {
+            if (enemy.id != eid) {
+                collisions.collideAndDisplace(
+                    enemy, gameSettings.enemies[enemy.type].radius,
+                    this.enemies[eid], gameSettings.enemies[this.enemies[eid].type].radius,
+                );
+            }
+        }
+
+        //check for collisions with players
+        for (let pid in this.players) {
+            if (this.players[pid].alive) {
+                collisions.collideAndDisplace(
+                    enemy, gameSettings.enemies[enemy.type].radius,
+                    this.players[pid], gameSettings.playerRadius
+                );
+            }
+        }
+        
+        enemy_info[id] = {
+            x: enemy.x,
+            y: enemy.y,
+            type: enemy.type,
+            health: enemy.health,
+        }
     }
+
+    return enemy_info;
 }
 
 //UPDATE PICKUPS
@@ -286,7 +370,19 @@ Room.prototype.updatePickups = function () {
         }
     }
 
-    return this.pickups;
+    //collect info for clients
+    var pickup_info = {};
+
+    for (let id in this.pickups) {
+        let pickup = this.pickups[id];
+        pickup_info[id] = {
+            x: pickup.x,
+            y: pickup.y,
+            type: pickup.type,
+        }
+    }
+
+    return pickup_info;
 }
 
 
@@ -469,6 +565,56 @@ Room.prototype.spawnPickups = function () {
 
 Room.prototype.spawnWave = function () {
     this.waveCount += 1;
+
+    //make enemies based on number of players
+    for (let i = 0; i < this.getPop() * gameSettings.enemyMax; i++) {
+
+        //generate id
+        let id = Math.random();
+
+        //pick randoim type for this enemy
+        let type = Object.keys(gameSettings.enemies)[randint(0, Object.keys(gameSettings.enemies).length -1)];
+
+        //determine side that enemy will spawn on
+        let side = randint(1,4);
+
+        //determine starting x and y
+        var x;
+        var y;
+        switch (side) {
+            //top
+            case 1:
+                y = 0;
+                x = randint(0, gameSettings.width);
+                break;
+            //bottom
+            case 2:
+                y = gameSettings.height;
+                x = randint(0, gameSettings.width);
+                break;
+            //right
+            case 3:
+                y = randint(0, gameSettings.height);
+                x = gameSettings.width;
+                break;
+            //left
+            case 4:
+                y = randint(0, gameSettings.height);;
+                x = 0;
+                break;
+        }
+
+        this.enemies[id] = {
+            type: type,
+            x: x,
+            y: y,
+            health: gameSettings.enemies[type].maxHealth,
+        }
+    }
+}
+
+Room.prototype.enemyCount = function () {
+    return Object.keys(this.enemies).length;
 }
 
 //stops timing events for the room

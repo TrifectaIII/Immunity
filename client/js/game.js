@@ -1,11 +1,14 @@
 //player info from server
 var playerData = {};
 
-//shotData info from server
+//shot info from server
 var shotData = {};
 
-//pickupData info from server
+//pickup info from server
 var pickupData = {};
+
+//enemy info from server
+var enemyData = {};
 
 //object to hold info re: screen offset based on player position
 var screenOffset = {
@@ -48,6 +51,9 @@ function drawGame () {
 
         //draw shots
         drawShots();
+
+        //draw enemies
+        drawEnemies();
 
         //draw living players
         drawLiving();
@@ -246,6 +252,56 @@ function drawShots() {
     pop();
 }
 
+//draw all enemies
+function drawEnemies() {
+    push();
+    for (let id in enemyData) {
+        let enemy = enemyData[id];
+        if (enemy.x-screenOffset.x > -50 &&
+            enemy.x-screenOffset.x < windowWidth + 50 &&
+            enemy.y-screenOffset.y > -50 &&
+            enemy.y-screenOffset.y < windowHeight + 50) {
+
+                //draw circle
+                fill(gameSettings.enemies[enemy.type].colors.dark);
+                stroke(gameSettings.enemies[enemy.type].colors.light);
+                strokeWeight(2);
+                ellipse(
+                    enemy.x-screenOffset.x,
+                    enemy.y-screenOffset.y,
+                    gameSettings.enemies[enemy.type].radius*2,
+                    gameSettings.enemies[enemy.type].radius*2
+                );
+
+                //draw healthbar
+                let x_offset = 15
+                let y_offset_abs = 35;
+                let y_offset = y_offset_abs;
+                if (enemy.y-screenOffset.y > windowHeight - 50) {
+                    y_offset = -y_offset_abs;
+                }
+                stroke(gameSettings.enemies[enemy.type].colors.dark);
+                strokeWeight(2);
+                fill('black');
+                rect(
+                    enemy.x - x_offset-screenOffset.x, 
+                    enemy.y + y_offset-screenOffset.y, 
+                    x_offset*2, 
+                    5*(y_offset/y_offset_abs),
+                );
+                strokeWeight(0);
+                fill(gameSettings.enemies[enemy.type].colors.light);
+                rect(
+                    enemy.x - x_offset-screenOffset.x, 
+                    enemy.y + y_offset-screenOffset.y, 
+                    x_offset*2*(enemy.health/gameSettings.enemies[enemy.type].maxHealth), 
+                    5*(y_offset/y_offset_abs),
+                );
+        }   
+    }
+    pop();
+}
+
 //draw dead playerData 
 function drawDead () {
     push();
@@ -320,7 +376,7 @@ function drawLiving () {
                     let y_offset_abs = 35;
                     let y_offset = y_offset_abs;
                     if (player.y-screenOffset.y > windowHeight - 50) {
-                        y_offset = -35;
+                        y_offset = -y_offset_abs;
                     }
                     stroke(gameSettings.classes[player.class].colors.dark);
                     strokeWeight(2);
