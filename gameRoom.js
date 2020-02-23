@@ -57,7 +57,7 @@ function Room (roomId) {
 
     //spawn pickups
     this.pickupSpawner = setInterval(
-        this.spawnPickups.bind(this), //bind to room scope
+        this.spawnPickup.bind(this), //bind to room scope
         gameSettings.pickupTime //interval from game settings
     );
 
@@ -539,22 +539,17 @@ Room.prototype.spawnShots = function (player, dest_x, dest_y) {
     }
 }
 
-//spawns pickups into the room based on # of players
-Room.prototype.spawnPickups = function () {
-    for (
-        let i=0; 
-        //try to make 1 for every current player
-        i < this.playerCount() && 
-        //loop should break if cap is hit (population * pickupMax)
-        Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax;
-        i++) {
-            let id = Math.random();
-            this.pickups[id] = {
-                //choose a random type from the settings list
-                type: gameSettings.pickupTypes[randint(0, gameSettings.pickupTypes.length-1)],
-                x: randint(100, gameSettings.width-100),
-                y: randint(100, gameSettings.height-100),
-            }
+//spawns pickup into the room
+Room.prototype.spawnPickup = function () {
+   
+    if (Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax) {
+        let id = Math.random();
+        this.pickups[id] = {
+            //choose a random type from the settings list
+            type: gameSettings.pickupTypes[randint(0, gameSettings.pickupTypes.length-1)],
+            x: randint(100, gameSettings.width-100),
+            y: randint(100, gameSettings.height-100),
+        }
     }
 }
 
