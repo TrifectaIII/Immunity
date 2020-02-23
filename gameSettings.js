@@ -135,7 +135,7 @@ var gameSettings = {
 
         scout: {
 
-            radius: 10,
+            radius: 20,
             maxHealth: 5,
             speed: 6,
             attackCooldown: 750,

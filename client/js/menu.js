@@ -134,7 +134,7 @@ TextInput.prototype.showAt = function (x, y, w, h) {
 var backButton = new Button(
     "BACK",
     gameSettings.colors.darkpink,
-    gameSettings.colors.red
+    gameSettings.colors.pink
 );
 
 function drawBackButton() {
@@ -212,8 +212,8 @@ var nameInput;
 //button to submit name
 var setNameButton = new Button(
     "SUBMIT", 
-    gameSettings.colors.brown, 
-    gameSettings.colors.yellow
+    gameSettings.colors.darkblue, 
+    gameSettings.colors.blue
 );
 
 function drawNameMenu (canvas) {
@@ -265,14 +265,14 @@ var codeInput;
 
 var createGameButton = new Button( 
     "NEW GAME", 
-    gameSettings.colors.darkblue, 
-    gameSettings.colors.blue
+    gameSettings.colors.darkgreen, 
+    gameSettings.colors.green
 );
 
 var joinButton = new Button( 
     "JOIN", 
-    gameSettings.colors.darkgreen, 
-    gameSettings.colors.green
+    gameSettings.colors.darkblue, 
+    gameSettings.colors.blue
 );
 
 function drawServerMenu (canvas) {
@@ -503,6 +503,7 @@ function menuMouseClicked () {
             if (clickTitleMenu()) {
                 menuIndex += 1;
             }
+            break;
 
         case 'name':
             if (clickNameMenu() && nameInput.getValue() != '') {
