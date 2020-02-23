@@ -33,8 +33,8 @@ var gameSettings = {
                 count: 5,
                 speed: 15,
                 angle:Math.PI/4,
-                range: 250,
-                cooldown: 120,
+                range: 200,
+                cooldown: 300,
             },
         },
 

@@ -24,7 +24,7 @@ window.addEventListener('blur', function () {
     clicking = false;
 });
 
-function sendClicking () {
+function sendClicking (socket) {
     if (clicking != oldClicking) {
         socket.emit('click', clicking);
         oldClicking = clicking;

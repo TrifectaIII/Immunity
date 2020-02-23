@@ -67,7 +67,7 @@ window.addEventListener('blur', function () {
 //move based on currently pressed keys
 
 //NOTE: this is called in a setInterval in controls.js
-function sendDirection () {
+function sendDirection (socket) {
 
     let newDirection = 'none';
 

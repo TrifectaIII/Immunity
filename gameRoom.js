@@ -155,6 +155,16 @@ Room.prototype.updatePlayers = function () {
     //loop through all players
     for (let id in this.players) {
         let player = this.players[id];
+
+        //reduce shot cooldown
+        player.cooldown -= gameSettings.tickRate;
+
+        //shoot for player if clicking and no cooldown
+        if (player.clicking && player.cooldown <= 0) {
+            this.playerShoot(player);
+            //start cooldown
+            player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+        }
         
         //move player based on direction
         if (player.health > 0) {
@@ -440,16 +450,79 @@ Room.prototype.addPlayer = function (player, className) {
         //start with no shooting cooldown
         player.cooldown = 0;
 
+        //start with no ready shots
+        player.readyShots = 0;
+
         //switch clicking state
         player.on('click', function (clicking) {
 
             player.clicking = clicking;
             
-        });
+            //shoot right away to avoid a click getting clipped by tickRate
+            if (player.clicking && player.cooldown <= 0) {
+                this.playerShoot(player);
+                //start cooldown
+                player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+            }
+        }.bind(this));//bind to room scope
 
         //handle shooting
         player.on('shoot', function (dest_x, dest_y) {
-            this.spawnShots(player, dest_x, dest_y);
+            //only shoot if alive and have ready shots
+            if (player.health > 0 && player.readyShots > 0) {
+
+                //remove 1 ready shot
+                player.readyShots--;
+                        
+                //each class shoots differently
+                let myClass = gameSettings.classes[player.type];
+
+                //single-shot classes
+                if (myClass.shots.count == 1) {
+                    //calculate velocity based on shot speed and where the player clicked
+                    vel = velocity(
+                        angle(player.x, player.y, dest_x, dest_y), 
+                        myClass.shots.speed
+                    );
+
+                    //create new shot object
+                    var id = Math.random();
+                    this.shots[id] = {
+                        x: player.x,
+                        y: player.y,
+                        type: player.type,
+                        playerId: player.id,
+                        velocity: vel,
+                        range: myClass.shots.range,
+                    };
+                }
+
+                //multi-shot (shotgun) classes
+                else {
+                    for (let i = 0; i < myClass.shots.count; i++) {
+
+                        let vel = velocity(
+                            angle(
+                                player.x, player.y, 
+                                dest_x, dest_y
+                            ) 
+                            + (i - myClass.shots.count/2 + 0.5) 
+                            * (myClass.shots.angle/(myClass.shots.count-1)),
+                            myClass.shots.speed
+                        );
+
+                        var id = Math.random();
+                        this.shots[id] = {
+                            x: player.x,
+                            y: player.y,
+                            type: player.type,
+                            playerId: player.id,
+                            velocity: vel,
+                            range: myClass.shots.range,
+                        };
+                    }
+                }
+            }
         }.bind(this));//bind to room scope
 
         //confirm join with server after player totally set up
@@ -483,60 +556,13 @@ Room.prototype.spawnPlayer = function (player) {
 }
 
 //creates shots from given player to given spot based on class
-Room.prototype.spawnShots = function (player, dest_x, dest_y) {
+Room.prototype.playerShoot = function (player) {
 
-    //only shoot if alive
-    if (player.health > 0) {
-                
-        //each class shoots differently
-        let myClass = gameSettings.classes[player.type];
+    //add 1 to ready shots
+    player.readyShots++;
 
-        //single-shot classes
-        if (myClass.shots.count == 1) {
-            //calculate velocity based on shot speed and where the player clicked
-            vel = velocity(
-                angle(player.x, player.y, dest_x, dest_y), 
-                myClass.shots.speed
-            );
-
-            //create new shot object
-            var id = Math.random();
-            this.shots[id] = {
-                x: player.x,
-                y: player.y,
-                type: player.type,
-                playerId: player.id,
-                velocity: vel,
-                range: myClass.shots.range,
-            };
-        }
-
-        //multi-shot (shotgun) classes
-        else {
-            for (let i = 0; i < myClass.shots.count; i++) {
-
-                let vel = velocity(
-                    angle(
-                        player.x, player.y, 
-                        dest_x, dest_y
-                    ) 
-                    + (i - myClass.shots.count/2 + 0.5) 
-                    * (myClass.shots.angle/(myClass.shots.count-1)),
-                    myClass.shots.speed
-                );
-
-                var id = Math.random();
-                this.shots[id] = {
-                    x: player.x,
-                    y: player.y,
-                    type: player.type,
-                    playerId: player.id,
-                    velocity: vel,
-                    range: myClass.shots.range,
-                };
-            }
-        }
-    }
+    //ask for coordinates
+    player.emit('shoot_request');
 }
 
 //spawns pickup into the room
