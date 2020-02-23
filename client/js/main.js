@@ -73,7 +73,7 @@ function joinGame(menuChoices) {
         roomId = newId;
 
         //Start controls (controls.js)
-        startControls(canvas);
+        startControls(socket);
 
         //change state
         state = 'game';
