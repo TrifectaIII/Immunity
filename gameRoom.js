@@ -111,8 +111,8 @@ Room.prototype.updateShots = function () {
                         enemy.health--;
                         destroyed = true;
                         if (enemy.health <= 0) {
-                            if (shot.socketId in this.players) {
-                                this.players[shot.socketId].killStreak++;
+                            if (shot.playerId in this.players) {
+                                this.players[shot.playerId].killStreak++;
                             }
                             delete this.enemies[id];
                         }
@@ -289,7 +289,7 @@ Room.prototype.updateEnemies = function () {
                     //set player to respawn if dead
                     if (player.health <= 0) {
                         setTimeout(function () {
-                            this.spawnSocket(player);
+                            this.spawnPlayer(player);
                         }.bind(this), 
                         gameSettings.respawnTime);
                     }
@@ -403,95 +403,57 @@ Room.prototype.updatePickups = function () {
 // ADD SOCKET TO ROOM AND SET IT UP
 ///////////////////////////////////////////////////////////////////////////
 
-Room.prototype.addSocket = function (socket, className) {
-    if (this.getPop() < gameSettings.roomCap) {
+Room.prototype.addPlayer = function (player, className) {
+    if (!this.isFull()) {
 
         //add to players object
-        this.players[socket.id] = socket;
+        this.players[player.id] = player;
 
         //join socketio room
-        socket.join(this.roomId);
+        player.join(this.roomId);
 
         //set roomId to socket
-        socket.roomId = this.roomId;
-
-        //give default direction
-        socket.direction = 'none';
+        player.roomId = this.roomId;
 
         //give socket it's selected class
-        socket.type = className;
+        player.type = className;
 
         //spawn socket for first time
-        this.spawnSocket(socket);
+        this.spawnPlayer(player);
 
         //SET UP LISTENERS
         /////////////////////////////////
 
+        //give default direction
+        player.direction = 'none';
+
         //switch player direction
-        socket.on('direction', function (direction) {
+        player.on('direction', function (direction) {
 
-            socket.direction = direction;
+            player.direction = direction;
 
-        }.bind(this));//bind to room scope
+        });
+
+        //give default click value
+        player.clicking = false;
+
+        //start with no shooting cooldown
+        player.cooldown = 0;
+
+        //switch clicking state
+        player.on('click', function (clicking) {
+
+            player.clicking = clicking;
+            
+        });
 
         //handle shooting
-        socket.on('shoot', function (dest_x, dest_y) {
-
-            if (socket.health > 0) {
-                
-                //each class shoots differently
-                let myClass = gameSettings.classes[socket.type];
-
-                //single-shot classes
-                if (myClass.shots.count == 1) {
-                    //calculate velocity based on shot speed and where the player clicked
-                    vel = velocity(
-                        angle(socket.x, socket.y, dest_x, dest_y), 
-                        myClass.shots.speed
-                    );
-
-                    //create new shot object
-                    var id = Math.random();
-                    this.shots[id] = {
-                        x: socket.x,
-                        y: socket.y,
-                        type: socket.type,
-                        socketId: socket.id,
-                        velocity: vel,
-                        range: myClass.shots.range,
-                    };
-                }
-
-                //multi-shot (shotgun) classes
-                else {
-                    for (let i = 0; i < myClass.shots.count; i++) {
-
-                        let vel = velocity(
-                            angle(
-                                socket.x, socket.y, 
-                                dest_x, dest_y
-                            ) 
-                            + (i - myClass.shots.count/2 + 0.5) 
-                            * (myClass.shots.angle/(myClass.shots.count-1)),
-                            myClass.shots.speed
-                        );
-    
-                        var id = Math.random();
-                        this.shots[id] = {
-                            x: socket.x,
-                            y: socket.y,
-                            type: socket.type,
-                            socketId: socket.id,
-                            velocity: vel,
-                            range: myClass.shots.range,
-                        };
-                    }
-                }
-            }
+        player.on('shoot', function (dest_x, dest_y) {
+            this.spawnShots(player, dest_x, dest_y);
         }.bind(this));//bind to room scope
 
-        //confirm join with server after socket totally set up
-        socket.emit('joined',this.roomId);
+        //confirm join with server after player totally set up
+        player.emit('joined',this.roomId);
     }
 }
 
@@ -501,23 +463,80 @@ Room.prototype.addSocket = function (socket, className) {
 ///////////////////////////////////////////
 
 //remove socket if socket exists in room
-Room.prototype.removeSocket = function (socket) {
-    if (socket.id in this.players) {
-        delete this.players[socket.id];
+Room.prototype.removePlayer = function (player) {
+    if (player.id in this.players) {
+        delete this.players[player.id];
     }
 }
 
 //spawns or respawns a player
-Room.prototype.spawnSocket = function (socket) {
+Room.prototype.spawnPlayer = function (player) {
     //give random position in world
-    socket.x = randint(100, gameSettings.width - 100);
-    socket.y = randint(100, gameSettings.height - 100);
+    player.x = randint(100, gameSettings.width - 100);
+    player.y = randint(100, gameSettings.height - 100);
 
     //give max health based on 
-    socket.health = gameSettings.classes[socket.type].maxHealth;
+    player.health = gameSettings.classes[player.type].maxHealth;
 
     //reset killstreak
-    socket.killStreak = 0;
+    player.killStreak = 0;
+}
+
+//creates shots from given player to given spot based on class
+Room.prototype.spawnShots = function (player, dest_x, dest_y) {
+
+    //only shoot if alive
+    if (player.health > 0) {
+                
+        //each class shoots differently
+        let myClass = gameSettings.classes[player.type];
+
+        //single-shot classes
+        if (myClass.shots.count == 1) {
+            //calculate velocity based on shot speed and where the player clicked
+            vel = velocity(
+                angle(player.x, player.y, dest_x, dest_y), 
+                myClass.shots.speed
+            );
+
+            //create new shot object
+            var id = Math.random();
+            this.shots[id] = {
+                x: player.x,
+                y: player.y,
+                type: player.type,
+                playerId: player.id,
+                velocity: vel,
+                range: myClass.shots.range,
+            };
+        }
+
+        //multi-shot (shotgun) classes
+        else {
+            for (let i = 0; i < myClass.shots.count; i++) {
+
+                let vel = velocity(
+                    angle(
+                        player.x, player.y, 
+                        dest_x, dest_y
+                    ) 
+                    + (i - myClass.shots.count/2 + 0.5) 
+                    * (myClass.shots.angle/(myClass.shots.count-1)),
+                    myClass.shots.speed
+                );
+
+                var id = Math.random();
+                this.shots[id] = {
+                    x: player.x,
+                    y: player.y,
+                    type: player.type,
+                    playerId: player.id,
+                    velocity: vel,
+                    range: myClass.shots.range,
+                };
+            }
+        }
+    }
 }
 
 //spawns pickups into the room based on # of players
@@ -525,9 +544,9 @@ Room.prototype.spawnPickups = function () {
     for (
         let i=0; 
         //try to make 1 for every current player
-        i < this.getPop() && 
+        i < this.playerCount() && 
         //loop should break if cap is hit (population * pickupMax)
-        Object.keys(this.pickups).length < this.getPop() * gameSettings.pickupMax;
+        Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax;
         i++) {
             let id = Math.random();
             this.pickups[id] = {
@@ -539,11 +558,12 @@ Room.prototype.spawnPickups = function () {
     } 
 }
 
+//spawns a wave of enemies around the edge of the game area
 Room.prototype.spawnWave = function () {
     this.waveCount += 1;
 
     //make enemies based on number of players
-    for (let i = 0; i < this.getPop() * gameSettings.enemyMax; i++) {
+    for (let i = 0; i < this.playerCount() * gameSettings.enemyMax; i++) {
 
         //generate id
         let id = Math.random();
@@ -590,28 +610,29 @@ Room.prototype.spawnWave = function () {
     }
 }
 
+//count then number of enemies in the room
 Room.prototype.enemyCount = function () {
     return Object.keys(this.enemies).length;
+}
+
+//get current population of room
+Room.prototype.playerCount = function () {
+    return Object.keys(this.players).length;
+}
+
+//checks if room is full of players
+Room.prototype.isFull = function () {
+    return this.playerCount() >= gameSettings.roomCap;
+}
+
+//checks if room is empty
+Room.prototype.isEmpty = function () {
+    return this.playerCount() == 0;
 }
 
 //stops timing events for the room
 Room.prototype.shutdown = function () {
     clearInterval(this.pickupSpawner);
-}
-
-//get current population of room
-Room.prototype.getPop = function () {
-    return Object.keys(this.players).length;
-}
-
-//checks if room has space
-Room.prototype.hasSpace = function () {
-    return this.getPop() < gameSettings.roomCap;
-}
-
-//checks if room is empty
-Room.prototype.isEmpty = function () {
-    return this.getPop() == 0;
 }
 
 

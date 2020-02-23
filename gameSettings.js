@@ -31,6 +31,7 @@ var gameSettings = {
                 speed: 15,
                 angle:Math.PI/4,
                 range: 250,
+                cooldown: 120,
             },
         },
 
@@ -50,6 +51,7 @@ var gameSettings = {
                 speed: 15,
                 angle:Math.PI/6,
                 range: 300,
+                cooldown: 60,
             },
         },
 
@@ -69,6 +71,7 @@ var gameSettings = {
                 speed: 25,
                 angle: 0,
                 range: 800,
+                cooldown: 400,
             },
         },
 
@@ -88,6 +91,7 @@ var gameSettings = {
                 speed: 15,
                 angle: 0,
                 range: 600,
+                cooldown: 60,
             },
         },
     },
@@ -103,12 +107,12 @@ var gameSettings = {
             radius: 25,
             maxHealth: 5,
             speed: 5,
-            attackCooldown: 500,//1 attack a second
-            attackDamage: 1,//damage per attack
+            attackCooldown: 500,
+            attackDamage: 1,
 
             colors: {
                 dark: "#000000",
-                light: "#FF004D",
+                light: "#29ADFF",
             },
         },
 
@@ -117,14 +121,28 @@ var gameSettings = {
             radius: 40,
             maxHealth: 15,
             speed: 3,
-            attackCooldown: 1000,//1 attack a second
-            attackDamage: 3,//damage per attack
+            attackCooldown: 1000,
+            attackDamage: 3,
 
             colors: {
                 dark: "#000000",
-                light: "#FF004D",
+                light: "#00E436",
             },
-        }
+        },
+
+        scout: {
+
+            radius: 10,
+            maxHealth: 5,
+            speed: 10,
+            attackCooldown: 750,
+            attackDamage: 1,
+
+            colors: {
+                dark: "#000000",
+                light: "#FF77A8",
+            },
+        },
         
     },
 

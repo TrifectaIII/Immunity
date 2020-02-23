@@ -525,7 +525,7 @@ function drawMinimap () {
     //draw enemy pips
     for (let id in enemyData) {
         let enemy = enemyData[id];
-        fill(gameSettings.enemies[enemy.type].colors.light);
+        fill(gameSettings.colors.red);
         ellipse(
             (enemy.x/gameSettings.width)*minimapWidth+minimapOffset.x,
             (enemy.y/gameSettings.height)*minimapHeight + minimapOffset.y,

@@ -70,7 +70,7 @@ function showRooms (gameRooms) {
         console.log("ROOM STATUS #############");
         for (let roomId in gameRooms) {
             console.log(
-                `Game Room ${roomId}: ${gameRooms[roomId].getPop()} Players`
+                `Game Room ${roomId}: ${gameRooms[roomId].playerCount()} Players`
             );
         }
         console.log("#########################");
@@ -102,7 +102,7 @@ io.sockets.on('connection', function (socket) {
         //remove from room if in one
         if ('roomId' in socket) {
 
-            gameRooms[socket.roomId].removeSocket(socket);
+            gameRooms[socket.roomId].removePlayer(socket);
 
             //shut down and delete room if empty
             if (gameRooms[socket.roomId].isEmpty()) {
@@ -131,7 +131,7 @@ io.sockets.on('connection', function (socket) {
         }
 
         //reject socket if room full
-        else if (roomId in gameRooms && !gameRooms[roomId].hasSpace()) {
+        else if (roomId in gameRooms && gameRooms[roomId].isFull()) {
             socket.emit('rejection', 'Game Full');
         }
 
@@ -149,7 +149,7 @@ io.sockets.on('connection', function (socket) {
             gameRooms[newRoomId] = new gameRoom(newRoomId);
 
             //place socket into room
-            gameRooms[newRoomId].addSocket(socket, className);
+            gameRooms[newRoomId].addPlayer(socket, className);
 
             //show current room status
             showRooms(gameRooms);
@@ -158,7 +158,7 @@ io.sockets.on('connection', function (socket) {
         //add to room if room exists and has space
         else if (roomId in gameRooms) {
 
-            gameRooms[roomId].addSocket(socket, className);
+            gameRooms[roomId].addPlayer(socket, className);
 
             //show current room status
             showRooms(gameRooms);
