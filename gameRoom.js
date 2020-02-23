@@ -121,7 +121,7 @@ Room.prototype.updateShots = function () {
         }
 
         //remove range based on speed
-        shot.range -= gameSettings.classes[shot.class].shots.speed;
+        shot.range -= gameSettings.classes[shot.type].shots.speed;
         
         //destroy if out of range
         destroyed = destroyed || shot.range <= 1;
@@ -140,7 +140,7 @@ Room.prototype.updateShots = function () {
         shot_info[id] = {
             x: shot.x,
             y: shot.y,
-            class: shot.class,
+            type: shot.type,
         };
     }
 
@@ -160,7 +160,7 @@ Room.prototype.updatePlayers = function () {
         if (player.health > 0) {
 
             //speed is set by class
-            let speed = gameSettings.classes[player.class].speed;
+            let speed = gameSettings.classes[player.type].speed;
             let speedComponent = speed/(Math.sqrt(2));
 
             //move based on direction sent by client
@@ -203,8 +203,10 @@ Room.prototype.updatePlayers = function () {
             for (let pid in this.players) {
                 if (player.id != pid && this.players[pid].health > 0) {
                     collisions.collideAndDisplace(
-                        player, gameSettings.playerRadius,
-                        this.players[pid], gameSettings.playerRadius
+                        player, 
+                        gameSettings.classes[player.type].radius,
+                        this.players[pid], 
+                        gameSettings.classes[this.players[pid].type].radius
                     );
                 }
             }
@@ -223,7 +225,7 @@ Room.prototype.updatePlayers = function () {
         player_info[id] = {
             x: player.x,
             y: player.y,
-            class: player.class,
+            type: player.type,
             health: player.health,
             name: player.name,
             killStreak: player.killStreak,
@@ -278,7 +280,7 @@ Room.prototype.updateEnemies = function () {
             if (enemy.attackCooldown <= 0 &&
                 collisions.collide(
                     enemy, gameSettings.enemies[enemy.type].radius,
-                    player, gameSettings.playerRadius
+                    player, gameSettings.classes[player.type].radius
                 )) {
                     //reset enemy cooldown
                     enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
@@ -308,8 +310,10 @@ Room.prototype.updateEnemies = function () {
         for (let pid in this.players) {
             if (this.players[pid].health > 0) {
                 collisions.collideAndDisplace(
-                    enemy, gameSettings.enemies[enemy.type].radius,
-                    this.players[pid], gameSettings.playerRadius
+                    enemy, 
+                    gameSettings.enemies[enemy.type].radius,
+                    this.players[pid], 
+                    gameSettings.classes[this.players[pid].type].radius
                 );
             }
         }
@@ -358,7 +362,7 @@ Room.prototype.updatePickups = function () {
         if (closestDistance < Infinity &&
             collisions.collide(
                 player, 
-                gameSettings.playerRadius,
+                gameSettings.classes[player.type].radius,
                 pickup, 
                 gameSettings.pickupRadius
             )
@@ -366,10 +370,10 @@ Room.prototype.updatePickups = function () {
             switch (pickup.type) {
                 case "health":
                     //if player not at max health
-                    if (player.health < gameSettings.classes[player.class].maxHealth) {
+                    if (player.health < gameSettings.classes[player.type].maxHealth) {
                         //give health and delete pickup
                         player.health = Math.min(
-                            gameSettings.classes[player.class].maxHealth,
+                            gameSettings.classes[player.type].maxHealth,
                             player.health + gameSettings.pickupHealthAmount
                         );
                         delete this.pickups[id];
@@ -415,7 +419,7 @@ Room.prototype.addSocket = function (socket, className) {
         socket.direction = 'none';
 
         //give socket it's selected class
-        socket.class = className;
+        socket.type = className;
 
         //spawn socket for first time
         this.spawnSocket(socket);
@@ -436,7 +440,7 @@ Room.prototype.addSocket = function (socket, className) {
             if (socket.health > 0) {
                 
                 //each class shoots differently
-                let myClass = gameSettings.classes[socket.class];
+                let myClass = gameSettings.classes[socket.type];
 
                 //single-shot classes
                 if (myClass.shots.count == 1) {
@@ -451,7 +455,7 @@ Room.prototype.addSocket = function (socket, className) {
                     this.shots[id] = {
                         x: socket.x,
                         y: socket.y,
-                        class: socket.class,
+                        type: socket.type,
                         socketId: socket.id,
                         velocity: vel,
                         range: myClass.shots.range,
@@ -476,7 +480,7 @@ Room.prototype.addSocket = function (socket, className) {
                         this.shots[id] = {
                             x: socket.x,
                             y: socket.y,
-                            class: socket.class,
+                            type: socket.type,
                             socketId: socket.id,
                             velocity: vel,
                             range: myClass.shots.range,
@@ -485,40 +489,6 @@ Room.prototype.addSocket = function (socket, className) {
                 }
             }
         }.bind(this));//bind to room scope
-
-        //handle pickup command 
-        // socket.on('pickup', function () {
-        //     if (socket.alive) {
-        //         //loop through pickups and find closest
-        //         let closestDistance = Infinity;
-        //         let closestId = 0;
-        //         for (let id in this.pickups) {
-        //             let thisDistance = collisions.distance(this.pickups[id], socket);
-        //             if (thisDistance < closestDistance) {
-        //                 closestDistance = thisDistance;
-        //                 closestId = id;
-        //             }
-        //         }
-        //         //if pickup is close enough, consume it.
-        //         if (closestDistance < Infinity &&
-        //             collisions.collide(
-        //                 socket, 
-        //                 gameSettings.playerRadius,
-        //                 this.pickups[closestId], 
-        //                 gameSettings.pickupRadius
-        //             )
-        //             ) {
-        //             switch (this.pickups[closestId].type) {
-        //                 //health pickup gives 5 hp, up to max
-        //                 case "health":
-        //                     socket.health = Math.min(gameSettings.classes[socket.class].maxHealth, socket.health + 5);
-        //                     break;
-        //             }
-        //             //delete after use
-        //             delete this.pickups[closestId];
-        //         }
-        //     }
-        // }.bind(this));//bind to room scope
 
         //confirm join with server after socket totally set up
         socket.emit('joined',this.roomId);
@@ -543,8 +513,8 @@ Room.prototype.spawnSocket = function (socket) {
     socket.x = randint(100, gameSettings.width - 100);
     socket.y = randint(100, gameSettings.height - 100);
 
-    //give max health based on class
-    socket.health = gameSettings.classes[socket.class].maxHealth;
+    //give max health based on 
+    socket.health = gameSettings.classes[socket.type].maxHealth;
 
     //reset killstreak
     socket.killStreak = 0;

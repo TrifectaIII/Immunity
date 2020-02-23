@@ -12,14 +12,12 @@ var gameSettings = {
     // time in MS to respawn players
     respawnTime: 3000,
 
-    //size of player
-    playerRadius: 25,
-
     //info specific to each class
     classes: {
 
         heavy: {
-
+            
+            radius: 30,
             maxHealth: 20,
             speed: 3,
 
@@ -38,6 +36,7 @@ var gameSettings = {
 
         engineer: {
 
+            radius: 25,
             maxHealth: 15,
             speed: 5,
 
@@ -56,6 +55,7 @@ var gameSettings = {
 
         sniper: {
 
+            radius: 20,
             maxHealth: 10,
             speed: 7,
 
@@ -74,6 +74,7 @@ var gameSettings = {
 
         soldier: {
 
+            radius: 25,
             maxHealth: 15,
             speed: 5,
 
@@ -100,8 +101,8 @@ var gameSettings = {
         normal: {
 
             radius: 25,
-            speed: 5,
             maxHealth: 5,
+            speed: 5,
             attackCooldown: 500,//1 attack a second
             attackDamage: 1,//damage per attack
 
@@ -112,9 +113,10 @@ var gameSettings = {
         },
 
         heavy: {
+
             radius: 40,
-            speed: 3,
             maxHealth: 15,
+            speed: 3,
             attackCooldown: 1000,//1 attack a second
             attackDamage: 3,//damage per attack
 
