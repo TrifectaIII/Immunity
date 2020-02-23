@@ -34,7 +34,7 @@ var gameSettings = {
                 speed: 15,
                 angle:Math.PI/4,
                 range: 200,
-                cooldown: 300,
+                cooldown: 200,
             },
         },
 
@@ -54,7 +54,7 @@ var gameSettings = {
                 speed: 15,
                 angle:Math.PI/6,
                 range: 300,
-                cooldown: 60,
+                cooldown: 100,
             },
         },
 
@@ -73,8 +73,8 @@ var gameSettings = {
                 count: 1,
                 speed: 25,
                 angle: 0,
-                range: 800,
-                cooldown: 400,
+                range: 1000,
+                cooldown: 300,
             },
         },
 
@@ -93,7 +93,7 @@ var gameSettings = {
                 count: 1,
                 speed: 15,
                 angle: 0,
-                range: 600,
+                range: 500,
                 cooldown: 60,
             },
         },
