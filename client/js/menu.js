@@ -148,6 +148,61 @@ function drawBackButton() {
 }
 
 
+
+
+// TITLE MENU
+//////////////////////////////////////////////////////////////////////////////
+
+var titleProg = 0;
+var titleColors = [];
+
+for (let type in gameSettings.classes) {
+    titleColors.push(gameSettings.classes[type].colors.light);
+}
+
+var startButton = new Button(
+    "START",
+    gameSettings.colors.darkgreen,
+    gameSettings.colors.green
+);
+
+function drawTitleMenu () {
+
+    push();
+
+    textAlign(CENTER, CENTER);
+
+    //update and draw set name button
+    startButton.update(
+        windowWidth/2,
+        windowHeight*2/3, 
+        windowWidth/4, 
+        windowHeight/8
+    );
+    startButton.draw();
+
+    //draw title
+    stroke('black');
+    strokeWeight(8);
+    titleProg -= 0.1;
+    fill(titleColors[Math.floor(-(titleProg/titleColors.length)%titleColors.length)]);
+    textSize(100);
+    text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
+
+    //draw credits
+    strokeWeight(2);
+    fill('black');
+    textSize(40);
+    text("WASD to Move\nClick to Shoot", windowWidth/2, windowHeight/2);
+
+    pop();
+}
+
+function clickTitleMenu () {
+    return startButton.mouseOver();
+}
+
+
 // NAME MENU
 //////////////////////////////////////////////////////////////////////////////
 
@@ -171,12 +226,6 @@ function drawNameMenu (canvas) {
     push();
     textAlign(CENTER, CENTER);
 
-    //refresh screen
-    clear();
-
-    //draw background
-    drawMenuGrid();
-
     //update and draw set name button
     setNameButton.update(
         windowWidth/2,
@@ -186,17 +235,12 @@ function drawNameMenu (canvas) {
     );
     setNameButton.draw();
 
-    //draw text for code entry
+    //draw text for name entry
     stroke('black');
     strokeWeight(2);
     fill('black');
     textSize(40);
     text("Enter Name:", windowWidth/2, windowHeight/3);
-
-    //no back button because first menu
-    // drawBackButton();
-
-    drawMenuCrosshair();
 
     //display input for name entry
     nameInput.showAt(
@@ -241,12 +285,6 @@ function drawServerMenu (canvas) {
     push();
     textAlign(CENTER, CENTER);
 
-    //refresh screen
-    clear();
-
-    //draw background
-    drawMenuGrid();
-
     //update and draw buttons
     createGameButton.update(
         windowWidth/2, 
@@ -272,10 +310,6 @@ function drawServerMenu (canvas) {
     text("- OR -", windowWidth/2, windowHeight*17/40);
     text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
 
-    drawBackButton();
-
-    drawMenuCrosshair();
-
     //display input for game code
     codeInput.showAt(
         windowWidth/2, 
@@ -283,6 +317,7 @@ function drawServerMenu (canvas) {
         windowWidth/4,
         75
     );
+
     pop();
 }
 
@@ -315,12 +350,7 @@ function drawClassMenu () {
     push();
     textAlign(CENTER, CENTER);
 
-    //refresh screen
-    clear();
-
-    //draw background
-    drawMenuGrid();
-
+    
     //update and draw buttons
     let counter = 1;
     for (let className in classButtons) {
@@ -341,10 +371,6 @@ function drawClassMenu () {
     fill('black');
     textSize(40);
     text("Choose a Class:", windowWidth/2, windowHeight/12);
-
-    drawBackButton();
-
-    drawMenuCrosshair();
 }
 
 function clickClassMenu () {
@@ -412,7 +438,7 @@ var menuChoices = {
 }
 
 //list of menu progression (first to last)
-const menuList = ['name', 'server', 'class'];
+const menuList = ['title', 'name', 'server', 'class'];
 
 //tracks which menu we are on, starts at first
 var menuIndex = 0;
@@ -420,7 +446,21 @@ var menuIndex = 0;
 
 //draws each menu
 function drawMenus (canvas) {
+
+    //refresh screen
+    clear();
+
+    //draw background
+    drawMenuGrid();
+
+    //draw contents of menu based on state
     switch (menuList[menuIndex]) {
+
+        //draw title menu
+        case 'title':
+            drawTitleMenu();
+            break;
+
         //draw name menu
         case 'name':
             drawNameMenu(canvas);
@@ -436,6 +476,13 @@ function drawMenus (canvas) {
             drawClassMenu();
             break;
     }
+
+    if (menuIndex > 0) {
+        drawBackButton();
+    }
+
+    //draw mouse crosshair
+    drawMenuCrosshair();
 }
 
 //checks for clicks when menu is active
@@ -451,6 +498,12 @@ function menuMouseClicked () {
 
     //otherwise, menu specific
     switch (menuList[menuIndex]) {
+
+        case 'title':
+            if (clickTitleMenu()) {
+                menuIndex += 1;
+            }
+
         case 'name':
             if (clickNameMenu() && nameInput.getValue() != '') {
                 menuChoices.name = nameInput.getValue();

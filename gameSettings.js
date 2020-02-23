@@ -1,4 +1,7 @@
 var gameSettings = {
+    //title of game (WIP)
+    title: "Immunity",
+
     //max players per room
     roomCap: 6,
 
@@ -106,7 +109,7 @@ var gameSettings = {
 
             radius: 25,
             maxHealth: 5,
-            speed: 5,
+            speed: 4,
             attackCooldown: 500,
             attackDamage: 1,
 
@@ -120,7 +123,7 @@ var gameSettings = {
 
             radius: 40,
             maxHealth: 15,
-            speed: 3,
+            speed: 2,
             attackCooldown: 1000,
             attackDamage: 3,
 
@@ -134,7 +137,7 @@ var gameSettings = {
 
             radius: 10,
             maxHealth: 5,
-            speed: 10,
+            speed: 6,
             attackCooldown: 750,
             attackDamage: 1,
 
