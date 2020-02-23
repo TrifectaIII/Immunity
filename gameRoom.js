@@ -555,15 +555,17 @@ Room.prototype.spawnPickups = function () {
                 x: randint(100, gameSettings.width-100),
                 y: randint(100, gameSettings.height-100),
             }
-    } 
+    }
 }
 
 //spawns a wave of enemies around the edge of the game area
 Room.prototype.spawnWave = function () {
     this.waveCount += 1;
 
-    //make enemies based on number of players
-    for (let i = 0; i < this.playerCount() * gameSettings.enemyMax; i++) {
+    //cap based on number of players and wave count
+    let enemyCap = this.playerCount() * (gameSettings.enemyMax + this.waveCount - 1);
+
+    for (let i = 0; i < enemyCap; i++) {
 
         //generate id
         let id = Math.random();
