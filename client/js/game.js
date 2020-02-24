@@ -16,83 +16,134 @@ var deathStart;
 
 //conglomerate draw function for game objects
 function drawGame () {
+    push();
+
+    //refresh screen
+    clear()
+
     if (socket.id in playerData) {
         let player = playerData[socket.id];
 
-        push();
+        //if player actively in game
+        if (player.type != 'choosing') {
+            //calculate screen offset based on player position
+            calcOffset(player);
 
-        //refresh screen
-        clear()
+            //draw grid background
+            drawGrid();
 
-        //calculate screen offset based on player position
-        calcOffset(player);
+            //draw game area borders
+            drawBorders();
 
-        //draw grid background
-        drawGrid();
+            //draw dead players
+            drawDead();
 
-        //draw game area borders
-        drawBorders();
-
-        //draw dead players
-        drawDead();
-
-        //draw client player if dead
-        if (player.health <= 0) {
-            drawPlayer(player);
-        }
-
-        //draw pickups
-        drawPickups();
-
-        //draw shots
-        drawShots();
-
-        //draw enemies
-        drawEnemies();
-
-        //draw living players
-        drawLiving();
-
-        // then draw client player on top if living
-        if (player.health > 0) {
-            drawPlayer(player);
-        }
-
-        //draw death message if client player is dead
-        deathMsg(player);
-
-        //draw UI
-
-        //draw minimap
-        drawMinimap();
-
-        if (player.health > 0) {
-            //draw healthbar, then erase time of death
-            drawHealthbar(player);
-            deathStart = 0;
-        } else {
-            //note time of death, then draw respawn bar
-            if (deathStart == 0) {
-                deathStart = (new Date()).getTime();
+            //draw client player if dead
+            if (player.health <= 0) {
+                drawPlayer(player);
             }
-            let deathTime = (new Date()).getTime() - deathStart;
-            drawMainbar(player, deathTime/gameSettings.respawnTime);
+
+            //draw pickups
+            drawPickups();
+
+            //draw shots
+            drawShots();
+
+            //draw enemies
+            drawEnemies();
+
+            //draw living players
+            drawLiving();
+
+            // then draw client player on top if living
+            if (player.health > 0) {
+                drawPlayer(player);
+            }
+
+            //draw death message if client player is dead
+            deathMsg(player);
+
+            //draw UI
+
+            //draw minimap
+            drawMinimap();
+
+            if (player.health > 0) {
+                //draw healthbar, then erase time of death
+                drawHealthbar(player);
+                deathStart = 0;
+            } else {
+                //note time of death, then draw respawn bar
+                if (deathStart == 0) {
+                    deathStart = (new Date()).getTime();
+                }
+                let deathTime = (new Date()).getTime() - deathStart;
+                drawMainbar(player, deathTime/gameSettings.respawnTime);
+            }
+
+            //draw info about the current gameRoom
+            drawRoomInfo(gameSettings.classes[player.type].colors.dark);
+
+            //draw names of playerData
+            drawPlayerInfo();
+
+            //draw fps counter
+            drawFPS(gameSettings.classes[player.type].colors.dark);
+
+            // draw crosshair
+            drawCrosshair(gameSettings.classes[player.type].colors.dark);
         }
 
-        //draw info about the current gameRoom
-        drawRoomInfo(player);
+        //draw game if player not in game yet
+        else {
 
-        //draw names of playerData
-        drawPlayerInfo();
+            //calculate screen offset based on center of screen
+            calcOffset({
+                x: gameSettings.width/2,
+                y: gameSettings.height/2
+            });
 
-        //draw fps counter
-        drawFPS(player);
+            //draw grid background
+            drawGrid();
 
-        // draw crosshair
-        drawCrosshair(player);
+            //draw game area borders
+            drawBorders();
 
-        pop();
+            //draw dead players
+            drawDead();
+
+            //draw pickups
+            drawPickups();
+
+            //draw shots
+            drawShots();
+
+            //draw enemies
+            drawEnemies();
+
+            //draw living players
+            drawLiving();
+
+            //draw UI
+
+            //draw minimap
+            drawMinimap();
+
+            //draw info about the current gameRoom
+            drawRoomInfo(gameSettings.colors.darkgrey);
+
+            //draw names of playerData
+            drawPlayerInfo();
+
+            //draw fps counter
+            drawFPS(gameSettings.colors.darkgrey);
+
+            // draw crosshair
+            drawCrosshair(gameSettings.colors.darkgrey);
+        }
     }
+
+    pop();
 }
 
 //calculate screen offset based on player position
@@ -318,6 +369,7 @@ function drawDead () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
+            if (player.type == 'choosing') continue;
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -353,6 +405,7 @@ function drawLiving () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
+            if (player.type == 'choosing') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -376,6 +429,7 @@ function drawLiving () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
+            if (player.type == 'choosing') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -463,9 +517,9 @@ function deathMsg (player) {
 }
 
 //draw cosshair
-function drawCrosshair (player) {
+function drawCrosshair (color) {
     push();
-    stroke(gameSettings.classes[player.type].colors.dark);
+    stroke(color);
     strokeWeight(2);
     fill(0,0);
     ellipse(mouseX, mouseY, 30, 30);
@@ -531,6 +585,7 @@ function drawMinimap () {
 
     //draw other player pips
     for (let id in playerData) {
+        if (playerData[id].type == 'choosing') continue;
         if (id != socket.id && playerData[id].health > 0) {
             let player = playerData[id];
             fill(gameSettings.classes[player.type].colors.light);
@@ -555,25 +610,28 @@ function drawMinimap () {
 
     //draw client player pip with outline indicator + larger
     let player = playerData[socket.id];
-    strokeWeight(2);
-    stroke(gameSettings.colors.white);
-    fill(gameSettings.classes[player.type].colors.light);
-    ellipse(
-        (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
-        (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
-        minimapPipSize*1.25, minimapPipSize*1.25,
-    );
+    if (player.type != 'choosing') {
+        strokeWeight(2);
+        stroke(gameSettings.colors.white);
+        fill(gameSettings.classes[player.type].colors.light);
+        ellipse(
+            (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
+            (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
+            minimapPipSize*1.25, minimapPipSize*1.25,
+        );
+    }
+    
     pop();
 }
 
 //display room code + info so others can join
-function drawRoomInfo (player) {
+function drawRoomInfo (color) {
     push();
     textAlign(LEFT, CENTER);
     stroke('black');
     strokeWeight(0);
     textSize(30);
-    fill(gameSettings.classes[player.type].colors.dark);
+    fill(color);
     text(`Game Code: ${roomId}`, 15, 20);
 
     text(`Players: ${Object.keys(playerData).length}/${gameSettings.roomCap}`, 15, 60);
@@ -594,8 +652,16 @@ function drawPlayerInfo () {
     for (let id in playerData) {
         //draw name and killstreak
         let player = playerData[id];
-        fill(gameSettings.classes[player.type].colors.dark);
-        text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+        if (player.type != 'choosing') {
+            fill(gameSettings.classes[player.type].colors.dark);
+            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+        }
+        else {
+            fill(gameSettings.colors.darkgrey);
+            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+            counter++;
+            continue;
+        }
         
         //draw healthbar
         let barWidth = 110;
@@ -621,12 +687,12 @@ function drawPlayerInfo () {
 }
 
 //draw framerate
-function drawFPS (player) {
+function drawFPS (color) {
     push();
     textAlign(RIGHT, CENTER);
     textSize(30);
     strokeWeight(0);
-    fill(gameSettings.classes[player.type].colors.dark);
+    fill(color);
     //get fps from p5 and draw
     text(
         `FPS: ${Math.round(frameRate())}`, 

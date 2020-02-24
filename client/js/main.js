@@ -54,8 +54,7 @@ function joinGame(menuChoices) {
     socket.emit(
         'join_game', 
         menuChoices.roomId, 
-        menuChoices.name, 
-        menuChoices.className
+        menuChoices.name
     );
 
     //if socket rejected, send back to menu and display reason error
@@ -75,11 +74,22 @@ function joinGame(menuChoices) {
         //Start controls (controls.js)
         startControls(socket);
 
-        //change state
-        state = 'game';
-
         //remove error message if shown
         errors.hideError();
+
+        //ask player to choose a class
+        inGameMenuState = 'class';
+        state = 'ingamemenu';
+
+        //ask player again whenever server requests
+        socket.on('class_request', function () {
+            inGameMenuState = 'class';
+            state = 'ingamemenu';
+        });
+
+        socket.on('spawned', function () {
+            state = 'game';
+        });
 
         //recieve player info from server
         socket.on ('game_update', function (serverData) {
@@ -145,6 +155,12 @@ function draw () {
         case 'game':
             drawGame();
             break;
+
+        //draw in game menus over game (ingamemenu.js)
+        case 'ingamemenu':
+            drawGame();
+            drawInGameMenus();
+            break;
     }
 
     //no matter state, draw error if active (error.js)
@@ -153,14 +169,30 @@ function draw () {
 
 //look for button clicks during menus
 function mouseClicked () {
-    if (state == 'menu') {
-        menuMouseClicked(); //(menu.js)
+
+    switch (state) {
+
+        case 'menu':
+            menuMouseClicked(); //(menu.js)
+            break;
+
+        case 'ingamemenu':
+            inGameMenuMouseClicked();//(ingamemenu.js)
+            break;
     }
+
 }
 
 //look for enter presses on menus
 function keyPressed () {
-    if (state == 'menu') {
-        menuKeyPressed(keyCode); //(menu.js)
+    switch (state) {
+
+        case 'menu':
+            menuKeyPressed(keyCode); //(menu.js)
+            break;
+
+        // case 'ingamemenu':
+        //     inGameMenuKeyPressed(); //(ingamemenu.js)
+        //     break;
     }
 }

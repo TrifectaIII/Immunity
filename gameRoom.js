@@ -156,14 +156,21 @@ Room.prototype.updatePlayers = function () {
     for (let id in this.players) {
         let player = this.players[id];
 
+        //ask for class if not chosen
+        if (player.type == 'choosing') {
+            continue;
+        }
+
         //reduce shot cooldown
         player.cooldown -= gameSettings.tickRate;
 
         //shoot for player if clicking and no cooldown
-        if (player.clicking && player.cooldown <= 0) {
-            this.playerShoot(player);
-            //start cooldown
-            player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+        if (player.clicking && 
+            player.cooldown <= 0 &&
+            player.health > 0) {
+                this.playerShoot(player);
+                //start cooldown
+                player.cooldown = gameSettings.classes[player.type].shots.cooldown;
         }
         
         //move player based on direction
@@ -292,15 +299,26 @@ Room.prototype.updateEnemies = function () {
                     enemy, gameSettings.enemies[enemy.type].radius,
                     player, gameSettings.classes[player.type].radius
                 )) {
+
                     //reset enemy cooldown
                     enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
+                    
                     //do damage to player
                     player.health -= gameSettings.enemies[enemy.type].attackDamage;
-                    //set player to respawn if dead
+                    
+                    //if player died
                     if (player.health <= 0) {
+
+                        //do not allow negative life
+                        player.health = 0;
+
+                        //set to respawn and choose new class
                         setTimeout(function () {
-                            this.spawnPlayer(player);
+                            //ask for new class choice on respawn
+                            player.type = 'choosing';
+                            player.emit('class_request');
                         }.bind(this), 
+                        //respawn time from settings
                         gameSettings.respawnTime);
                     }
             }
@@ -318,7 +336,8 @@ Room.prototype.updateEnemies = function () {
 
         //check for collisions with living players
         for (let pid in this.players) {
-            if (this.players[pid].health > 0) {
+            if (this.players[pid].type != 'choosing' &&
+                this.players[pid].health > 0) {
                 collisions.collideAndDisplace(
                     enemy, 
                     gameSettings.enemies[enemy.type].radius,
@@ -358,7 +377,8 @@ Room.prototype.updatePickups = function () {
         let closestDistance = Infinity;
         let closestId = 0;
         for (let pid in this.players) {
-            if (this.players[pid].health > 0) {
+            if (this.players[pid].type != 'choosing' &&
+                this.players[pid].health > 0) {
                 let thisDistance = collisions.distance(this.players[pid], pickup);
                 if (thisDistance < closestDistance) {
                     closestDistance = thisDistance;
@@ -366,6 +386,7 @@ Room.prototype.updatePickups = function () {
                 }
             }
         }
+
         let player = this.players[closestId];
 
         //if player is close enough
@@ -413,7 +434,7 @@ Room.prototype.updatePickups = function () {
 // ADD SOCKET TO ROOM AND SET IT UP
 ///////////////////////////////////////////////////////////////////////////
 
-Room.prototype.addPlayer = function (player, className) {
+Room.prototype.addPlayer = function (player) {
     if (!this.isFull()) {
 
         //add to players object
@@ -425,14 +446,37 @@ Room.prototype.addPlayer = function (player, className) {
         //set roomId to socket
         player.roomId = this.roomId;
 
-        //give socket it's selected class
-        player.type = className;
-
-        //spawn socket for first time
-        this.spawnPlayer(player);
+        //start killStreak at 0
+        player.killStreak = 0;
 
         //SET UP LISTENERS
         /////////////////////////////////
+
+        //give default class
+        player.type = 'choosing';
+
+        //set class based on player choice
+        player.on ('class_choice', function (type) {
+            //only change if valid choice
+            if (player.type == 'choosing' &&
+                type in gameSettings.classes) {
+                player.type = type;
+                
+                //spawn player in
+                
+                //give random position in world
+                player.x = randint(100, gameSettings.width - 100);
+                player.y = randint(100, gameSettings.height - 100);
+
+                //give max health based on 
+                player.health = gameSettings.classes[player.type].maxHealth;
+
+                //reset killstreak
+                player.killStreak = 0;
+
+                player.emit('spawned');
+            }
+        }.bind(this));//bind to room scope
 
         //give default direction
         player.direction = 'none';
@@ -459,10 +503,12 @@ Room.prototype.addPlayer = function (player, className) {
             player.clicking = clicking;
             
             //shoot right away to avoid a click getting clipped by tickRate
-            if (player.clicking && player.cooldown <= 0) {
-                this.playerShoot(player);
-                //start cooldown
-                player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+            if (player.clicking && 
+                player.cooldown <= 0 &&
+                player.health > 0) {
+                    this.playerShoot(player);
+                    //start cooldown
+                    player.cooldown = gameSettings.classes[player.type].shots.cooldown;
             }
         }.bind(this));//bind to room scope
 
@@ -540,19 +586,6 @@ Room.prototype.removePlayer = function (player) {
     if (player.id in this.players) {
         delete this.players[player.id];
     }
-}
-
-//spawns or respawns a player
-Room.prototype.spawnPlayer = function (player) {
-    //give random position in world
-    player.x = randint(100, gameSettings.width - 100);
-    player.y = randint(100, gameSettings.height - 100);
-
-    //give max health based on 
-    player.health = gameSettings.classes[player.type].maxHealth;
-
-    //reset killstreak
-    player.killStreak = 0;
 }
 
 //creates shots from given player to given spot based on class

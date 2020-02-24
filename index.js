@@ -120,24 +120,19 @@ io.sockets.on('connection', function (socket) {
     ////////////////////////////////
 
     //connect socket to room
-    socket.once ('join_game', function (roomId, name, className) {
+    socket.once ('join_game', function (roomId, name) {
 
         //set name of socket
         socket.name = name.trim().substring(0,6);
 
-        //reject socket if chosen class is non-existent
-        if (!(className in gameSettings.classes)) {
-            socket.emit('rejection', 'Invalid Class');
+        //reject socket if room does not exist
+        if (!(roomId in gameRooms) && roomId != 'new_game') {
+            socket.emit('rejection', 'Game Does Not Exist');
         }
 
         //reject socket if room full
         else if (roomId in gameRooms && gameRooms[roomId].isFull()) {
             socket.emit('rejection', 'Game Full');
-        }
-
-        //reject socket if room does not exist
-        else if (!(roomId in gameRooms) && roomId != 'new_game') {
-            socket.emit('rejection', 'Game Does Not Exist');
         }
 
         //create new room on request
@@ -149,7 +144,7 @@ io.sockets.on('connection', function (socket) {
             gameRooms[newRoomId] = new gameRoom(newRoomId);
 
             //place socket into room
-            gameRooms[newRoomId].addPlayer(socket, className);
+            gameRooms[newRoomId].addPlayer(socket);
 
             //show current room status
             showRooms(gameRooms);
@@ -158,7 +153,7 @@ io.sockets.on('connection', function (socket) {
         //add to room if room exists and has space
         else if (roomId in gameRooms) {
 
-            gameRooms[roomId].addPlayer(socket, className);
+            gameRooms[roomId].addPlayer(socket);
 
             //show current room status
             showRooms(gameRooms);

@@ -331,57 +331,6 @@ function clickServerMenu () {
     return false;
 }
 
-// CLASS MENU
-//////////////////////////////////////////////////////////////////////////////
-
-var classButtons = {};
-
-for (let className in gameSettings.classes) {
-    classButtons[className] = new Button(
-        className.toUpperCase(),
-        gameSettings.classes[className].colors.dark,
-        gameSettings.classes[className].colors.light
-    );
-}
-
-var classCount = Object.keys(classButtons).length;
-
-function drawClassMenu () {
-    push();
-    textAlign(CENTER, CENTER);
-
-    
-    //update and draw buttons
-    let counter = 1;
-    for (let className in classButtons) {
-        let button = classButtons[className];
-        button.update(
-            windowWidth/2, 
-            windowHeight*counter/(1+classCount), 
-            windowWidth/3,
-            windowHeight/(4+classCount)
-        );
-        button.draw();
-        counter++;
-    }
-
-    //draw text for code entry
-    stroke('black');
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("Choose a Class:", windowWidth/2, windowHeight/12);
-}
-
-function clickClassMenu () {
-    for (let className in classButtons) {
-        if (classButtons[className].mouseOver()) {
-            return className;
-        }
-    }
-    return false;
-}
-
 // Loading Screen
 //////////////////////////////////////////////////////////////////////////////
 
@@ -438,7 +387,7 @@ var menuChoices = {
 }
 
 //list of menu progression (first to last)
-const menuList = ['title', 'name', 'server', 'class'];
+const menuList = ['title', 'name', 'server'];
 
 //tracks which menu we are on, starts at first
 var menuIndex = 0;
@@ -470,11 +419,6 @@ function drawMenus (canvas) {
         case 'server':
             drawServerMenu(canvas);
             break;
-
-        //draw class menu
-        case 'class':
-            drawClassMenu();
-            break;
     }
 
     if (menuIndex > 0) {
@@ -483,6 +427,11 @@ function drawMenus (canvas) {
 
     //draw mouse crosshair
     drawMenuCrosshair();
+
+    //if at the end of menus, try to join game
+    if (menuIndex == menuList.length) {
+        joinGame(menuChoices);
+    }
 }
 
 //checks for clicks when menu is active
@@ -529,19 +478,6 @@ function menuMouseClicked () {
                     break;
             }
             break;
-
-        case 'class':
-            if (clickClassMenu()) {
-                //join game once class selected
-                menuChoices.className = clickClassMenu();
-                menuIndex += 1;
-            }
-            break;
-    }
-
-    //if at the end of menus, go to game
-    if (menuIndex == menuList.length) {
-        joinGame(menuChoices);
     }
 }
 
