@@ -218,13 +218,15 @@ Room.prototype.updatePlayers = function () {
 
             //check for collisions with other players
             for (let pid in this.players) {
-                if (player.id != pid && this.players[pid].health > 0) {
-                    collisions.collideAndDisplace(
-                        player, 
-                        gameSettings.classes[player.type].radius,
-                        this.players[pid], 
-                        gameSettings.classes[this.players[pid].type].radius
-                    );
+                if (player.id != pid && 
+                    player.type != 'choosing' &&
+                    this.players[pid].health > 0) {
+                        collisions.collideAndDisplace(
+                            player, 
+                            gameSettings.classes[player.type].radius,
+                            this.players[pid], 
+                            gameSettings.classes[this.players[pid].type].radius
+                        );
                 }
             }
 
@@ -338,12 +340,12 @@ Room.prototype.updateEnemies = function () {
         for (let pid in this.players) {
             if (this.players[pid].type != 'choosing' &&
                 this.players[pid].health > 0) {
-                collisions.collideAndDisplace(
-                    enemy, 
-                    gameSettings.enemies[enemy.type].radius,
-                    this.players[pid], 
-                    gameSettings.classes[this.players[pid].type].radius
-                );
+                    collisions.collideAndDisplace(
+                        enemy, 
+                        gameSettings.enemies[enemy.type].radius,
+                        this.players[pid], 
+                        gameSettings.classes[this.players[pid].type].radius
+                    );
             }
         }
     }
