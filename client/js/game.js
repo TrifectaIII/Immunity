@@ -226,8 +226,10 @@ function drawPickups() {
 
 //draw all shots
 function drawShots() {
+
     push();
     strokeWeight(2);
+    
     for (let id in shotData) {
         let shot = shotData[id];
         if (shot.x-screenOffset.x > 0 &&
@@ -243,12 +245,16 @@ function drawShots() {
                 );
         }
     }
+
     pop();
 }
 
 //draw all enemies
 function drawEnemies() {
+
     push();
+
+    //draw enemies
     for (let id in enemyData) {
         let enemy = enemyData[id];
         if (enemy.x-screenOffset.x > -50 &&
@@ -266,8 +272,16 @@ function drawEnemies() {
                     gameSettings.enemies[enemy.type].radius*2,
                     gameSettings.enemies[enemy.type].radius*2
                 );
+        }   
+    }
 
-                //draw healthbar
+    //draw healthbars
+    for (let id in enemyData) {
+        let enemy = enemyData[id];
+        if (enemy.x-screenOffset.x > -50 &&
+            enemy.x-screenOffset.x < windowWidth + 50 &&
+            enemy.y-screenOffset.y > -50 &&
+            enemy.y-screenOffset.y < windowHeight + 50) {
                 let x_offset = 15
                 let y_offset_abs = gameSettings.enemies[enemy.type].radius + 10;
                 let y_offset = y_offset_abs;
@@ -298,7 +312,9 @@ function drawEnemies() {
 
 //draw dead players
 function drawDead () {
+
     push();
+
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
@@ -321,31 +337,19 @@ function drawDead () {
                         gameSettings.classes[player.type].radius*2 - 1, 
                         gameSettings.classes[player.type].radius*2 - 1
                     );
-
-                    //draw death cross
-                    strokeWeight(5);
-                    stroke(gameSettings.colors.red);
-                    line(
-                        player.x-screenOffset.x+25,
-                        player.y-screenOffset.y+25,
-                        player.x-screenOffset.x-25,
-                        player.y-screenOffset.y-25
-                    );
-                    line(
-                        player.x-screenOffset.x+25,
-                        player.y-screenOffset.y-25,
-                        player.x-screenOffset.x-25,
-                        player.y-screenOffset.y+25
-                    );
             }
         }
     }
+
     pop();
 }
 
 //draw living players
 function drawLiving () {
+
     push();
+
+    //draw players
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
@@ -354,7 +358,7 @@ function drawLiving () {
                 player.x-screenOffset.x < windowWidth + 50 &&
                 player.y-screenOffset.y > -50 &&
                 player.y-screenOffset.y < windowHeight + 50) {
-                    //draw player
+                    
                     fill(gameSettings.classes[player.type].colors.light);
                     stroke(gameSettings.classes[player.type].colors.dark);
                     strokeWeight(2);
@@ -364,8 +368,19 @@ function drawLiving () {
                         gameSettings.classes[player.type].radius*2 - 1, 
                         gameSettings.classes[player.type].radius*2 - 1
                     );
+            }
+        }
+    }
 
-                    //draw healthbar
+    //draw healthbar
+    for (let id in playerData) {
+        if (id != socket.id) {
+            let player = playerData[id];
+            if (player.health > 0 &&
+                player.x-screenOffset.x > -50 &&
+                player.x-screenOffset.x < windowWidth + 50 &&
+                player.y-screenOffset.y > -50 &&
+                player.y-screenOffset.y < windowHeight + 50) {
                     let x_offset = 15
                     let y_offset_abs = gameSettings.classes[player.type].radius + 10;
                     let y_offset = y_offset_abs;
@@ -392,36 +407,41 @@ function drawLiving () {
             }
         }
     }
+
     pop();
 }
 
 //draw client's player
 function drawPlayer (player) {
     push();
-    fill(gameSettings.classes[player.type].colors.light);
-    stroke(gameSettings.classes[player.type].colors.dark);
-    strokeWeight(2);
-    ellipse(
-        player.x-screenOffset.x, 
-        player.y-screenOffset.y, 
-        gameSettings.classes[player.type].radius*2 - 1, 
-        gameSettings.classes[player.type].radius*2 - 1
-    );
-    //draw death cross if dead
-    if (player.health <= 0) {
-        strokeWeight(5);
-        stroke(gameSettings.colors.red);
-        line(
-            player.x-screenOffset.x+gameSettings.classes[player.type].radius,
-            player.y-screenOffset.y+gameSettings.classes[player.type].radius,
-            player.x-screenOffset.x-gameSettings.classes[player.type].radius,
-            player.y-screenOffset.y-gameSettings.classes[player.type].radius
+
+    //draw living
+    if (player.health > 0) {
+        fill(gameSettings.classes[player.type].colors.light);
+        stroke(gameSettings.classes[player.type].colors.dark);
+        strokeWeight(2);
+        ellipse(
+            player.x-screenOffset.x, 
+            player.y-screenOffset.y, 
+            gameSettings.classes[player.type].radius*2 - 1, 
+            gameSettings.classes[player.type].radius*2 - 1
         );
-        line(
-            player.x-screenOffset.x+gameSettings.classes[player.type].radius,
-            player.y-screenOffset.y-gameSettings.classes[player.type].radius,
-            player.x-screenOffset.x-gameSettings.classes[player.type].radius,
-            player.y-screenOffset.y+gameSettings.classes[player.type].radius
+    }
+    
+    //draw player as transparent if dead
+    else {
+        let fillcolor = color(gameSettings.classes[player.type].colors.light);
+        fillcolor.setAlpha(100);
+        let strokecolor = color(gameSettings.classes[player.type].colors.dark);
+        strokecolor.setAlpha(100)
+        fill(fillcolor);
+        stroke(strokecolor);
+        strokeWeight(2);
+        ellipse(
+            player.x-screenOffset.x, 
+            player.y-screenOffset.y, 
+            gameSettings.classes[player.type].radius*2 - 1, 
+            gameSettings.classes[player.type].radius*2 - 1
         );
     }
     pop();
