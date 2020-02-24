@@ -706,7 +706,7 @@ function drawFPS (color) {
     //round and average the list
     let fpsSum = fpsList.reduce((a,b) => a+b);
     let fpsAverage = (fpsSum/fpsList.length);
-    let fps = fpsAverage.toFixed(1);
+    let fps = fpsAverage.toFixed(0);
 
     push();
     textAlign(RIGHT, CENTER);
