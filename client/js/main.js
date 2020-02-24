@@ -177,7 +177,7 @@ function mouseClicked () {
             break;
 
         case 'ingamemenu':
-            inGameMenuMouseClicked();//(ingamemenu.js)
+            inGameMenuMouseClicked(socket);//(ingamemenu.js)
             break;
     }
 
@@ -192,7 +192,6 @@ function keyPressed () {
             break;
 
         // case 'ingamemenu':
-        //     inGameMenuKeyPressed(); //(ingamemenu.js)
         //     break;
     }
 }

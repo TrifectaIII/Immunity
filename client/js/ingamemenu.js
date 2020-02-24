@@ -1,3 +1,23 @@
+//Exit Game Button
+//////////////////////////////////////////////////////////////////////////////
+
+//button to exit the game entirely
+var exitGameButton = new Button(
+    "EXIT\nGAME",
+    gameSettings.colors.darkpink,
+    gameSettings.colors.pink
+);
+
+function drawExitGameButton() {
+    exitGameButton.update(
+        windowWidth - 100, 
+        windowHeight - 100, 
+        windowHeight/8, 
+        windowHeight/8
+    );
+    exitGameButton.draw();
+}
+
 
 // CLASS MENU
 //////////////////////////////////////////////////////////////////////////////
@@ -67,10 +87,19 @@ function drawInGameMenus () {
             break;
     }
 
+    drawExitGameButton();
+
     drawMenuCrosshair();
 }
 
-function inGameMenuMouseClicked () {
+function inGameMenuMouseClicked (socket) {
+    if(exitGameButton.mouseOver()) {
+        errors.displayError('Left Game', 5000);
+        restartMenus();
+        socket.close();
+        return;
+    }
+
     switch (inGameMenuState) {
         case 'class':
             if (clickClassMenu()) {
