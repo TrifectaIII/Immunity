@@ -61,7 +61,17 @@ function Room (roomId) {
         gameSettings.pickupTime //interval from game settings
     );
 
+    //counts each enemy wave
     this.waveCount = 0;
+
+    //how many lives the players have left
+    this.livesCount = 3;
+
+    //how many players have joined at any time, up to 4
+    this.playersSeen = 0;
+
+    //switch for if the game is over
+    this.gameOver = false;
 }
 
 
@@ -71,6 +81,22 @@ function Room (roomId) {
 
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
+
+    //check for a game over
+    let gameOver = true;
+
+    //if lives left, not a game over
+    if (this.livesCount > 0) {
+        gameOver = false;
+    }
+    //if any players alive, not a game over
+    for (let id in this.players) {
+        if (this.players[id].health > 0) {
+            gameOver = false;
+        }
+    }
+    this.gameOver = gameOver;
+
     //return game info for emit to room
     return {
         player_info: this.updatePlayers(),
@@ -80,6 +106,8 @@ Room.prototype.update = function () {
 
         game_info: {
             waveCount: this.waveCount,
+            livesCount: this.livesCount,
+            gameOver: this.gameOver,
         },
     }
 }
@@ -89,46 +117,48 @@ Room.prototype.update = function () {
 
 Room.prototype.updateShots = function () {
 
-    //loop through all shots
-    for (let id in this.shots) {
-        let shot = this.shots[id];
+    if (!this.gameOver) {
+        //loop through all shots
+        for (let id in this.shots) {
+            let shot = this.shots[id];
 
-        //move based on velocity
-        shot.x += shot.velocity.x;
-        shot.y += shot.velocity.y;
+            //move based on velocity
+            shot.x += shot.velocity.x;
+            shot.y += shot.velocity.y;
 
-        let destroyed = false;
+            let destroyed = false;
 
-        // check for collisions with enemys
-        for (let id in this.enemies) {
-            let enemy = this.enemies[id];
-            if (collisions.collide(
-                    enemy, gameSettings.enemies[enemy.type].radius, 
-                    shot, 0
-                )) {
-                    //remove health
-                    if (enemy.health > 0) {
-                        enemy.health--;
-                        destroyed = true;
-                        if (enemy.health <= 0) {
-                            if (shot.playerId in this.players) {
-                                this.players[shot.playerId].killStreak++;
+            // check for collisions with enemys
+            for (let id in this.enemies) {
+                let enemy = this.enemies[id];
+                if (collisions.collide(
+                        enemy, gameSettings.enemies[enemy.type].radius, 
+                        shot, 0
+                    )) {
+                        //remove health
+                        if (enemy.health > 0) {
+                            enemy.health--;
+                            destroyed = true;
+                            if (enemy.health <= 0) {
+                                if (shot.playerId in this.players) {
+                                    this.players[shot.playerId].killStreak++;
+                                }
+                                delete this.enemies[id];
                             }
-                            delete this.enemies[id];
                         }
-                    }
-            } 
-        }
+                } 
+            }
 
-        //remove range based on speed
-        shot.range -= gameSettings.classes[shot.type].shots.speed;
-        
-        //destroy if out of range
-        destroyed = destroyed || shot.range <= 1;
-        
-        //delete if destroyed
-        if (destroyed) {
-            delete this.shots[id];
+            //remove range based on speed
+            shot.range -= gameSettings.classes[shot.type].shots.speed;
+            
+            //destroy if out of range
+            destroyed = destroyed || shot.range <= 1;
+            
+            //delete if destroyed
+            if (destroyed) {
+                delete this.shots[id];
+            }
         }
     }
 
@@ -152,87 +182,119 @@ Room.prototype.updateShots = function () {
 
 Room.prototype.updatePlayers = function () {
 
-    //loop through all players
+    //respawn any dead players
     for (let id in this.players) {
         let player = this.players[id];
+        if (player.type != 'choosing' &&
+            !player.respawning &&
+            player.health <= 0) {
 
-        //ask for class if not chosen
-        if (player.type == 'choosing') {
-            continue;
-        }
+                //mark as respawning
+                player.respawning = true;
 
-        //reduce shot cooldown
-        player.cooldown -= gameSettings.tickRate;
-
-        //shoot for player if clicking and no cooldown
-        if (player.clicking && 
-            player.cooldown <= 0 &&
-            player.health > 0) {
-                this.playerShoot(player);
-                //start cooldown
-                player.cooldown = gameSettings.classes[player.type].shots.cooldown;
-        }
-        
-        //move player based on direction
-        if (player.health > 0) {
-
-            //speed is set by class
-            let speed = gameSettings.classes[player.type].speed;
-            let speedComponent = speed/(Math.sqrt(2));
-
-            //move based on direction sent by client
-            switch (player.direction) {
-                case 'none':
-                    break;
-                //diagonal movements use component speed
-                case 'rightup':
-                    player.x += speedComponent;
-                    player.y -= speedComponent;
-                    break;
-                case 'leftup':
-                    player.x -= speedComponent;
-                    player.y -= speedComponent;
-                    break;
-                case 'rightdown':
-                    player.x += speedComponent;
-                    player.y += speedComponent;
-                    break;
-                case 'leftdown':
-                    player.x -= speedComponent;
-                    player.y += speedComponent;
-                    break;
-                //cardinal movements use raw speed
-                case 'right':
-                    player.x += speed;
-                    break;
-                case 'left':
-                    player.x -= speed;
-                    break;
-                case 'up':
-                    player.y -= speed;
-                    break;
-                case 'down':
-                    player.y += speed;
-                    break;
-            }
-
-            //check for collisions with other players
-            for (let pid in this.players) {
-                if (player.id != pid && 
-                    player.type != 'choosing' &&
-                    this.players[pid].health > 0) {
-                        collisions.collideAndDisplace(
-                            player, 
-                            gameSettings.classes[player.type].radius,
-                            this.players[pid], 
-                            gameSettings.classes[this.players[pid].type].radius
-                        );
+                //if game not over, wait for respawn time
+                if (!this.gameOver) {
+                    //set to respawn and choose new class
+                    setTimeout(function () {
+                        //ask for new class choice on respawn
+                        player.type = 'choosing';
+                        player.emit('player_died');
+                    }.bind(this), 
+                    //respawn time from settings
+                    gameSettings.respawnTime);
                 }
+
+                //if game over, do it automatically
+                else {
+                    player.type = 'choosing';
+                    player.emit('player_died');
+                }
+        }
+    }
+
+    if (!this.gameOver) {
+        //loop through all players
+        for (let id in this.players) {
+            let player = this.players[id];
+
+            //ask for class if not chosen
+            if (player.type == 'choosing') {
+                continue;
             }
 
-            //boundaries
-            player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
-            player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
+            //reduce shot cooldown
+            player.cooldown -= gameSettings.tickRate;
+
+            //shoot for player if clicking and no cooldown
+            if (player.clicking && 
+                player.cooldown <= 0 &&
+                player.health > 0) {
+                    this.playerShoot(player);
+                    //start cooldown
+                    player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+            }
+            
+            //move player based on direction
+            if (player.health > 0) {
+
+                //speed is set by class
+                let speed = gameSettings.classes[player.type].speed;
+                let speedComponent = speed/(Math.sqrt(2));
+
+                //move based on direction sent by client
+                switch (player.direction) {
+                    case 'none':
+                        break;
+                    //diagonal movements use component speed
+                    case 'rightup':
+                        player.x += speedComponent;
+                        player.y -= speedComponent;
+                        break;
+                    case 'leftup':
+                        player.x -= speedComponent;
+                        player.y -= speedComponent;
+                        break;
+                    case 'rightdown':
+                        player.x += speedComponent;
+                        player.y += speedComponent;
+                        break;
+                    case 'leftdown':
+                        player.x -= speedComponent;
+                        player.y += speedComponent;
+                        break;
+                    //cardinal movements use raw speed
+                    case 'right':
+                        player.x += speed;
+                        break;
+                    case 'left':
+                        player.x -= speed;
+                        break;
+                    case 'up':
+                        player.y -= speed;
+                        break;
+                    case 'down':
+                        player.y += speed;
+                        break;
+                }
+
+                //check for collisions with other players
+                for (let pid in this.players) {
+                    if (player.id != pid && 
+                        player.type != 'choosing' &&
+                        this.players[pid].health > 0) {
+                            collisions.collideAndDisplace(
+                                player, 
+                                gameSettings.classes[player.type].radius,
+                                this.players[pid], 
+                                gameSettings.classes[this.players[pid].type].radius
+                            );
+                    }
+                }
+
+                //boundaries
+                player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
+                player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
+            }
         }
     }
 
@@ -259,93 +321,83 @@ Room.prototype.updatePlayers = function () {
 
 Room.prototype.updateEnemies = function () {
 
-    //spawn new wave if all enemies dead
-    if (this.enemyCount() <= 0) {
-        this.spawnWave();
-    }
+    if (!this.gameOver) {
+        //spawn new wave if all enemies dead
+        if (this.enemyCount() <= 0) {
+            this.spawnWave();
+        }
 
-    //loop through all enemies
-    for (let id in this.enemies) {
-        let enemy = this.enemies[id];
+        //loop through all enemies
+        for (let id in this.enemies) {
+            let enemy = this.enemies[id];
 
-        //find closest player
-        let closestDistance = Infinity;
-        let closestId = 0;
-        for (let pid in this.players) {
-            if (this.players[pid].health > 0) {
-                let thisDistance = collisions.distance(this.players[pid], enemy);
-                if (thisDistance < closestDistance) {
-                    closestDistance = thisDistance;
-                    closestId = pid;
+            //find closest player
+            let closestDistance = Infinity;
+            let closestId = 0;
+            for (let pid in this.players) {
+                if (this.players[pid].type != 'choosing' &&
+                    this.players[pid].health > 0) {
+                    let thisDistance = collisions.distance(this.players[pid], enemy);
+                    if (thisDistance < closestDistance) {
+                        closestDistance = thisDistance;
+                        closestId = pid;
+                    }
                 }
             }
-        }
 
-        //reduce attack cooldown
-        if (enemy.attackCooldown > 0) {
-            enemy.attackCooldown -= gameSettings.tickRate;
-        }
-
-        if (closestDistance < Infinity) {
-            let player = this.players[closestId];
-
-            //move in direction of closest player
-            let ang = angle(enemy.x, enemy.y, player.x, player.y);
-            let vel = velocity(ang, gameSettings.enemies[enemy.type].speed);
-            enemy.x += vel.x;
-            enemy.y += vel.y;
-
-            //attacking
-            if (enemy.attackCooldown <= 0 &&
-                collisions.collide(
-                    enemy, gameSettings.enemies[enemy.type].radius,
-                    player, gameSettings.classes[player.type].radius
-                )) {
-
-                    //reset enemy cooldown
-                    enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
-                    
-                    //do damage to player
-                    player.health -= gameSettings.enemies[enemy.type].attackDamage;
-                    
-                    //if player died
-                    if (player.health <= 0) {
-
-                        //do not allow negative life
-                        player.health = 0;
-
-                        //set to respawn and choose new class
-                        setTimeout(function () {
-                            //ask for new class choice on respawn
-                            player.type = 'choosing';
-                            player.emit('class_request');
-                        }.bind(this), 
-                        //respawn time from settings
-                        gameSettings.respawnTime);
-                    }
+            //reduce attack cooldown
+            if (enemy.attackCooldown > 0) {
+                enemy.attackCooldown -= gameSettings.tickRate;
             }
-        }
 
-        //check for collisions with other enemies
-        for (let eid in this.enemies) {
-            if (enemy.id != eid) {
-                collisions.collideAndDisplace(
-                    enemy, gameSettings.enemies[enemy.type].radius,
-                    this.enemies[eid], gameSettings.enemies[this.enemies[eid].type].radius,
-                );
+            if (closestDistance < Infinity) {
+                let player = this.players[closestId];
+
+                //move in direction of closest player
+                let ang = angle(enemy.x, enemy.y, player.x, player.y);
+                let vel = velocity(ang, gameSettings.enemies[enemy.type].speed);
+                enemy.x += vel.x;
+                enemy.y += vel.y;
+
+                //attacking
+                if (enemy.attackCooldown <= 0 &&
+                    collisions.collide(
+                        enemy, gameSettings.enemies[enemy.type].radius,
+                        player, gameSettings.classes[player.type].radius
+                    )) {
+
+                        //reset enemy cooldown
+                        enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
+                        
+                        //do damage to player
+                        player.health -= gameSettings.enemies[enemy.type].attackDamage;
+                        
+                        //if player died, do not allow negative life
+                        player.health = Math.max(player.health, 0);
+                }
             }
-        }
 
-        //check for collisions with living players
-        for (let pid in this.players) {
-            if (this.players[pid].type != 'choosing' &&
-                this.players[pid].health > 0) {
+            //check for collisions with other enemies
+            for (let eid in this.enemies) {
+                if (enemy.id != eid) {
                     collisions.collideAndDisplace(
-                        enemy, 
-                        gameSettings.enemies[enemy.type].radius,
-                        this.players[pid], 
-                        gameSettings.classes[this.players[pid].type].radius
+                        enemy, gameSettings.enemies[enemy.type].radius,
+                        this.enemies[eid], gameSettings.enemies[this.enemies[eid].type].radius,
                     );
+                }
+            }
+
+            //check for collisions with living players
+            for (let pid in this.players) {
+                if (this.players[pid].type != 'choosing' &&
+                    this.players[pid].health > 0) {
+                        collisions.collideAndDisplace(
+                            enemy, 
+                            gameSettings.enemies[enemy.type].radius,
+                            this.players[pid], 
+                            gameSettings.classes[this.players[pid].type].radius
+                        );
+                }
             }
         }
     }
@@ -371,47 +423,49 @@ Room.prototype.updateEnemies = function () {
 
 Room.prototype.updatePickups = function () {
 
-    //loop through all pickups
-    for (let id in this.pickups) {
-        let pickup = this.pickups[id];
+    if (!this.gameOver) {
+        //loop through all pickups
+        for (let id in this.pickups) {
+            let pickup = this.pickups[id];
 
-        //find closest alive player
-        let closestDistance = Infinity;
-        let closestId = 0;
-        for (let pid in this.players) {
-            if (this.players[pid].type != 'choosing' &&
-                this.players[pid].health > 0) {
-                let thisDistance = collisions.distance(this.players[pid], pickup);
-                if (thisDistance < closestDistance) {
-                    closestDistance = thisDistance;
-                    closestId = pid;
+            //find closest alive player
+            let closestDistance = Infinity;
+            let closestId = 0;
+            for (let pid in this.players) {
+                if (this.players[pid].type != 'choosing' &&
+                    this.players[pid].health > 0) {
+                    let thisDistance = collisions.distance(this.players[pid], pickup);
+                    if (thisDistance < closestDistance) {
+                        closestDistance = thisDistance;
+                        closestId = pid;
+                    }
                 }
             }
-        }
 
-        let player = this.players[closestId];
+            let player = this.players[closestId];
 
-        //if player is close enough
-        if (closestDistance < Infinity &&
-            collisions.collide(
-                player, 
-                gameSettings.classes[player.type].radius,
-                pickup, 
-                gameSettings.pickupRadius
-            )
-        ) {
-            switch (pickup.type) {
-                case "health":
-                    //if player not at max health
-                    if (player.health < gameSettings.classes[player.type].maxHealth) {
-                        //give health and delete pickup
-                        player.health = Math.min(
-                            gameSettings.classes[player.type].maxHealth,
-                            player.health + gameSettings.pickupHealthAmount
-                        );
-                        delete this.pickups[id];
-                    }
-                    break;
+            //if player is close enough
+            if (closestDistance < Infinity &&
+                collisions.collide(
+                    player, 
+                    gameSettings.classes[player.type].radius,
+                    pickup, 
+                    gameSettings.pickupRadius
+                )
+            ) {
+                switch (pickup.type) {
+                    case "health":
+                        //if player not at max health
+                        if (player.health < gameSettings.classes[player.type].maxHealth) {
+                            //give health and delete pickup
+                            player.health = Math.min(
+                                gameSettings.classes[player.type].maxHealth,
+                                player.health + gameSettings.pickupHealthAmount
+                            );
+                            delete this.pickups[id];
+                        }
+                        break;
+                }
             }
         }
     }
@@ -457,14 +511,30 @@ Room.prototype.addPlayer = function (player) {
         //give default class
         player.type = 'choosing';
 
+        //if haven't seen enough players to meet cap yet, give a life
+        if (!this.gameOver &&
+            this.playersSeen < gameSettings.roomCap) {
+            this.livesCount++;
+            this.playersSeen++;
+        }
+
         //set class based on player choice
         player.on ('class_choice', function (type) {
-            //only change if valid choice
-            if (player.type == 'choosing' &&
+            //only change if valid choice and a life exists
+            if (this.livesCount > 0 &&
+                player.type == 'choosing' &&
                 type in gameSettings.classes) {
+
+                //set class
                 player.type = type;
+
+                //subtract life
+                this.livesCount--;
                 
                 //spawn player in
+
+                //mark as not respawning
+                player.respawning = false;
                 
                 //give random position in world
                 player.x = randint(100, gameSettings.width - 100);
@@ -476,7 +546,8 @@ Room.prototype.addPlayer = function (player) {
                 //reset killstreak
                 player.killStreak = 0;
 
-                player.emit('spawned');
+                //tell player he is spawned
+                player.emit('player_spawned');
             }
         }.bind(this));//bind to room scope
 
@@ -570,6 +641,35 @@ Room.prototype.addPlayer = function (player) {
                         };
                     }
                 }
+            }
+        }.bind(this));//bind to room scope
+
+        //restart game if client requests and game is over
+        player.on('restart_game', function () {
+            //make sure game is actually over
+
+            //reset all players
+            if (this.gameOver) {
+                for (let id in this.players) {
+                    this.players[id].health = 0;
+                    this.players[id].type = 'choosing';
+                }
+
+                //reset room
+                this.enemies = {};
+                this.shots = {};
+                this.pickups = {};
+
+                clearInterval(this.pickupSpawner);
+                this.pickupSpawner = setInterval(
+                    this.spawnPickup.bind(this), //bind to room scope
+                    gameSettings.pickupTime //interval from game settings
+                );
+
+                this.waveCount = 0;
+                this.playersSeen = this.playerCount();
+                this.livesCount = 3 + this.playerCount();
+                this.gameOver = false;
             }
         }.bind(this));//bind to room scope
 

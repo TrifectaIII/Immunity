@@ -78,16 +78,16 @@ function joinGame(menuChoices) {
         errors.hideError();
 
         //ask player to choose a class
-        inGameMenuState = 'class';
+        inGameMenuState = 'dead';
         state = 'ingamemenu';
 
         //ask player again whenever server requests
-        socket.on('class_request', function () {
-            inGameMenuState = 'class';
+        socket.on('player_died', function () {
+            inGameMenuState = 'dead';
             state = 'ingamemenu';
         });
 
-        socket.on('spawned', function () {
+        socket.on('player_spawned', function () {
             state = 'game';
         });
 

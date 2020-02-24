@@ -53,12 +53,13 @@ function drawClassMenu () {
         counter++;
     }
 
-    //draw text for code entry
+    //draw text
     stroke('black');
     strokeWeight(3);
     fill(gameSettings.colors.white);
     textSize(40);
     text("Choose a Class:", windowWidth/2, windowHeight/12);
+    pop();
 }
 
 function clickClassMenu () {
@@ -70,20 +71,86 @@ function clickClassMenu () {
     return false;
 }
 
+// NO LIVES MENU
+//////////////////////////////////////////////////////////////////////////////
+
+function drawNoLivesMenu () {
+    push();
+    textAlign(CENTER, CENTER);
+
+    //draw text
+    stroke('black');
+    strokeWeight(3);
+    fill(gameSettings.colors.red);
+    textSize(60);
+    text("No Lives Remaining", windowWidth/2, windowHeight/2);
+    pop();
+}
+
+// GAME OVER MENU
+//////////////////////////////////////////////////////////////////////////////
+
+var restartButton = new Button (
+    "NEW GAME",
+    gameSettings.colors.darkgreen,
+    gameSettings.colors.green
+);
+
+function drawGameOverMenu () {
+    console.log('drawing go')
+    push();
+    textAlign(CENTER, CENTER);
+
+    //update and draw restart button
+    restartButton.update(
+        windowWidth/2,
+        windowHeight*2/3,
+        windowWidth/3,
+        windowHeight/8,
+    )
+
+    restartButton.draw();
+
+    //draw text
+    stroke('black');
+    strokeWeight(3);
+    fill(gameSettings.colors.red);
+    textSize(60);
+    text("GAME OVER", windowWidth/2, windowHeight/3);
+
+    fill(gameSettings.colors.white);
+    text(`WAVE: ${gameData.waveCount}`, windowWidth/2, windowHeight/2);
+    pop();
+}
+
+function clickGameOverMenu() {
+    return restartButton.mouseOver();
+}
+
 // In Game Menu State Machine
 //////////////////////////////////////////////////////////////////////////////
 
-var inGameMenuState;
+var inGameMenuState;//can be 'dead'
 
 //draw in game menus
 function drawInGameMenus () {
-
     //darken game screen
     background(0, 200);
 
     switch (inGameMenuState) {
-        case 'class':
-            drawClassMenu();
+        case 'dead':
+            //if game is over
+            if (gameData.gameOver) {
+                drawGameOverMenu();
+            }
+            //if lives left, select new class
+            else if (gameData.livesCount > 0) {
+                drawClassMenu();
+            }
+            //if no lives left
+            else {
+                drawNoLivesMenu();
+            }
             break;
     }
 
@@ -101,9 +168,15 @@ function inGameMenuMouseClicked (socket) {
     }
 
     switch (inGameMenuState) {
-        case 'class':
-            if (clickClassMenu()) {
-                socket.emit('class_choice', clickClassMenu());
+        case 'dead':
+            if (gameData.gameOver) {
+                if (clickGameOverMenu()) {
+                    socket.emit('restart_game');
+                }
+            }
+            else if (gameData.livesCount > 0 &&
+                clickClassMenu()) {
+                    socket.emit('class_choice', clickClassMenu());
             }
             break;
     }

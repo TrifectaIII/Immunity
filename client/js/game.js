@@ -510,7 +510,7 @@ function drawDeathMsg (player) {
         fill(gameSettings.classes[player.type].colors.light);
         stroke('black');
         strokeWeight(3);
-        textSize(40);
+        textSize(60);
         text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
         pop();
     }
@@ -637,6 +637,12 @@ function drawRoomInfo (color) {
     text(`Players: ${Object.keys(playerData).length}/${gameSettings.roomCap}`, 15, 60);
 
     text(`Wave: ${gameData.waveCount}`, 15 ,100);
+
+    //draw lives as red if none left
+    if (gameData.livesCount <= 0) {
+        fill(gameSettings.colors.red);
+    }
+    text(`Lives: ${gameData.livesCount}`, 15, 140);
     pop();
 }
 
@@ -696,8 +702,6 @@ function drawFPS (color) {
     if (fpsList.length > 500/gameSettings.tickRate) {
         fpsList.shift();
     }
-
-    console.log(fpsList)
 
     //round and average the list
     let fpsSum = fpsList.reduce((a,b) => a+b);
