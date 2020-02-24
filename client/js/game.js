@@ -11,9 +11,6 @@ var screenOffset = {
     y:0,
 }
 
-// hold time of death
-var deathStart;
-
 //conglomerate draw function for game objects
 function drawGame () {
     push();
@@ -61,7 +58,7 @@ function drawGame () {
             }
 
             //draw death message if client player is dead
-            deathMsg(player);
+            drawDeathMsg(player);
 
             //draw UI
 
@@ -501,8 +498,11 @@ function drawPlayer (player) {
     pop();
 }
 
+// hold time of death
+var deathStart;
+
 //tint screen and display message when player is dead
-function deathMsg (player) {
+function drawDeathMsg (player) {
     if (player.health <= 0) {
         push();
         textAlign(CENTER, CENTER);
@@ -686,8 +686,24 @@ function drawPlayerInfo () {
     pop();
 }
 
+var fpsList = [];
+
 //draw framerate
 function drawFPS (color) {
+    //add fps to list
+    fpsList.push(frameRate());
+    //remove oldest if above 0.5 seconds
+    if (fpsList.length > 500/gameSettings.tickRate) {
+        fpsList.shift();
+    }
+
+    console.log(fpsList)
+
+    //round and average the list
+    let fpsSum = fpsList.reduce((a,b) => a+b);
+    let fpsAverage = (fpsSum/fpsList.length);
+    let fps = fpsAverage.toFixed(1);
+
     push();
     textAlign(RIGHT, CENTER);
     textSize(30);
@@ -695,7 +711,7 @@ function drawFPS (color) {
     fill(color);
     //get fps from p5 and draw
     text(
-        `FPS: ${Math.round(frameRate())}`, 
+        `FPS: ${fps}`, 
         windowWidth-15, 
         windowHeight-30
     );
