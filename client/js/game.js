@@ -22,7 +22,7 @@ function drawGame () {
         let player = playerData[socket.id];
 
         //if player actively in game
-        if (player.type != 'choosing') {
+        if (player.type != 'none') {
             //calculate screen offset based on player position
             calcOffset(player);
 
@@ -366,7 +366,7 @@ function drawDead () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
-            if (player.type == 'choosing') continue;
+            if (player.type == 'none') continue;
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -402,7 +402,7 @@ function drawLiving () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
-            if (player.type == 'choosing') continue;
+            if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -426,7 +426,7 @@ function drawLiving () {
     for (let id in playerData) {
         if (id != socket.id) {
             let player = playerData[id];
-            if (player.type == 'choosing') continue;
+            if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -585,7 +585,7 @@ function drawMinimap () {
 
     //draw other player pips
     for (let id in playerData) {
-        if (playerData[id].type == 'choosing') continue;
+        if (playerData[id].type == 'none') continue;
         if (id != socket.id && playerData[id].health > 0) {
             let player = playerData[id];
             fill(gameSettings.classes[player.type].colors.light);
@@ -610,7 +610,7 @@ function drawMinimap () {
 
     //draw client player pip with outline indicator + larger
     let player = playerData[socket.id];
-    if (player.type != 'choosing') {
+    if (player.type != 'none') {
         strokeWeight(2);
         stroke(gameSettings.colors.white);
         fill(gameSettings.classes[player.type].colors.light);
@@ -658,7 +658,7 @@ function drawPlayerInfo () {
     for (let id in playerData) {
         //draw name and killstreak
         let player = playerData[id];
-        if (player.type != 'choosing') {
+        if (player.type != 'none') {
             fill(gameSettings.classes[player.type].colors.dark);
             text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
         }

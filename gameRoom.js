@@ -55,6 +55,11 @@ function Room (roomId) {
     this.pickups = {};
     this.enemies = {};
 
+    //counters for object ids
+    this.shotIdCounter = 0;
+    this.pickupIdCounter = 0;
+    this.enemyIdCounter = 0;
+
     //spawn pickups
     this.pickupSpawner = setInterval(
         this.spawnPickup.bind(this), //bind to room scope
@@ -185,7 +190,7 @@ Room.prototype.updatePlayers = function () {
     //respawn any dead players
     for (let id in this.players) {
         let player = this.players[id];
-        if (player.type != 'choosing' &&
+        if (player.type != 'none' &&
             !player.respawning &&
             player.health <= 0) {
 
@@ -197,7 +202,7 @@ Room.prototype.updatePlayers = function () {
                     //set to respawn and choose new class
                     setTimeout(function () {
                         //ask for new class choice on respawn
-                        player.type = 'choosing';
+                        player.type = 'none';
                         player.emit('player_died');
                     }.bind(this), 
                     //respawn time from settings
@@ -206,7 +211,7 @@ Room.prototype.updatePlayers = function () {
 
                 //if game over, do it automatically
                 else {
-                    player.type = 'choosing';
+                    player.type = 'none';
                     player.emit('player_died');
                 }
         }
@@ -218,7 +223,7 @@ Room.prototype.updatePlayers = function () {
             let player = this.players[id];
 
             //ask for class if not chosen
-            if (player.type == 'choosing') {
+            if (player.type == 'none') {
                 continue;
             }
 
@@ -280,7 +285,7 @@ Room.prototype.updatePlayers = function () {
                 //check for collisions with other players
                 for (let pid in this.players) {
                     if (player.id != pid && 
-                        player.type != 'choosing' &&
+                        player.type != 'none' &&
                         this.players[pid].health > 0) {
                             collisions.collideAndDisplace(
                                 player, 
@@ -335,7 +340,7 @@ Room.prototype.updateEnemies = function () {
             let closestDistance = Infinity;
             let closestId = 0;
             for (let pid in this.players) {
-                if (this.players[pid].type != 'choosing' &&
+                if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
                     let thisDistance = collisions.distance(this.players[pid], enemy);
                     if (thisDistance < closestDistance) {
@@ -389,7 +394,7 @@ Room.prototype.updateEnemies = function () {
 
             //check for collisions with living players
             for (let pid in this.players) {
-                if (this.players[pid].type != 'choosing' &&
+                if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
                         collisions.collideAndDisplace(
                             enemy, 
@@ -432,7 +437,7 @@ Room.prototype.updatePickups = function () {
             let closestDistance = Infinity;
             let closestId = 0;
             for (let pid in this.players) {
-                if (this.players[pid].type != 'choosing' &&
+                if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
                     let thisDistance = collisions.distance(this.players[pid], pickup);
                     if (thisDistance < closestDistance) {
@@ -509,7 +514,7 @@ Room.prototype.addPlayer = function (player) {
         /////////////////////////////////
 
         //give default class
-        player.type = 'choosing';
+        player.type = 'none';
 
         //if haven't seen enough players to meet cap yet, give a life
         if (!this.gameOver &&
@@ -522,7 +527,7 @@ Room.prototype.addPlayer = function (player) {
         player.on ('class_choice', function (type) {
             //only change if valid choice and a life exists
             if (this.livesCount > 0 &&
-                player.type == 'choosing' &&
+                player.type == 'none' &&
                 type in gameSettings.classes) {
 
                 //set class
@@ -604,8 +609,9 @@ Room.prototype.addPlayer = function (player) {
                         myClass.shots.speed
                     );
 
-                    //create new shot object
-                    var id = Math.random();
+                    //use id counter as id, then increase
+                    var id = this.shotIdCounter++;
+                    //create new object
                     this.shots[id] = {
                         x: player.x,
                         y: player.y,
@@ -630,7 +636,9 @@ Room.prototype.addPlayer = function (player) {
                             myClass.shots.speed
                         );
 
-                        var id = Math.random();
+                        //use id counter as id, then increase
+                        var id = this.shotIdCounter++;
+                        //create new object
                         this.shots[id] = {
                             x: player.x,
                             y: player.y,
@@ -652,13 +660,16 @@ Room.prototype.addPlayer = function (player) {
             if (this.gameOver) {
                 for (let id in this.players) {
                     this.players[id].health = 0;
-                    this.players[id].type = 'choosing';
+                    this.players[id].type = 'none';
                 }
 
                 //reset room
                 this.enemies = {};
                 this.shots = {};
                 this.pickups = {};
+                this.shotIdCounter = 0;
+                this.pickupIdCounter = 0;
+                this.enemyIdCounter = 0;
 
                 clearInterval(this.pickupSpawner);
                 this.pickupSpawner = setInterval(
@@ -704,7 +715,8 @@ Room.prototype.playerShoot = function (player) {
 Room.prototype.spawnPickup = function () {
    
     if (Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax) {
-        let id = Math.random();
+        //use id counter as id, then increase
+        let id = this.pickupIdCounter++;
         this.pickups[id] = {
             //choose a random type from the settings list
             type: gameSettings.pickupTypes[randint(0, gameSettings.pickupTypes.length-1)],
@@ -723,8 +735,8 @@ Room.prototype.spawnWave = function () {
 
     for (let i = 0; i < enemyCap; i++) {
 
-        //generate id
-        let id = Math.random();
+        //use id counter as id, then increase
+        let id = this.enemyIdCounter++;
 
         //pick randoim type for this enemy
         let type = Object.keys(gameSettings.enemies)[randint(0, Object.keys(gameSettings.enemies).length -1)];
