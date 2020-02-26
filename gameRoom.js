@@ -69,8 +69,8 @@ function Room (roomId) {
     //counts each enemy wave
     this.waveCount = 0;
 
-    //how many lives the players have left
-    this.livesCount = 3;
+    //how many lives the players have
+    this.livesCount = gameSettings.livesStart;
 
     //how many players have joined at any time, up to 4
     this.playersSeen = 0;
@@ -140,14 +140,19 @@ Room.prototype.updateShots = function () {
                         enemy, gameSettings.enemies[enemy.type].radius, 
                         shot, 0
                     )) {
-                        //remove health
+                        //remove health based on class
                         if (enemy.health > 0) {
-                            enemy.health--;
+                            enemy.health -= gameSettings.classes[shot.type].shots.damage;
                             destroyed = true;
+
+                            //check if enemy died
                             if (enemy.health <= 0) {
+
+                                //increase killStreak
                                 if (shot.playerId in this.players) {
                                     this.players[shot.playerId].killStreak++;
                                 }
+                                //delete enemy
                                 delete this.enemies[id];
                             }
                         }
@@ -351,8 +356,8 @@ Room.prototype.updateEnemies = function () {
             }
 
             //reduce attack cooldown
-            if (enemy.attackCooldown > 0) {
-                enemy.attackCooldown -= gameSettings.tickRate;
+            if (enemy.cooldown > 0) {
+                enemy.cooldown -= gameSettings.tickRate;
             }
 
             if (closestDistance < Infinity) {
@@ -365,17 +370,17 @@ Room.prototype.updateEnemies = function () {
                 enemy.y += vel.y;
 
                 //attacking
-                if (enemy.attackCooldown <= 0 &&
+                if (enemy.cooldown <= 0 &&
                     collisions.collide(
                         enemy, gameSettings.enemies[enemy.type].radius,
                         player, gameSettings.classes[player.type].radius
                     )) {
 
                         //reset enemy cooldown
-                        enemy.attackCooldown = gameSettings.enemies[enemy.type].attackCooldown;
+                        enemy.cooldown = gameSettings.enemies[enemy.type].attack.cooldown;
                         
                         //do damage to player
-                        player.health -= gameSettings.enemies[enemy.type].attackDamage;
+                        player.health -= gameSettings.enemies[enemy.type].attack.damage;
                         
                         //if player died, do not allow negative life
                         player.health = Math.max(player.health, 0);
@@ -679,7 +684,7 @@ Room.prototype.addPlayer = function (player) {
 
                 this.waveCount = 0;
                 this.playersSeen = this.playerCount();
-                this.livesCount = 3 + this.playerCount();
+                this.livesCount = gameSettings.livesStart + this.playerCount();
                 this.gameOver = false;
             }
         }.bind(this));//bind to room scope
@@ -775,7 +780,7 @@ Room.prototype.spawnWave = function () {
             x: x,
             y: y,
             health: gameSettings.enemies[type].maxHealth,
-            attackCooldown: 0,
+            cooldown: 0,
         }
     }
 }

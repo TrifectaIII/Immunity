@@ -12,29 +12,33 @@ var gameSettings = {
     width: 2000,
     height: 2000,
 
+    //starting lives for each room
+    livesStart: 3,
+
     // time in MS to respawn players
     respawnTime: 3000,
 
     //info specific to each class
     classes: {
 
-        heavy: {
-            
-            radius: 30,
-            maxHealth: 20,
-            speed: 3,
+        soldier: {
 
-            colors: { //green
-                light: '#00E436',
-                dark: '#008751',
+            radius: 25,
+            maxHealth: 15,
+            speed: 5,
+
+            colors: { //blue
+                light: '#29ADFF',
+                dark: '#1D2B53',
             },
 
             shots: {
-                count: 5,
+                count: 1,
                 speed: 15,
-                angle:Math.PI/4,
-                range: 200,
-                cooldown: 200,
+                angle: 0,
+                range: 500,
+                cooldown: 100,
+                damage: 1,
             },
         },
 
@@ -55,6 +59,7 @@ var gameSettings = {
                 angle:Math.PI/6,
                 range: 300,
                 cooldown: 100,
+                damage: 1,
             },
         },
 
@@ -74,27 +79,29 @@ var gameSettings = {
                 speed: 25,
                 angle: 0,
                 range: 1000,
-                cooldown: 300,
+                cooldown: 1000,
+                damage: 10,
             },
         },
 
-        soldier: {
+        heavy: {
+            
+            radius: 30,
+            maxHealth: 20,
+            speed: 3,
 
-            radius: 25,
-            maxHealth: 15,
-            speed: 5,
-
-            colors: { //blue
-                light: '#29ADFF',
-                dark: '#1D2B53',
+            colors: { //green
+                light: '#00E436',
+                dark: '#008751',
             },
 
             shots: {
-                count: 1,
+                count: 5,
                 speed: 15,
-                angle: 0,
-                range: 500,
-                cooldown: 60,
+                angle:Math.PI/4,
+                range: 200,
+                cooldown: 1000,
+                damage: 3,
             },
         },
     },
@@ -110,8 +117,11 @@ var gameSettings = {
             radius: 25,
             maxHealth: 5,
             speed: 4,
-            attackCooldown: 500,
-            attackDamage: 1,
+
+            attack: {
+                cooldown: 500,
+                damage: 1,
+            },
 
             colors: {
                 dark: "#000000",
@@ -124,8 +134,11 @@ var gameSettings = {
             radius: 40,
             maxHealth: 15,
             speed: 2,
-            attackCooldown: 1000,
-            attackDamage: 3,
+
+            attack: {
+                cooldown: 1000,
+                damage: 3,
+            },
 
             colors: {
                 dark: "#000000",
@@ -138,8 +151,11 @@ var gameSettings = {
             radius: 20,
             maxHealth: 5,
             speed: 6,
-            attackCooldown: 750,
-            attackDamage: 1,
+
+            attack: {
+                cooldown: 750,
+                damage: 1,
+            },
 
             colors: {
                 dark: "#000000",
