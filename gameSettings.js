@@ -133,7 +133,7 @@ var gameSettings = {
 
             radius: 40,
             maxHealth: 15,
-            speed: 2,
+            speed: 3,
 
             attack: {
                 cooldown: 1000,
@@ -169,7 +169,7 @@ var gameSettings = {
     pickupTime: 5000,
 
     //max pickups in the world at a time, per player
-    pickupMax: 1,
+    pickupMax: 3,
 
     //radius of pickup objects
     pickupRadius: 18,
