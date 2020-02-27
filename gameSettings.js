@@ -19,7 +19,7 @@ var gameSettings = {
     respawnTime: 3000,
 
     //info specific to each class
-    classes: {
+    playerTypes: {
 
         soldier: {
 
@@ -110,7 +110,7 @@ var gameSettings = {
     enemyMax: 10,
 
     //info specific to each enemy type
-    enemies: {
+    enemyTypes: {
 
         normal: {
 

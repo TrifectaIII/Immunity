@@ -137,12 +137,12 @@ Room.prototype.updateShots = function () {
             for (let id in this.enemies) {
                 let enemy = this.enemies[id];
                 if (collisions.collide(
-                        enemy, gameSettings.enemies[enemy.type].radius, 
+                        enemy, gameSettings.enemyTypes[enemy.type].radius, 
                         shot, 0
                     )) {
                         //remove health based on class
                         if (enemy.health > 0) {
-                            enemy.health -= gameSettings.classes[shot.type].shots.damage;
+                            enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
                             destroyed = true;
 
                             //check if enemy died
@@ -160,7 +160,7 @@ Room.prototype.updateShots = function () {
             }
 
             //remove range based on speed
-            shot.range -= gameSettings.classes[shot.type].shots.speed;
+            shot.range -= gameSettings.playerTypes[shot.type].shots.speed;
             
             //destroy if out of range
             destroyed = destroyed || shot.range <= 1;
@@ -241,14 +241,14 @@ Room.prototype.updatePlayers = function () {
                 player.health > 0) {
                     this.playerShoot(player);
                     //start cooldown
-                    player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+                    player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
             }
             
             //move player based on direction
             if (player.health > 0) {
 
                 //speed is set by class
-                let speed = gameSettings.classes[player.type].speed;
+                let speed = gameSettings.playerTypes[player.type].speed;
                 let speedComponent = speed/(Math.sqrt(2));
 
                 //move based on direction sent by client
@@ -294,9 +294,9 @@ Room.prototype.updatePlayers = function () {
                         this.players[pid].health > 0) {
                             collisions.collideAndDisplace(
                                 player, 
-                                gameSettings.classes[player.type].radius,
+                                gameSettings.playerTypes[player.type].radius,
                                 this.players[pid], 
-                                gameSettings.classes[this.players[pid].type].radius
+                                gameSettings.playerTypes[this.players[pid].type].radius
                             );
                     }
                 }
@@ -365,22 +365,22 @@ Room.prototype.updateEnemies = function () {
 
                 //move in direction of closest player
                 let ang = angle(enemy.x, enemy.y, player.x, player.y);
-                let vel = velocity(ang, gameSettings.enemies[enemy.type].speed);
+                let vel = velocity(ang, gameSettings.enemyTypes[enemy.type].speed);
                 enemy.x += vel.x;
                 enemy.y += vel.y;
 
                 //attacking
                 if (enemy.cooldown <= 0 &&
                     collisions.collide(
-                        enemy, gameSettings.enemies[enemy.type].radius,
-                        player, gameSettings.classes[player.type].radius
+                        enemy, gameSettings.enemyTypes[enemy.type].radius,
+                        player, gameSettings.playerTypes[player.type].radius
                     )) {
 
                         //reset enemy cooldown
-                        enemy.cooldown = gameSettings.enemies[enemy.type].attack.cooldown;
+                        enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
                         
                         //do damage to player
-                        player.health -= gameSettings.enemies[enemy.type].attack.damage;
+                        player.health -= gameSettings.enemyTypes[enemy.type].attack.damage;
                         
                         //if player died, do not allow negative life
                         player.health = Math.max(player.health, 0);
@@ -391,8 +391,8 @@ Room.prototype.updateEnemies = function () {
             for (let eid in this.enemies) {
                 if (enemy.id != eid) {
                     collisions.collideAndDisplace(
-                        enemy, gameSettings.enemies[enemy.type].radius,
-                        this.enemies[eid], gameSettings.enemies[this.enemies[eid].type].radius,
+                        enemy, gameSettings.enemyTypes[enemy.type].radius,
+                        this.enemies[eid], gameSettings.enemyTypes[this.enemies[eid].type].radius,
                     );
                 }
             }
@@ -403,9 +403,9 @@ Room.prototype.updateEnemies = function () {
                     this.players[pid].health > 0) {
                         collisions.collideAndDisplace(
                             enemy, 
-                            gameSettings.enemies[enemy.type].radius,
+                            gameSettings.enemyTypes[enemy.type].radius,
                             this.players[pid], 
-                            gameSettings.classes[this.players[pid].type].radius
+                            gameSettings.playerTypes[this.players[pid].type].radius
                         );
                 }
             }
@@ -458,7 +458,7 @@ Room.prototype.updatePickups = function () {
             if (closestDistance < Infinity &&
                 collisions.collide(
                     player, 
-                    gameSettings.classes[player.type].radius,
+                    gameSettings.playerTypes[player.type].radius,
                     pickup, 
                     gameSettings.pickupRadius
                 )
@@ -466,10 +466,10 @@ Room.prototype.updatePickups = function () {
                 switch (pickup.type) {
                     case "health":
                         //if player not at max health
-                        if (player.health < gameSettings.classes[player.type].maxHealth) {
+                        if (player.health < gameSettings.playerTypes[player.type].maxHealth) {
                             //give health and delete pickup
                             player.health = Math.min(
-                                gameSettings.classes[player.type].maxHealth,
+                                gameSettings.playerTypes[player.type].maxHealth,
                                 player.health + gameSettings.pickupHealthAmount
                             );
                             delete this.pickups[id];
@@ -533,7 +533,7 @@ Room.prototype.addPlayer = function (player) {
             //only change if valid choice and a life exists
             if (this.livesCount > 0 &&
                 player.type == 'none' &&
-                type in gameSettings.classes) {
+                type in gameSettings.playerTypes) {
 
                 //set class
                 player.type = type;
@@ -551,7 +551,7 @@ Room.prototype.addPlayer = function (player) {
                 player.y = randint(100, gameSettings.height - 100);
 
                 //give max health based on 
-                player.health = gameSettings.classes[player.type].maxHealth;
+                player.health = gameSettings.playerTypes[player.type].maxHealth;
 
                 //reset killstreak
                 player.killStreak = 0;
@@ -591,7 +591,7 @@ Room.prototype.addPlayer = function (player) {
                 player.health > 0) {
                     this.playerShoot(player);
                     //start cooldown
-                    player.cooldown = gameSettings.classes[player.type].shots.cooldown;
+                    player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
             }
         }.bind(this));//bind to room scope
 
@@ -604,7 +604,7 @@ Room.prototype.addPlayer = function (player) {
                 player.readyShots--;
                         
                 //each class shoots differently
-                let myClass = gameSettings.classes[player.type];
+                let myClass = gameSettings.playerTypes[player.type];
 
                 //single-shot classes
                 if (myClass.shots.count == 1) {
@@ -744,7 +744,7 @@ Room.prototype.spawnWave = function () {
         let id = this.enemyIdCounter++;
 
         //pick randoim type for this enemy
-        let type = Object.keys(gameSettings.enemies)[randint(0, Object.keys(gameSettings.enemies).length -1)];
+        let type = Object.keys(gameSettings.enemyTypes)[randint(0, Object.keys(gameSettings.enemyTypes).length -1)];
 
         //determine side that enemy will spawn on
         let side = randint(1,4);
@@ -779,7 +779,7 @@ Room.prototype.spawnWave = function () {
             type: type,
             x: x,
             y: y,
-            health: gameSettings.enemies[type].maxHealth,
+            health: gameSettings.enemyTypes[type].maxHealth,
             cooldown: 0,
         }
     }

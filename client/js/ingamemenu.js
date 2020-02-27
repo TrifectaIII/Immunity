@@ -24,11 +24,11 @@ function drawExitGameButton() {
 
 var classButtons = {};
 
-for (let className in gameSettings.classes) {
+for (let className in gameSettings.playerTypes) {
     classButtons[className] = new Button(
         className.toUpperCase(),
-        gameSettings.classes[className].colors.dark,
-        gameSettings.classes[className].colors.light
+        gameSettings.playerTypes[className].colors.dark,
+        gameSettings.playerTypes[className].colors.light
     );
 }
 
