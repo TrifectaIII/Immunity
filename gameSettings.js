@@ -175,7 +175,15 @@ var gameSettings = {
     pickupRadius: 18,
 
     //different types of pickups
-    pickupTypes: ['health'],
+    pickupTypes: {
+        health: {
+            chance: 80,
+        },
+
+        life: {
+            chance: 20,
+        },
+    },
 
     //health pickup value
     pickupHealthAmount: 5,

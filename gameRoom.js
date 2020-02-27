@@ -235,14 +235,8 @@ Room.prototype.updatePlayers = function () {
             //reduce shot cooldown
             player.cooldown -= gameSettings.tickRate;
 
-            //shoot for player if clicking and no cooldown
-            if (player.clicking && 
-                player.cooldown <= 0 &&
-                player.health > 0) {
-                    this.playerShoot(player);
-                    //start cooldown
-                    player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
-            }
+            //shoot for player
+            this.playerShoot(player);
             
             //move player based on direction
             if (player.health > 0) {
@@ -475,6 +469,11 @@ Room.prototype.updatePickups = function () {
                             delete this.pickups[id];
                         }
                         break;
+
+                    case "life":
+                        //give another life to room
+                        this.livesCount++;
+                        delete this.pickups[id];
                 }
             }
         }
@@ -586,13 +585,8 @@ Room.prototype.addPlayer = function (player) {
             player.clicking = clicking;
             
             //shoot right away to avoid a click getting clipped by tickRate
-            if (player.clicking && 
-                player.cooldown <= 0 &&
-                player.health > 0) {
-                    this.playerShoot(player);
-                    //start cooldown
-                    player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
-            }
+            this.playerShoot(player);
+
         }.bind(this));//bind to room scope
 
         //handle shooting
@@ -706,14 +700,22 @@ Room.prototype.removePlayer = function (player) {
     }
 }
 
-//creates shots from given player to given spot based on class
+//shoot for player if appropriate
 Room.prototype.playerShoot = function (player) {
 
-    //add 1 to ready shots
-    player.readyShots++;
+    if (player.clicking && 
+        player.cooldown <= 0 &&
+        player.health > 0) {
 
-    //ask for coordinates
-    player.emit('shoot_request');
+            //add 1 to ready shots
+            player.readyShots++;
+
+            //ask for coordinates
+            player.emit('shoot_request');
+
+            //start cooldown
+            player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
+    }
 }
 
 //spawns pickup into the room
@@ -722,9 +724,27 @@ Room.prototype.spawnPickup = function () {
     if (Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax) {
         //use id counter as id, then increase
         let id = this.pickupIdCounter++;
+
+        //calculate type based on chances
+        let typeMax = 0
+        for (let type in gameSettings.pickupTypes) {
+            typeMax += gameSettings.pickupTypes[type].chance;
+        }
+        let typeNum = randint(0, typeMax);
+        let chosenType = '';
+        for (let type in gameSettings.pickupTypes) {
+            if (typeNum <= gameSettings.pickupTypes[type].chance) {
+                chosenType = type;
+                break;
+            }
+            else {
+                typeNum -= gameSettings.pickupTypes[type].chance;
+            }
+        }
+
+        //create pickup object
         this.pickups[id] = {
-            //choose a random type from the settings list
-            type: gameSettings.pickupTypes[randint(0, gameSettings.pickupTypes.length-1)],
+            type: chosenType,
             x: randint(100, gameSettings.width-100),
             y: randint(100, gameSettings.height-100),
         }

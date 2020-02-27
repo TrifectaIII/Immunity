@@ -227,11 +227,23 @@ function drawBorders () {
     pop();
 }
 
+
+//for pickup color animation
+var pickupProg = 0;
+var pickupColors = [];
+
+for (let type in gameSettings.playerTypes) {
+    pickupColors.push(gameSettings.playerTypes[type].colors.light);
+}
+
 //draws pickup-able objects
 function drawPickups() {
     push();
+
+    pickupProg -= 0.5;
+    let progColor = pickupColors[Math.floor(-(pickupProg/pickupColors.length)%pickupColors.length)];
+    stroke(progColor);
     fill(gameSettings.colors.white);
-    stroke(gameSettings.colors.black);
     strokeWeight(4);
     for (let id in pickupData) {
         let pickup = pickupData[id];
@@ -265,6 +277,21 @@ function drawPickups() {
                         6,
                         gameSettings.pickupRadius
                     )
+                    pop();
+                }
+
+                else if (pickup.type == 'life') {
+                    push();
+                    fill(progColor);
+                    strokeWeight(4);
+                    stroke(gameSettings.colors.black);
+                    textAlign(CENTER, CENTER);
+                    textSize(30);
+                    text(
+                        '+1', 
+                        pickup.x-screenOffset.x, 
+                        pickup.y-screenOffset.y - 3
+                    );
                     pop();
                 }
         }
