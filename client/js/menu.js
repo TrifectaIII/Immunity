@@ -154,11 +154,12 @@ function drawBackButton() {
 //////////////////////////////////////////////////////////////////////////////
 
 var titleProg = 0;
-var titleColors = [];
-
-for (let type in gameSettings.playerTypes) {
-    titleColors.push(gameSettings.playerTypes[type].colors.light);
-}
+var titleColors = [
+    gameSettings.colors.blue,
+    gameSettings.colors.green,
+    gameSettings.colors.yellow,
+    gameSettings.colors.pink
+];
 
 var startButton = new Button(
     "START",
@@ -335,11 +336,12 @@ function clickServerMenu () {
 //////////////////////////////////////////////////////////////////////////////
 
 var loadingProg = 0;
-var loadingColors = [];
-
-for (let className in gameSettings.playerTypes) {
-    loadingColors.push(gameSettings.playerTypes[className].colors.light);
-}
+var loadingColors = [
+    gameSettings.colors.blue,
+    gameSettings.colors.green,
+    gameSettings.colors.yellow,
+    gameSettings.colors.pink
+];
 
 function drawLoading () {
     push();

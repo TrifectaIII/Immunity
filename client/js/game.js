@@ -230,11 +230,12 @@ function drawBorders () {
 
 //for pickup color animation
 var pickupProg = 0;
-var pickupColors = [];
-
-for (let type in gameSettings.playerTypes) {
-    pickupColors.push(gameSettings.playerTypes[type].colors.light);
-}
+var pickupColors = [
+    gameSettings.colors.blue,
+    gameSettings.colors.green,
+    gameSettings.colors.yellow,
+    gameSettings.colors.pink
+];
 
 //draws pickup-able objects
 function drawPickups() {
