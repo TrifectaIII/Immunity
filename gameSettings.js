@@ -9,8 +9,8 @@ var gameSettings = {
     tickRate: 20,
 
     //size of game area
-    width: 2000,
-    height: 2000,
+    width: 3000,
+    height: 3000,
 
     //starting lives for each room
     livesStart: 3,
@@ -166,10 +166,10 @@ var gameSettings = {
     },
 
     //time between spawns of pickups in ms
-    pickupTime: 5000,
+    pickupTime: 6000,
 
     //max pickups in the world at a time, per player
-    pickupMax: 3,
+    pickupMax: 5,
 
     //radius of pickup objects
     pickupRadius: 18,
