@@ -16,117 +16,118 @@ function drawGame () {
     push();
 
     //refresh screen
-    clear()
+    clear();
 
-    if (socket.id in playerData) {
+    //if player exists and has a class
+    if (socket.id in playerData &&
+        playerData[socket.id].type != 'none') {
+        
+        //get player object
         let player = playerData[socket.id];
 
-        //if player actively in game
-        if (player.type != 'none') {
-            //calculate screen offset based on player position
-            calcOffset(player);
+        //calculate screen offset based on player position
+        calcOffset(player);
 
-            //draw grid background
-            drawGrid();
+        //draw grid background
+        drawGrid();
 
-            //draw game area borders
-            drawBorders();
+        //draw game area borders
+        drawBorders();
 
-            //draw dead players
-            drawDead();
+        //draw dead players
+        drawDead();
 
-            //draw client player if dead
-            if (player.health <= 0) {
-                drawPlayer(player);
-            }
-
-            //draw pickups
-            drawPickups();
-
-            //draw shots
-            drawShots();
-
-            //draw enemies
-            drawEnemies();
-
-            //draw living players
-            drawLiving();
-
-            // then draw client player on top if living
-            if (player.health > 0) {
-                drawPlayer(player);
-                drawHealthbar(player);
-                deathStart = 0;
-            }
-
-            //draw UI
-
-            //draw minimap
-            drawMinimap();
-
-            //draw info about the current gameRoom
-            drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
-
-            //draw names of playerData
-            drawPlayerInfo();
-
-            //draw fps counter
-            drawFPS(gameSettings.playerTypes[player.type].colors.dark);
-
-            //draw Death screen if player is dead
-            drawDeathMsg(player);
-
-            // draw crosshair
-            drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
+        //draw client player if dead
+        if (player.health <= 0) {
+            drawPlayer(player);
         }
 
-        //draw game if player not in game yet
-        else {
+        //draw pickups
+        drawPickups();
 
-            //calculate screen offset based on center of screen
-            calcOffset({
-                x: gameSettings.width/2,
-                y: gameSettings.height/2
-            });
+        //draw shots
+        drawShots();
 
-            //draw grid background
-            drawGrid();
+        //draw enemies
+        drawEnemies();
 
-            //draw game area borders
-            drawBorders();
+        //draw living players
+        drawLiving();
 
-            //draw dead players
-            drawDead();
-
-            //draw pickups
-            drawPickups();
-
-            //draw shots
-            drawShots();
-
-            //draw enemies
-            drawEnemies();
-
-            //draw living players
-            drawLiving();
-
-            //draw UI
-
-            //draw minimap
-            drawMinimap();
-
-            //draw info about the current gameRoom
-            drawRoomInfo(gameSettings.colors.darkgrey);
-
-            //draw names of playerData
-            drawPlayerInfo();
-
-            //draw fps counter
-            drawFPS(gameSettings.colors.darkgrey);
-
-            // draw crosshair
-            drawCrosshair(gameSettings.colors.darkgrey);
+        // then draw client player on top if living
+        if (player.health > 0) {
+            drawPlayer(player);
+            drawHealthbar(player);
+            deathStart = 0;
         }
+
+        //draw UI
+
+        //draw minimap
+        drawMinimap(player);
+
+        //draw info about the current gameRoom
+        drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
+
+        //draw names of playerData
+        drawPlayerInfo();
+
+        //draw fps counter
+        drawFPS(gameSettings.playerTypes[player.type].colors.dark);
+
+        //draw Death screen if player is dead
+        drawDeathMsg(player);
+
+        // draw crosshair
+        drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
+    }
+
+    //draw game if player not in game
+    else {
+
+        //calculate screen offset based on center of screen
+        calcOffset({
+            x: gameSettings.width/2,
+            y: gameSettings.height/2
+        });
+
+        //draw grid background
+        drawGrid();
+
+        //draw game area borders
+        drawBorders();
+
+        //draw dead players
+        drawDead();
+
+        //draw pickups
+        drawPickups();
+
+        //draw shots
+        drawShots();
+
+        //draw enemies
+        drawEnemies();
+
+        //draw living players
+        drawLiving();
+
+        //draw UI
+
+        //draw minimap
+        drawMinimap();
+
+        //draw info about the current gameRoom
+        drawRoomInfo(gameSettings.colors.darkgrey);
+
+        //draw names of players
+        drawPlayerInfo();
+
+        //draw fps counter
+        drawFPS(gameSettings.colors.darkgrey);
+
+        // draw crosshair
+        drawCrosshair(gameSettings.colors.darkgrey);
     }
 
     pop();
@@ -547,8 +548,8 @@ function drawHealthbar (player) {
     pop();
 }
 
-//draws minimap 
-function drawMinimap () {
+//draws minimap, player argument optional
+function drawMinimap (player) {
     //settings for the minimap
     let minimapWidth = Math.min(250, Math.max(windowWidth/6, windowHeight/6));
     let minimapHeight = (minimapWidth/gameSettings.width) * gameSettings.height;
@@ -572,7 +573,9 @@ function drawMinimap () {
 
     //draw other player pips
     for (let id in playerData) {
+
         if (playerData[id].type == 'none') continue;
+
         if (id != socket.id && playerData[id].health > 0) {
             let player = playerData[id];
             fill(gameSettings.playerTypes[player.type].colors.light);
@@ -596,8 +599,8 @@ function drawMinimap () {
     }
 
     //draw client player pip with outline indicator + larger
-    let player = playerData[socket.id];
-    if (player.type != 'none') {
+    if (player != null) {
+
         strokeWeight(2);
         stroke(gameSettings.colors.white);
         fill(gameSettings.playerTypes[player.type].colors.light);
