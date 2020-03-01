@@ -15,19 +15,27 @@ function drawMenuCrosshair () {
 //draw grid background for menus
 //////////////////////////////////////////////////////////////////////////////
 
+var bgOff = 0;
+
 function drawMenuGrid () {
     push();
     background('#FFF1E8');
     strokeWeight(1);
     stroke('#C2C3C7');
 
-    for (let x = (windowWidth%100)/2; x < windowWidth; x+=100) {
+    bgOff++;
+    if (bgOff >= 100) {
+        bgOff = 0;
+    }
+
+
+    for (let x = bgOff; x < windowWidth; x+=100) {
         line(
             x, 0,
             x, windowHeight
         );
     }
-    for (let y = (windowHeight%100)/2; y < windowHeight; y+=100) {
+    for (let y = bgOff; y < windowHeight; y+=100) {
         line(
             0, y,
             windowWidth, y
