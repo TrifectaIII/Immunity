@@ -55,28 +55,14 @@ function drawGame () {
             // then draw client player on top if living
             if (player.health > 0) {
                 drawPlayer(player);
+                drawHealthbar(player);
+                deathStart = 0;
             }
-
-            //draw death message if client player is dead
-            drawDeathMsg(player);
 
             //draw UI
 
             //draw minimap
             drawMinimap();
-
-            if (player.health > 0) {
-                //draw healthbar, then erase time of death
-                drawHealthbar(player);
-                deathStart = 0;
-            } else {
-                //note time of death, then draw respawn bar
-                if (deathStart == 0) {
-                    deathStart = (new Date()).getTime();
-                }
-                let deathTime = (new Date()).getTime() - deathStart;
-                drawMainbar(player, deathTime/gameSettings.respawnTime);
-            }
 
             //draw info about the current gameRoom
             drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
@@ -86,6 +72,9 @@ function drawGame () {
 
             //draw fps counter
             drawFPS(gameSettings.playerTypes[player.type].colors.dark);
+
+            //draw Death screen if player is dead
+            drawDeathMsg(player);
 
             // draw crosshair
             drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
@@ -526,36 +515,6 @@ function drawPlayer (player) {
     pop();
 }
 
-// hold time of death
-var deathStart;
-
-//tint screen and display message when player is dead
-function drawDeathMsg (player) {
-    if (player.health <= 0) {
-        push();
-        textAlign(CENTER, CENTER);
-        background(0, 200);
-        fill(gameSettings.playerTypes[player.type].colors.light);
-        stroke('black');
-        strokeWeight(3);
-        textSize(60);
-        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
-        pop();
-    }
-}
-
-//draw cosshair
-function drawCrosshair (color) {
-    push();
-    stroke(color);
-    strokeWeight(2);
-    fill(0,0);
-    ellipse(mouseX, mouseY, 30, 30);
-    line(mouseX+20, mouseY, mouseX-20, mouseY);
-    line(mouseX, mouseY+20, mouseX, mouseY-20);
-    pop();
-}
-
 //draws the main bar at bottom of the screen
 function drawMainbar (player, prog) {
     //prog is ratio from 0 to 1
@@ -747,5 +706,49 @@ function drawFPS (color) {
         windowWidth-15, 
         windowHeight-30
     );
+    pop();
+}
+
+// hold time of death
+var deathStart;
+
+//tint screen and display message when player is dead
+function drawDeathMsg (player) {
+
+    //reset death timer if living
+    if (player.health > 0) {
+        deathStart = 0;
+    }
+
+    //if dead
+    else {
+        push();
+        textAlign(CENTER, CENTER);
+        background(0, 200);
+        fill(gameSettings.playerTypes[player.type].colors.light);
+        stroke('black');
+        strokeWeight(3);
+        textSize(60);
+        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
+        pop();
+
+        //note time of death, then draw respawn bar
+        if (deathStart == 0) {
+            deathStart = (new Date()).getTime();
+        }
+        let deathTime = (new Date()).getTime() - deathStart;
+        drawMainbar(player, deathTime/gameSettings.respawnTime);
+    }
+}
+
+//draw cosshair
+function drawCrosshair (color) {
+    push();
+    stroke(color);
+    strokeWeight(2);
+    fill(0,0);
+    ellipse(mouseX, mouseY, 30, 30);
+    line(mouseX+20, mouseY, mouseX-20, mouseY);
+    line(mouseX, mouseY+20, mouseX, mouseY-20);
     pop();
 }
