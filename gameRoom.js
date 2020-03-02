@@ -143,7 +143,10 @@ Room.prototype.updateShots = function () {
                         //remove health based on class
                         if (enemy.health > 0) {
                             enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
+                            enemy.hit = true;
                             destroyed = true;
+
+                            collisions.calCollisionVect(shot,enemy);
 
                             //check if enemy died
                             if (enemy.health <= 0) {
@@ -338,6 +341,7 @@ Room.prototype.updateEnemies = function () {
             //find closest player
             let closestDistance = Infinity;
             let closestId = 0;
+
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
@@ -354,7 +358,33 @@ Room.prototype.updateEnemies = function () {
                 enemy.cooldown -= gameSettings.tickRate;
             }
 
-            if (closestDistance < Infinity) {
+
+
+            // resolve dynamic collision when hit by bullet
+            if (enemy.hit){
+
+                enemy.x += enemy.dx;
+                enemy.y += enemy.dy;
+
+                enemy.dx *= .7;
+                enemy.dy *= .7;
+
+
+                if (enemy.dx < 1){
+                    enemy.dx = 0;
+                }
+
+                if (enemy.dy < 1){
+                    enemy.dy = 0;
+                }
+
+                if (enemy.dx == 0 && enemy.dy ==0){
+                    enemy.hit = false;
+                }
+                
+            }
+
+            if (closestDistance < Infinity && enemy.hit !=true) {
                 let player = this.players[closestId];
 
                 //move in direction of closest player
@@ -379,7 +409,12 @@ Room.prototype.updateEnemies = function () {
                         //if player died, do not allow negative life
                         player.health = Math.max(player.health, 0);
                 }
+
+
+
             }
+
+
 
             //check for collisions with other enemies
             for (let eid in this.enemies) {
@@ -618,6 +653,7 @@ Room.prototype.addPlayer = function (player) {
                         playerId: player.id,
                         velocity: vel,
                         range: myClass.shots.range,
+                        mass: 5,
                     };
                 }
 
@@ -799,8 +835,12 @@ Room.prototype.spawnWave = function () {
             type: type,
             x: x,
             y: y,
+            dx:0,
+            dy:0,
             health: gameSettings.enemyTypes[type].maxHealth,
             cooldown: 0,
+            hit:false,
+            mass: 10,
         }
     }
 }
