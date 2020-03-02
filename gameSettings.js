@@ -1,3 +1,4 @@
+
 var gameSettings = {
     //title of game (WIP)
     title: "Immunity",
@@ -26,6 +27,7 @@ var gameSettings = {
             radius: 25,
             maxHealth: 15,
             speed: 5,
+            mass: 15,
 
             colors: { //blue
                 light: '#29ADFF',
@@ -39,6 +41,7 @@ var gameSettings = {
                 range: 500,
                 cooldown: 100,
                 damage: 1,
+                mass: 3,
             },
         },
 
@@ -47,6 +50,7 @@ var gameSettings = {
             radius: 25,
             maxHealth: 15,
             speed: 5,
+            mass: 15,
 
             colors: { //yellow
                 light: '#FFEC27',
@@ -60,6 +64,7 @@ var gameSettings = {
                 range: 300,
                 cooldown: 100,
                 damage: 1,
+                mass: 2,
             },
         },
 
@@ -68,6 +73,7 @@ var gameSettings = {
             radius: 20,
             maxHealth: 10,
             speed: 7,
+            mass: 10,
 
             colors: { //pink
                 light: '#FF77A8',
@@ -81,6 +87,7 @@ var gameSettings = {
                 range: 1000,
                 cooldown: 1000,
                 damage: 10,
+                mass: 50,
             },
         },
 
@@ -89,6 +96,7 @@ var gameSettings = {
             radius: 30,
             maxHealth: 20,
             speed: 3,
+            mass: 20,
 
             colors: { //green
                 light: '#00E436',
@@ -102,6 +110,7 @@ var gameSettings = {
                 range: 200,
                 cooldown: 1000,
                 damage: 3,
+                mass: 5,
             },
         },
     },
@@ -117,6 +126,7 @@ var gameSettings = {
             radius: 25,
             maxHealth: 5,
             speed: 4,
+            mass: 10,
 
             attack: {
                 cooldown: 500,
@@ -134,6 +144,7 @@ var gameSettings = {
             radius: 40,
             maxHealth: 15,
             speed: 3,
+            mass: 15,
 
             attack: {
                 cooldown: 1000,
@@ -151,6 +162,7 @@ var gameSettings = {
             radius: 20,
             maxHealth: 5,
             speed: 6,
+            mass: 5,
 
             attack: {
                 cooldown: 750,

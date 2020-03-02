@@ -1,3 +1,10 @@
+//Global Server Settings from gameSettings.js
+///////////////////////////////////////////////////////////////////////////
+
+const gameSettings = require('./gameSettings.js');
+
+
+//calulates distance between centerpoints of 2 objects w/ x/y attributes
 function distance (obj1, obj2) {
     return Math.sqrt(
         Math.pow(obj1.x-obj2.x, 2) + 
@@ -5,10 +12,12 @@ function distance (obj1, obj2) {
     );
 }
 
+//checks if 2 objects are colliding given their x/y attributes and their radii
 function collide (obj1, rad1, obj2, rad2) {
     return (distance(obj1, obj2) < rad1 + rad2);
 }
 
+//checks for collision, then displace both away from each other
 function collideAndDisplace (obj1, rad1, obj2, rad2) {
     let dist = distance(obj1, obj2);
     
@@ -35,8 +44,12 @@ function calCollisionVect(bullet, enemy){
 
     let dist = distance(bullet, enemy);
 
-    //assume bullets will always have a mass of 2
-    let total_mass = 2 + enemy.mass;
+    //get masses
+    let enemy_mass = gameSettings.enemyTypes[enemy.type].mass;
+    let bullet_mass = gameSettings.playerTypes[bullet.type].shots.mass;
+
+    //add masses
+    let total_mass = enemy_mass + bullet_mass;
 
     //normal unit vectors 
     let nx = (enemy.x - bullet.x)/dist;
@@ -47,24 +60,20 @@ function calCollisionVect(bullet, enemy){
     let ty = nx;
 
     // tangential velocity before collision 
-    let et = enemy.dx*tx +enemy.dy*ty;
+    let et = enemy.velocity.x*tx +enemy.velocity.y*ty;
     
     //normal velocity before collision
     let bvn = bullet.velocity.x*nx + bullet.velocity.y*ny;
-    let evn = enemy.dx*nx + enemy.dy*ny;
+    let evn = enemy.velocity.x*nx + enemy.velocity.y*ny;
 
     //normal velocity after collision
-    let evn_ac = (evn*(enemy.mass - 2)+4*bvn)/total_mass;
+    let evn_ac = (evn*(enemy_mass - bullet_mass)+2*bullet_mass*bvn)/total_mass;
     //change enemy velocity
-    enemy.dx = et*tx + evn_ac*nx; 
-    enemy.dy = et*ty + evn_ac*ny; 
-
-    
+    enemy.velocity.x = et*tx + evn_ac*nx; 
+    enemy.velocity.y = et*ty + evn_ac*ny; 
 }
 
-
-
-
+//what to expo
 module.exports = {
     distance:distance,
     collide:collide,

@@ -363,22 +363,22 @@ Room.prototype.updateEnemies = function () {
             // resolve dynamic collision when hit by bullet
             if (enemy.hit){
 
-                enemy.x += enemy.dx;
-                enemy.y += enemy.dy;
+                enemy.x += enemy.velocity.x;
+                enemy.y += enemy.velocity.y;
 
-                enemy.dx *= .7;
-                enemy.dy *= .7;
+                enemy.velocity.x *= .7;
+                enemy.velocity.y *= .7;
 
 
-                if (enemy.dx < 1){
-                    enemy.dx = 0;
+                if (enemy.velocity.x < 1){
+                    enemy.velocity.x = 0;
                 }
 
-                if (enemy.dy < 1){
-                    enemy.dy = 0;
+                if (enemy.velocity.y < 1){
+                    enemy.velocity.y = 0;
                 }
 
-                if (enemy.dx == 0 && enemy.dy ==0){
+                if (enemy.velocity.x == 0 && enemy.velocity.y ==0){
                     enemy.hit = false;
                 }
                 
@@ -653,7 +653,6 @@ Room.prototype.addPlayer = function (player) {
                         playerId: player.id,
                         velocity: vel,
                         range: myClass.shots.range,
-                        mass: 5,
                     };
                 }
 
@@ -835,12 +834,13 @@ Room.prototype.spawnWave = function () {
             type: type,
             x: x,
             y: y,
-            dx:0,
-            dy:0,
+            velocity: {
+                x:0,
+                y:0,
+            },
             health: gameSettings.enemyTypes[type].maxHealth,
             cooldown: 0,
             hit:false,
-            mass: 10,
         }
     }
 }
