@@ -742,6 +742,7 @@ Room.prototype.addPlayer = function (player) {
                 for (let id in this.players) {
                     this.players[id].health = 0;
                     this.players[id].type = 'none';
+                    this.players[id].killStreak = 0;
                 }
 
                 //reset room
