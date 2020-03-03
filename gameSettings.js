@@ -26,7 +26,8 @@ var gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            speed: 5,
+            acceleration: 1,
+            maxVelocity: 5,
             mass: 15,
 
             colors: { //blue
@@ -36,7 +37,7 @@ var gameSettings = {
 
             shots: {
                 count: 1,
-                speed: 15,
+                velocity: 15,
                 angle: 0,
                 range: 500,
                 cooldown: 100,
@@ -49,7 +50,8 @@ var gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            speed: 5,
+            acceleration: 1,
+            maxVelocity: 5,
             mass: 15,
 
             colors: { //yellow
@@ -59,7 +61,7 @@ var gameSettings = {
 
             shots: {
                 count: 3,
-                speed: 15,
+                velocity: 15,
                 angle:Math.PI/6,
                 range: 300,
                 cooldown: 100,
@@ -72,7 +74,8 @@ var gameSettings = {
 
             radius: 20,
             maxHealth: 10,
-            speed: 7,
+            acceleration: 2,
+            maxVelocity: 7,
             mass: 10,
 
             colors: { //pink
@@ -82,7 +85,7 @@ var gameSettings = {
 
             shots: {
                 count: 1,
-                speed: 25,
+                velocity: 25,
                 angle: 0,
                 range: 1000,
                 cooldown: 1000,
@@ -95,7 +98,8 @@ var gameSettings = {
             
             radius: 30,
             maxHealth: 20,
-            speed: 3,
+            acceleration: 1,
+            maxVelocity: 3,
             mass: 20,
 
             colors: { //green
@@ -105,7 +109,7 @@ var gameSettings = {
 
             shots: {
                 count: 5,
-                speed: 15,
+                velocity: 15,
                 angle:Math.PI/4,
                 range: 200,
                 cooldown: 1000,
@@ -125,7 +129,8 @@ var gameSettings = {
 
             radius: 25,
             maxHealth: 5,
-            speed: 4,
+            acceleration: 0.1,
+            maxVelocity: 4,
             mass: 10,
 
             attack: {
@@ -143,7 +148,8 @@ var gameSettings = {
 
             radius: 40,
             maxHealth: 15,
-            speed: 3,
+            acceleration: 0.1,
+            maxVelocity: 3,
             mass: 15,
 
             attack: {
@@ -161,7 +167,8 @@ var gameSettings = {
 
             radius: 20,
             maxHealth: 5,
-            speed: 6,
+            acceleration: 0.5,
+            maxVelocity: 6,
             mass: 5,
 
             attack: {

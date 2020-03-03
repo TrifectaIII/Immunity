@@ -4,11 +4,42 @@
 const gameSettings = require('./gameSettings.js');
 
 
+
+//calculates component vectors based on angle and magnitude
+function componentVector(angle, magnitude) {
+    return {
+        x: Math.sin(angle) * magnitude,
+        y: Math.cos(angle) * magnitude,
+    };
+}
+
+//cap magnitude of object's velocity at maxSpeed
+function capVelocity(obj, maxSpeed) {
+
+    //get current magnitude of velocities
+    let currentMagnitude = Math.sqrt(
+        Math.pow(obj.velocity.x, 2) + 
+        Math.pow(obj.velocity.y, 2)
+    );
+
+    //check if exceeding max speed
+    if (currentMagnitude > maxSpeed) {
+
+        //calulate ratio for normalization
+        let ratio = maxSpeed/currentMagnitude;
+
+        //adjust velocity
+        obj.velocity.x *= ratio;
+        obj.velocity.y *= ratio;
+    }
+}
+
+
 //calulates distance between centerpoints of 2 objects w/ x/y attributes
 function distance (obj1, obj2) {
     return Math.sqrt(
         Math.pow(obj1.x-obj2.x, 2) + 
-        Math.pow(obj1.y-obj2.y ,2)
+        Math.pow(obj1.y-obj2.y, 2)
     );
 }
 
@@ -68,13 +99,16 @@ function calCollisionVect(bullet, enemy){
 
     //normal velocity after collision
     let evn_ac = (evn*(enemy_mass - bullet_mass)+2*bullet_mass*bvn)/total_mass;
-    //change enemy velocity
-    enemy.velocity.x = et*tx + evn_ac*nx; 
-    enemy.velocity.y = et*ty + evn_ac*ny; 
+    
+    //accelerate enemy
+    enemy.velocity.x += (et*tx + evn_ac*nx); 
+    enemy.velocity.y += (et*ty + evn_ac*ny); 
 }
 
-//what to expo
+//what to export
 module.exports = {
+    componentVector:componentVector,
+    capVelocity:capVelocity,
     distance:distance,
     collide:collide,
     collideAndDisplace:collideAndDisplace,

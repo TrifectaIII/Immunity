@@ -8,10 +8,10 @@ const gameSettings = require('./gameSettings.js');
 
 
 
-//Collision Functions from collisions.js
+//Collision/Physics Functions from physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const collisions = require('./collisions.js');
+const physics = require('./physics.js');
 
 
 
@@ -30,15 +30,6 @@ function randint(low,high) {
 function angle(x, y, dest_x, dest_y) {
     return Math.atan2(dest_x - x, dest_y - y);
 }
-
-//calculates component velocities of shot based on angle and net speed
-function velocity(ang, speed) {
-    return {
-        x:Math.sin(ang) * speed,
-        y:Math.cos(ang) * speed,
-    };
-}
-
 
 
 // ROOM CONSTRUCTOR
@@ -136,17 +127,17 @@ Room.prototype.updateShots = function () {
             // check for collisions with enemys
             for (let id in this.enemies) {
                 let enemy = this.enemies[id];
-                if (collisions.collide(
+                if (physics.collide(
                         enemy, gameSettings.enemyTypes[enemy.type].radius, 
                         shot, 0
                     )) {
                         //remove health based on class
                         if (enemy.health > 0) {
                             enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
-                            enemy.hit = true;
+                            // enemy.hit = true;
                             destroyed = true;
 
-                            collisions.calCollisionVect(shot,enemy);
+                            physics.calCollisionVect(shot,enemy);
 
                             //check if enemy died
                             if (enemy.health <= 0) {
@@ -162,8 +153,8 @@ Room.prototype.updateShots = function () {
                 } 
             }
 
-            //remove range based on speed
-            shot.range -= gameSettings.playerTypes[shot.type].shots.speed;
+            //remove range based on velocity
+            shot.range -= gameSettings.playerTypes[shot.type].shots.velocity;
             
             //destroy if out of range
             destroyed = destroyed || shot.range <= 1;
@@ -230,7 +221,7 @@ Room.prototype.updatePlayers = function () {
         for (let id in this.players) {
             let player = this.players[id];
 
-            //ask for class if not chosen
+            //do not update if no class chosen yet
             if (player.type == 'none') {
                 continue;
             }
@@ -241,55 +232,80 @@ Room.prototype.updatePlayers = function () {
             //shoot for player
             this.playerShoot(player);
             
-            //move player based on direction
+            //move player
             if (player.health > 0) {
 
-                //speed is set by class
-                let speed = gameSettings.playerTypes[player.type].speed;
-                let speedComponent = speed/(Math.sqrt(2));
+                //acceleration is set by class
+                let acceleration = gameSettings.playerTypes[player.type].acceleration;
+                let accelerationComponent = acceleration/(Math.sqrt(2));
 
-                //move based on direction sent by client
+                //accelerate based on direction sent by client
                 switch (player.direction) {
+                    //degrade velocities when no direction
                     case 'none':
+                        player.velocity.x *= 0.95;
+                        player.velocity.y *= 0.95;
                         break;
-                    //diagonal movements use component speed
+                    
+                    //diagonal movements use component acceleration
                     case 'rightup':
-                        player.x += speedComponent;
-                        player.y -= speedComponent;
+                        player.velocity.x += accelerationComponent;
+                        player.velocity.y -= accelerationComponent;
                         break;
                     case 'leftup':
-                        player.x -= speedComponent;
-                        player.y -= speedComponent;
+                        player.velocity.x -= accelerationComponent;
+                        player.velocity.y -= accelerationComponent;
                         break;
                     case 'rightdown':
-                        player.x += speedComponent;
-                        player.y += speedComponent;
+                        player.velocity.x += accelerationComponent;
+                        player.velocity.y += accelerationComponent;
                         break;
                     case 'leftdown':
-                        player.x -= speedComponent;
-                        player.y += speedComponent;
+                        player.velocity.x -= accelerationComponent;
+                        player.velocity.y += accelerationComponent;
                         break;
-                    //cardinal movements use raw speed
+                    
+                    //cardinal movements use raw acceleration
+                    //and degrade unused velocity
                     case 'right':
-                        player.x += speed;
+                        player.velocity.x += acceleration;
+                        player.velocity.y *= 0.95;
                         break;
                     case 'left':
-                        player.x -= speed;
+                        player.velocity.x -= acceleration;
+                        player.velocity.y *= 0.95;
                         break;
                     case 'up':
-                        player.y -= speed;
+                        player.velocity.y -= acceleration;
+                        player.velocity.x *= 0.95;
                         break;
                     case 'down':
-                        player.y += speed;
+                        player.velocity.y += acceleration;
+                        player.velocity.x *= 0.95;
                         break;
                 }
+
+                //if slow enough, stop
+                if (Math.abs(player.velocity.x) < 0.1) {
+                    player.velocity.x = 0;
+                }
+                if (Math.abs(player.velocity.y) < 0.1) {
+                    player.velocity.y = 0;
+                }
+
+                //cap velocity
+                physics.capVelocity(player, gameSettings.playerTypes[player.type].maxVelocity);
+
+                //move based on velocity
+                player.x += player.velocity.x;
+                player.y += player.velocity.y;
 
                 //check for collisions with other players
                 for (let pid in this.players) {
                     if (player.id != pid && 
                         player.type != 'none' &&
                         this.players[pid].health > 0) {
-                            collisions.collideAndDisplace(
+                            physics.collideAndDisplace(
                                 player, 
                                 gameSettings.playerTypes[player.type].radius,
                                 this.players[pid], 
@@ -345,7 +361,7 @@ Room.prototype.updateEnemies = function () {
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
-                    let thisDistance = collisions.distance(this.players[pid], enemy);
+                    let thisDistance = physics.distance(this.players[pid], enemy);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = pid;
@@ -358,44 +374,54 @@ Room.prototype.updateEnemies = function () {
                 enemy.cooldown -= gameSettings.tickRate;
             }
 
-
-
             // resolve dynamic collision when hit by bullet
-            if (enemy.hit){
+            // if (enemy.hit){
 
-                enemy.x += enemy.velocity.x;
-                enemy.y += enemy.velocity.y;
+            //     enemy.x += enemy.velocity.x;
+            //     enemy.y += enemy.velocity.y;
 
-                enemy.velocity.x *= .7;
-                enemy.velocity.y *= .7;
+            //     enemy.velocity.x *= .7;
+            //     enemy.velocity.y *= .7;
 
 
-                if (enemy.velocity.x < 1){
-                    enemy.velocity.x = 0;
-                }
+            //     if (enemy.velocity.x < 1){
+            //         enemy.velocity.x = 0;
+            //     }
 
-                if (enemy.velocity.y < 1){
-                    enemy.velocity.y = 0;
-                }
+            //     if (enemy.velocity.y < 1){
+            //         enemy.velocity.y = 0;
+            //     }
 
-                if (enemy.velocity.x == 0 && enemy.velocity.y ==0){
-                    enemy.hit = false;
-                }
+            //     if (enemy.velocity.x == 0 && enemy.velocity.y ==0){
+            //         enemy.hit = false;
+            //     }
                 
-            }
+            // }
 
-            if (closestDistance < Infinity && enemy.hit !=true) {
+            //if a living player exists
+            if (closestDistance < Infinity) {
+
+                //get player object
                 let player = this.players[closestId];
 
-                //move in direction of closest player
-                let ang = angle(enemy.x, enemy.y, player.x, player.y);
-                let vel = velocity(ang, gameSettings.enemyTypes[enemy.type].speed);
-                enemy.x += vel.x;
-                enemy.y += vel.y;
+                //accelerate in direction of closest player
+                let acceleration = physics.componentVector(
+                    angle(enemy.x, enemy.y, player.x, player.y), 
+                    gameSettings.enemyTypes[enemy.type].acceleration
+                );
+                enemy.velocity.x += acceleration.x;
+                enemy.velocity.y += acceleration.y;
+
+                //reduce velocity to max, if needed
+                physics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
+
+                //move based on velocity
+                enemy.x += enemy.velocity.x
+                enemy.y += enemy.velocity.y
 
                 //attacking
                 if (enemy.cooldown <= 0 &&
-                    collisions.collide(
+                    physics.collide(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         player, gameSettings.playerTypes[player.type].radius
                     )) {
@@ -409,17 +435,35 @@ Room.prototype.updateEnemies = function () {
                         //if player died, do not allow negative life
                         player.health = Math.max(player.health, 0);
                 }
-
-
-
             }
 
+            //if no living players
+            else {
+                //slow down
+                enemy.velocity.x *= 0.95;
+                enemy.velocity.y *= 0.95;
 
+                //if slow enough, stop
+                if (Math.abs(enemy.velocity.x) < 0.1) {
+                    enemy.velocity.x = 0;
+                }
+                if (Math.abs(enemy.velocity.y) < 0.1) {
+                    enemy.velocity.y = 0;
+                }
+
+                //move based on velocity
+                enemy.x += enemy.velocity.x
+                enemy.y += enemy.velocity.y
+            }
+
+            //boundaries
+            enemy.x = Math.min(Math.max(enemy.x, 0), gameSettings.width);
+            enemy.y = Math.min(Math.max(enemy.y, 0), gameSettings.height);
 
             //check for collisions with other enemies
             for (let eid in this.enemies) {
                 if (enemy.id != eid) {
-                    collisions.collideAndDisplace(
+                    physics.collideAndDisplace(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         this.enemies[eid], gameSettings.enemyTypes[this.enemies[eid].type].radius,
                     );
@@ -430,7 +474,7 @@ Room.prototype.updateEnemies = function () {
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
-                        collisions.collideAndDisplace(
+                        physics.collideAndDisplace(
                             enemy, 
                             gameSettings.enemyTypes[enemy.type].radius,
                             this.players[pid], 
@@ -473,7 +517,7 @@ Room.prototype.updatePickups = function () {
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
-                    let thisDistance = collisions.distance(this.players[pid], pickup);
+                    let thisDistance = physics.distance(this.players[pid], pickup);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = pid;
@@ -485,7 +529,7 @@ Room.prototype.updatePickups = function () {
 
             //if player is close enough
             if (closestDistance < Infinity &&
-                collisions.collide(
+                physics.collide(
                     player, 
                     gameSettings.playerTypes[player.type].radius,
                     pickup, 
@@ -558,8 +602,8 @@ Room.prototype.addPlayer = function (player) {
         //if haven't seen enough players to meet cap yet, give a life
         if (!this.gameOver &&
             this.playersSeen < gameSettings.roomCap) {
-            this.livesCount++;
-            this.playersSeen++;
+                this.livesCount++;
+                this.playersSeen++;
         }
 
         //set class based on player choice
@@ -579,6 +623,12 @@ Room.prototype.addPlayer = function (player) {
 
                 //mark as not respawning
                 player.respawning = false;
+
+                //give default velocities
+                player.velocity = {
+                    x: 0,
+                    y: 0,
+                }
                 
                 //give random position in world
                 player.x = randint(100, gameSettings.width - 100);
@@ -600,9 +650,7 @@ Room.prototype.addPlayer = function (player) {
 
         //switch player direction
         player.on('direction', function (direction) {
-
             player.direction = direction;
-
         });
 
         //give default click value
@@ -616,12 +664,9 @@ Room.prototype.addPlayer = function (player) {
 
         //switch clicking state
         player.on('click', function (clicking) {
-
             player.clicking = clicking;
-            
             //shoot right away to avoid a click getting clipped by tickRate
             this.playerShoot(player);
-
         }.bind(this));//bind to room scope
 
         //handle shooting
@@ -633,14 +678,15 @@ Room.prototype.addPlayer = function (player) {
                 player.readyShots--;
                         
                 //each class shoots differently
-                let myClass = gameSettings.playerTypes[player.type];
+                let classShots = gameSettings.playerTypes[player.type].shots;
 
                 //single-shot classes
-                if (myClass.shots.count == 1) {
-                    //calculate velocity based on shot speed and where the player clicked
-                    vel = velocity(
+                if (classShots.count <= 1) {
+                    
+                    //calculate velocity based on shot velocity and where the player clicked
+                    let velocity = physics.componentVector(
                         angle(player.x, player.y, dest_x, dest_y), 
-                        myClass.shots.speed
+                        classShots.velocity
                     );
 
                     //use id counter as id, then increase
@@ -651,23 +697,24 @@ Room.prototype.addPlayer = function (player) {
                         y: player.y,
                         type: player.type,
                         playerId: player.id,
-                        velocity: vel,
-                        range: myClass.shots.range,
+                        velocity: velocity,
+                        range: classShots.range,
                     };
                 }
 
                 //multi-shot (shotgun) classes
                 else {
-                    for (let i = 0; i < myClass.shots.count; i++) {
+                    for (let i = 0; i < classShots.count; i++) {
 
-                        let vel = velocity(
+                        //calculate velocity based on shot velocity and where the player clicked and spread
+                        let velocity = physics.componentVector(
                             angle(
                                 player.x, player.y, 
                                 dest_x, dest_y
                             ) 
-                            + (i - myClass.shots.count/2 + 0.5) 
-                            * (myClass.shots.angle/(myClass.shots.count-1)),
-                            myClass.shots.speed
+                            + (i - classShots.count/2 + 0.5) 
+                            * (classShots.angle/(classShots.count-1)),
+                            classShots.velocity
                         );
 
                         //use id counter as id, then increase
@@ -678,8 +725,8 @@ Room.prototype.addPlayer = function (player) {
                             y: player.y,
                             type: player.type,
                             playerId: player.id,
-                            velocity: vel,
-                            range: myClass.shots.range,
+                            velocity: velocity,
+                            range: classShots.range,
                         };
                     }
                 }
@@ -840,7 +887,7 @@ Room.prototype.spawnWave = function () {
             },
             health: gameSettings.enemyTypes[type].maxHealth,
             cooldown: 0,
-            hit:false,
+            // hit:false,
         }
     }
 }
