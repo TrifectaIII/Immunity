@@ -241,6 +241,7 @@ Room.prototype.updatePlayers = function () {
 
                 //accelerate based on direction sent by client
                 switch (player.direction) {
+                    
                     //degrade velocities when no direction
                     case 'none':
                         player.velocity.x *= 0.95;
@@ -536,6 +537,8 @@ Room.prototype.updatePickups = function () {
                     gameSettings.pickupRadius
                 )
             ) {
+
+                //effect determined by type
                 switch (pickup.type) {
                     case "health":
                         //if player not at max health
@@ -735,10 +738,11 @@ Room.prototype.addPlayer = function (player) {
 
         //restart game if client requests and game is over
         player.on('restart_game', function () {
+            
             //make sure game is actually over
-
-            //reset all players
             if (this.gameOver) {
+
+                //reset all players
                 for (let id in this.players) {
                     this.players[id].health = 0;
                     this.players[id].type = 'none';
@@ -786,9 +790,10 @@ Room.prototype.removePlayer = function (player) {
 //shoot for player if appropriate
 Room.prototype.playerShoot = function (player) {
 
-    if (player.clicking && 
-        player.cooldown <= 0 &&
-        player.health > 0) {
+    //make sure alive, clicking, and not on cooldown
+    if (player.health > 0 &&
+        player.clicking && 
+        player.cooldown <= 0) {
 
             //add 1 to ready shots
             player.readyShots++;
@@ -836,6 +841,8 @@ Room.prototype.spawnPickup = function () {
 
 //spawns a wave of enemies around the edge of the game area
 Room.prototype.spawnWave = function () {
+
+    //add to wave counter
     this.waveCount += 1;
 
     //cap based on number of players and wave count
@@ -878,6 +885,7 @@ Room.prototype.spawnWave = function () {
                 break;
         }
 
+        //create enemy object
         this.enemies[id] = {
             type: type,
             x: x,
