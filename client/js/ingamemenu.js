@@ -97,7 +97,6 @@ var restartButton = new Button (
 );
 
 function drawGameOverMenu () {
-    console.log('drawing go')
     push();
     textAlign(CENTER, CENTER);
 

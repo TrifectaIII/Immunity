@@ -48,29 +48,29 @@ console.log("SERVER BOOTED SUCCESSFULLY");
 //include gameSettings.js
 const gameSettings = require(__dirname + '/gameSettings.js');
 
-//include gameRoom constructor from gameRoom.js
-const gameRoom = require(__dirname + '/gameRoom.js');
+//include Room constructor from Room.js
+const Room = require(__dirname + '/Room.js');
 
 //object to hold individual game rooms
-var gameRooms = {};
+var Rooms = {};
 
 //generates new, currently-unused roomId
-function generateRoomId(gameRooms) {
+function generateRoomId(Rooms) {
     let roomIdCounter = 101;
-    while (roomIdCounter.toString() in gameRooms) {
+    while (roomIdCounter.toString() in Rooms) {
         roomIdCounter += 1;
     }
     return roomIdCounter.toString();
 }
 
 //logs current rooms and their populations
-function showRooms (gameRooms) {
+function showRooms (Rooms) {
     console.log('\n');
-    if (Object.keys(gameRooms).length > 0) {
+    if (Object.keys(Rooms).length > 0) {
         console.log("ROOM STATUS #############");
-        for (let roomId in gameRooms) {
+        for (let roomId in Rooms) {
             console.log(
-                `Game Room ${roomId}: ${gameRooms[roomId].playerCount()} Players`
+                `Game Room ${roomId}: ${Rooms[roomId].playerCount()} Players`
             );
         }
         console.log("#########################");
@@ -102,15 +102,15 @@ io.sockets.on('connection', function (socket) {
         //remove from room if in one
         if ('roomId' in socket) {
 
-            gameRooms[socket.roomId].removePlayer(socket);
+            Rooms[socket.roomId].removePlayer(socket);
 
             //delete room if empty
-            if (gameRooms[socket.roomId].isEmpty()) {
-                delete gameRooms[socket.roomId];
+            if (Rooms[socket.roomId].isEmpty()) {
+                delete Rooms[socket.roomId];
             }
 
             //show current room status
-            showRooms(gameRooms);
+            showRooms(Rooms);
         }     
     })
 
@@ -125,37 +125,37 @@ io.sockets.on('connection', function (socket) {
         socket.name = name.trim().substring(0,6);
 
         //reject socket if room does not exist
-        if (!(roomId in gameRooms) && roomId != 'new_game') {
+        if (!(roomId in Rooms) && roomId != 'new_game') {
             socket.emit('rejection', 'Game Does Not Exist');
         }
 
         //reject socket if room full
-        else if (roomId in gameRooms && gameRooms[roomId].isFull()) {
+        else if (roomId in Rooms && Rooms[roomId].isFull()) {
             socket.emit('rejection', 'Game Full');
         }
 
         //create new room on request
         else if (roomId == 'new_game') {
             //generate new room id
-            let newRoomId = generateRoomId(gameRooms);
+            let newRoomId = generateRoomId(Rooms);
             
             //create room object
-            gameRooms[newRoomId] = new gameRoom(newRoomId);
+            Rooms[newRoomId] = new Room(newRoomId);
 
             //place socket into room
-            gameRooms[newRoomId].addPlayer(socket);
+            Rooms[newRoomId].addPlayer(socket);
 
             //show current room status
-            showRooms(gameRooms);
+            showRooms(Rooms);
         }
 
         //add to room if room exists and has space
-        else if (roomId in gameRooms) {
+        else if (roomId in Rooms) {
 
-            gameRooms[roomId].addPlayer(socket);
+            Rooms[roomId].addPlayer(socket);
 
             //show current room status
-            showRooms(gameRooms);
+            showRooms(Rooms);
         }
 
         //reject if any other situation
@@ -171,8 +171,8 @@ io.sockets.on('connection', function (socket) {
 
 setInterval(function () {
     //update each room in turn and emit results to players
-    for (let roomId in gameRooms) {
-        let game_info = gameRooms[roomId].update();
+    for (let roomId in Rooms) {
+        let game_info = Rooms[roomId].update();
         io.to(roomId).emit('game_update', game_info);
     }
 //frequency set by game settings in gameSettings.js

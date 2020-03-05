@@ -1,4 +1,3 @@
-
 var gameSettings = {
     //title of game (WIP)
     title: "Immunity",
@@ -14,7 +13,7 @@ var gameSettings = {
     height: 1000,
 
     //starting lives for each room
-    livesStart: 3,
+    livesStart: 1,
 
     // time in MS to respawn players
     respawnTime: 3000,
@@ -196,11 +195,11 @@ var gameSettings = {
     //different types of pickups
     pickupTypes: {
         health: {
-            chance: 80,
+            chance: 90,
         },
 
         life: {
-            chance: 20,
+            chance: 10,
         },
     },
 

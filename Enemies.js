@@ -5,10 +5,10 @@ const gameSettings = require('./gameSettings.js');
 
 
 
-//Collision/Physics Functions from gamePhysics.js
+//Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gamePhysics = require('./gamePhysics.js');
+const Physics = require('./Physics.js');
 
 
 
@@ -27,7 +27,7 @@ function Enemies (room) {
 
 //updates all enemies
 Enemies.prototype.update = function () {
-
+    
     //make sure game is not over
     if (!this.room.gameOver) {
         //spawn new wave if all enemies dead
@@ -35,7 +35,7 @@ Enemies.prototype.update = function () {
             this.spawnWave();
         }
 
-        let players = this.room.players;
+        let players = this.room.players.players;
 
         //loop through all enemies
         for (let id in this.enemies) {
@@ -45,10 +45,10 @@ Enemies.prototype.update = function () {
             let closestDistance = Infinity;
             let closestId = 0;
 
-            for (let pid in this.players) {
-                if (this.players[pid].type != 'none' &&
-                    this.players[pid].health > 0) {
-                    let thisDistance = gamePhysics.distance(this.players[pid], enemy);
+            for (let pid in players) {
+                if (players[pid].type != 'none' &&
+                    players[pid].health > 0) {
+                    let thisDistance = Physics.distance(players[pid], enemy);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = pid;
@@ -65,18 +65,18 @@ Enemies.prototype.update = function () {
             if (closestDistance < Infinity) {
 
                 //get player object
-                let player = this.players[closestId];
+                let player = players[closestId];
 
                 //accelerate in direction of closest player
-                let acceleration = gamePhysics.componentVector(
-                    gamePhysics.angleBetween(enemy.x, enemy.y, player.x, player.y), 
+                let acceleration = Physics.componentVector(
+                    Physics.angleBetween(enemy.x, enemy.y, player.x, player.y), 
                     gameSettings.enemyTypes[enemy.type].acceleration
                 );
                 enemy.velocity.x += acceleration.x;
                 enemy.velocity.y += acceleration.y;
 
                 //reduce velocity to max, if needed
-                gamePhysics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
+                Physics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
 
                 //move based on velocity
                 enemy.x += enemy.velocity.x
@@ -84,7 +84,7 @@ Enemies.prototype.update = function () {
 
                 //attacking
                 if (enemy.cooldown <= 0 &&
-                    gamePhysics.isColliding(
+                    Physics.isColliding(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         player, gameSettings.playerTypes[player.type].radius
                     )) {
@@ -126,7 +126,7 @@ Enemies.prototype.update = function () {
             //check for collisions with other enemies
             for (let eid in this.enemies) {
                 if (enemy.id != eid) {
-                    gamePhysics.collideAndDisplace(
+                    Physics.collideAndDisplace(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         this.enemies[eid], gameSettings.enemyTypes[this.enemies[eid].type].radius,
                     );
@@ -134,14 +134,14 @@ Enemies.prototype.update = function () {
             }
 
             //check for collisions with living players
-            for (let pid in this.players) {
-                if (this.players[pid].type != 'none' &&
-                    this.players[pid].health > 0) {
-                        gamePhysics.collideAndDisplace(
+            for (let pid in players) {
+                if (players[pid].type != 'none' &&
+                    players[pid].health > 0) {
+                        Physics.collideAndDisplace(
                             enemy, 
                             gameSettings.enemyTypes[enemy.type].radius,
-                            this.players[pid], 
-                            gameSettings.playerTypes[this.players[pid].type].radius
+                            players[pid], 
+                            gameSettings.playerTypes[players[pid].type].radius
                         );
                 }
             }
@@ -156,7 +156,7 @@ Enemies.prototype.spawnWave = function () {
     this.room.waveCount++;
 
     //number of enemies based on number of players and wave count
-    let enemyNum = this.room.playerCount() * (gameSettings.enemyMax + this.waveCount - 1);
+    let enemyNum = this.room.playerCount() * (gameSettings.enemyMax + this.room.waveCount - 1);
 
     for (let i = 0; i < enemyNum; i++) {
         this.spawnEnemy();
@@ -215,10 +215,6 @@ Enemies.prototype.spawnEnemy = function () {
     }
 }
 
-Enemies.prototype.count = function () {
-    return Object.keys(this.enemies).length;
-}
-
 //collects info on enemies to send to clients
 Enemies.prototype.collect = function () {
 
@@ -235,6 +231,10 @@ Enemies.prototype.collect = function () {
     }
     
     return enemy_info;
+}
+
+Enemies.prototype.count = function () {
+    return Object.keys(this.enemies).length;
 }
 
 module.exports = Enemies;

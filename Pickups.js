@@ -5,17 +5,16 @@ const gameSettings = require('./gameSettings.js');
 
 
 
-//Collision/Physics Functions from gamePhysics.js
+//Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gamePhysics = require('./gamePhysics.js');
-
+const Physics = require('./Physics.js');
 
 
 // object constructor for enemies
 function Pickups (room) {
 
-    //hold individual enemy objects
+    //hold individual pickup objects
     this.pickups = {};
 
     //counter for object id's
@@ -40,7 +39,7 @@ Pickups.prototype.update = function () {
             this.spawnTimer = gameSettings.pickupTime;
         }
     
-        let players = this.room.players;
+        let players = this.room.players.players;
 
         //loop through all pickups
         for (let id in this.pickups) {
@@ -52,7 +51,7 @@ Pickups.prototype.update = function () {
             for (let pid in players) {
                 if (players[pid].type != 'none' &&
                     players[pid].health > 0) {
-                    let thisDistance = gamePhysics.distance(players[pid], pickup);
+                    let thisDistance = Physics.distance(players[pid], pickup);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = pid;
@@ -63,7 +62,7 @@ Pickups.prototype.update = function () {
 
             //if player is close enough
             if (closestDistance < Infinity &&
-                gamePhysics.isColliding(
+                Physics.isColliding(
                     player, 
                     gameSettings.playerTypes[player.type].radius,
                     pickup, 

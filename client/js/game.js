@@ -66,7 +66,7 @@ function drawGame () {
         //draw minimap
         drawMinimap(player);
 
-        //draw info about the current gameRoom
+        //draw info about the current Room
         drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
 
         //draw names of playerData
@@ -117,7 +117,7 @@ function drawGame () {
         //draw minimap
         drawMinimap();
 
-        //draw info about the current gameRoom
+        //draw info about the current Room
         drawRoomInfo(gameSettings.colors.darkgrey);
 
         //draw names of players
