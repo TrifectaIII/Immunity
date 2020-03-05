@@ -42,6 +42,8 @@ app.get('/js/gameSettings.js', function (req, res) {
 
 console.log("SERVER BOOTED SUCCESSFULLY");
 
+
+
 // GAME ROOMS
 ///////////////////////////////////////////////////
 
@@ -81,6 +83,7 @@ function showRooms (Rooms) {
     console.log('\n');
 }
  
+
 
 // HANDLE NEW SOCKETS
 ///////////////////////////////////////////////////
@@ -155,6 +158,7 @@ io.sockets.on('connection', function (socket) {
         }
     });
 });
+
 
 
 // MAIN GAME LOOP
