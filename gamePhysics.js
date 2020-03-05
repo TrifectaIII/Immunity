@@ -5,28 +5,33 @@ const gameSettings = require('./gameSettings.js');
 
 
 
-//calculates component vectors based on angle and magnitude
-function componentVector(angle, magnitude) {
+//calculates angle of vector between 2 points
+function angleBetween (x1, y1, x2, y2) {
+    return Math.atan2(x2 - x1, y2 - y1);
+}
+
+//calculates x/y component vectors based on angle and magnitude of vector
+function componentVector (angle, magnitude) {
     return {
         x: Math.sin(angle) * magnitude,
         y: Math.cos(angle) * magnitude,
     };
 }
 
-//cap magnitude of object's velocity at maxSpeed
-function capVelocity(obj, maxSpeed) {
+//cap magnitude of object's velocity at maxVelocity
+function capVelocity (obj, maxVelocity) {
 
     //get current magnitude of velocities
     let currentMagnitude = Math.sqrt(
-        Math.pow(obj.velocity.x, 2) + 
-        Math.pow(obj.velocity.y, 2)
+        obj.velocity.x ** 2 + 
+        obj.velocity.y ** 2
     );
 
-    //check if exceeding max speed
-    if (currentMagnitude > maxSpeed) {
+    //check if exceeding maxV
+    if (currentMagnitude > maxVelocity) {
 
         //calulate ratio for normalization
-        let ratio = maxSpeed/currentMagnitude;
+        let ratio = maxVelocity/currentMagnitude;
 
         //adjust velocity
         obj.velocity.x *= ratio;
@@ -44,7 +49,7 @@ function distance (obj1, obj2) {
 }
 
 //checks if 2 objects are colliding given their x/y attributes and their radii
-function collide (obj1, rad1, obj2, rad2) {
+function isColliding (obj1, rad1, obj2, rad2) {
     return (distance(obj1, obj2) < rad1 + rad2);
 }
 
@@ -107,10 +112,11 @@ function calCollisionVect(bullet, enemy){
 
 //what to export
 module.exports = {
+    angleBetween:angleBetween,
     componentVector:componentVector,
     capVelocity:capVelocity,
     distance:distance,
-    collide:collide,
+    isColliding:isColliding,
     collideAndDisplace:collideAndDisplace,
     calCollisionVect:calCollisionVect,
 }

@@ -104,9 +104,8 @@ io.sockets.on('connection', function (socket) {
 
             gameRooms[socket.roomId].removePlayer(socket);
 
-            //shut down and delete room if empty
+            //delete room if empty
             if (gameRooms[socket.roomId].isEmpty()) {
-                gameRooms[socket.roomId].shutdown();
                 delete gameRooms[socket.roomId];
             }
 

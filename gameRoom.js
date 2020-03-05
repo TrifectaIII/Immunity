@@ -1,18 +1,21 @@
-
-
-
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
 const gameSettings = require('./gameSettings.js');
 
 
-
-//Collision/Physics Functions from physics.js
+//Collision/Physics Functions from gamePhysics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const physics = require('./physics.js');
+const gamePhysics = require('./gamePhysics.js');
 
+
+//Objects to control different game entities
+///////////////////////////////////////////////////////////////////////////
+// const gamePlayers = require('./gamePlayers.js');
+// const gameShots = require('./gameShots.js');
+const gameEnemies = require('./gameEnemies.js');
+const gamePickups = require('./gamePickups.js');
 
 
 // Helper Functions
@@ -24,11 +27,6 @@ function randint(low,high) {
         return Math.floor(Math.random() * (high - low + 1) + low);
     }
     return Math.floor(Math.random() * (low - high + 1) + high);
-}
-
-//calculates angle of vector between player position and shot destination
-function angle(x, y, dest_x, dest_y) {
-    return Math.atan2(dest_x - x, dest_y - y);
 }
 
 
@@ -43,19 +41,12 @@ function Room (roomId) {
     //hold info about game objects
     this.players = {};
     this.shots = {};
-    this.pickups = {};
+    this.pickups = new gamePickups(this);
     this.enemies = {};
 
     //counters for object ids
     this.shotIdCounter = 0;
-    this.pickupIdCounter = 0;
     this.enemyIdCounter = 0;
-
-    //spawn pickups
-    this.pickupSpawner = setInterval(
-        this.spawnPickup.bind(this), //bind to room scope
-        gameSettings.pickupTime //interval from game settings
-    );
 
     //counts each enemy wave
     this.waveCount = 0;
@@ -93,11 +84,14 @@ Room.prototype.update = function () {
     }
     this.gameOver = gameOver;
 
+    //update game objects
+    this.pickups.update();
+
     //return game info for emit to room
     return {
         player_info: this.updatePlayers(),
         shot_info: this.updateShots(),
-        pickup_info: this.updatePickups(),
+        pickup_info: this.pickups.collect(),
         enemy_info: this.updateEnemies(),
 
         game_info: {
@@ -127,17 +121,16 @@ Room.prototype.updateShots = function () {
             // check for collisions with enemys
             for (let id in this.enemies) {
                 let enemy = this.enemies[id];
-                if (physics.collide(
+                if (gamePhysics.isColliding(
                         enemy, gameSettings.enemyTypes[enemy.type].radius, 
                         shot, 0
                     )) {
                         //remove health based on class
                         if (enemy.health > 0) {
                             enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
-                            // enemy.hit = true;
                             destroyed = true;
 
-                            physics.calCollisionVect(shot,enemy);
+                            gamePhysics.calCollisionVect(shot,enemy);
 
                             //check if enemy died
                             if (enemy.health <= 0) {
@@ -295,7 +288,7 @@ Room.prototype.updatePlayers = function () {
                 }
 
                 //cap velocity
-                physics.capVelocity(player, gameSettings.playerTypes[player.type].maxVelocity);
+                gamePhysics.capVelocity(player, gameSettings.playerTypes[player.type].maxVelocity);
 
                 //move based on velocity
                 player.x += player.velocity.x;
@@ -306,7 +299,7 @@ Room.prototype.updatePlayers = function () {
                     if (player.id != pid && 
                         player.type != 'none' &&
                         this.players[pid].health > 0) {
-                            physics.collideAndDisplace(
+                            gamePhysics.collideAndDisplace(
                                 player, 
                                 gameSettings.playerTypes[player.type].radius,
                                 this.players[pid], 
@@ -362,7 +355,7 @@ Room.prototype.updateEnemies = function () {
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
-                    let thisDistance = physics.distance(this.players[pid], enemy);
+                    let thisDistance = gamePhysics.distance(this.players[pid], enemy);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
                         closestId = pid;
@@ -375,30 +368,6 @@ Room.prototype.updateEnemies = function () {
                 enemy.cooldown -= gameSettings.tickRate;
             }
 
-            // resolve dynamic collision when hit by bullet
-            // if (enemy.hit){
-
-            //     enemy.x += enemy.velocity.x;
-            //     enemy.y += enemy.velocity.y;
-
-            //     enemy.velocity.x *= .7;
-            //     enemy.velocity.y *= .7;
-
-
-            //     if (enemy.velocity.x < 1){
-            //         enemy.velocity.x = 0;
-            //     }
-
-            //     if (enemy.velocity.y < 1){
-            //         enemy.velocity.y = 0;
-            //     }
-
-            //     if (enemy.velocity.x == 0 && enemy.velocity.y ==0){
-            //         enemy.hit = false;
-            //     }
-                
-            // }
-
             //if a living player exists
             if (closestDistance < Infinity) {
 
@@ -406,15 +375,15 @@ Room.prototype.updateEnemies = function () {
                 let player = this.players[closestId];
 
                 //accelerate in direction of closest player
-                let acceleration = physics.componentVector(
-                    angle(enemy.x, enemy.y, player.x, player.y), 
+                let acceleration = gamePhysics.componentVector(
+                    gamePhysics.angleBetween(enemy.x, enemy.y, player.x, player.y), 
                     gameSettings.enemyTypes[enemy.type].acceleration
                 );
                 enemy.velocity.x += acceleration.x;
                 enemy.velocity.y += acceleration.y;
 
                 //reduce velocity to max, if needed
-                physics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
+                gamePhysics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
 
                 //move based on velocity
                 enemy.x += enemy.velocity.x
@@ -422,7 +391,7 @@ Room.prototype.updateEnemies = function () {
 
                 //attacking
                 if (enemy.cooldown <= 0 &&
-                    physics.collide(
+                    gamePhysics.isColliding(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         player, gameSettings.playerTypes[player.type].radius
                     )) {
@@ -464,7 +433,7 @@ Room.prototype.updateEnemies = function () {
             //check for collisions with other enemies
             for (let eid in this.enemies) {
                 if (enemy.id != eid) {
-                    physics.collideAndDisplace(
+                    gamePhysics.collideAndDisplace(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         this.enemies[eid], gameSettings.enemyTypes[this.enemies[eid].type].radius,
                     );
@@ -475,7 +444,7 @@ Room.prototype.updateEnemies = function () {
             for (let pid in this.players) {
                 if (this.players[pid].type != 'none' &&
                     this.players[pid].health > 0) {
-                        physics.collideAndDisplace(
+                        gamePhysics.collideAndDisplace(
                             enemy, 
                             gameSettings.enemyTypes[enemy.type].radius,
                             this.players[pid], 
@@ -501,82 +470,6 @@ Room.prototype.updateEnemies = function () {
     
     return enemy_info;
 }
-
-//UPDATE PICKUPS
-/////////////////////////////////////////
-
-Room.prototype.updatePickups = function () {
-
-    if (!this.gameOver) {
-        //loop through all pickups
-        for (let id in this.pickups) {
-            let pickup = this.pickups[id];
-
-            //find closest alive player
-            let closestDistance = Infinity;
-            let closestId = 0;
-            for (let pid in this.players) {
-                if (this.players[pid].type != 'none' &&
-                    this.players[pid].health > 0) {
-                    let thisDistance = physics.distance(this.players[pid], pickup);
-                    if (thisDistance < closestDistance) {
-                        closestDistance = thisDistance;
-                        closestId = pid;
-                    }
-                }
-            }
-
-            let player = this.players[closestId];
-
-            //if player is close enough
-            if (closestDistance < Infinity &&
-                physics.collide(
-                    player, 
-                    gameSettings.playerTypes[player.type].radius,
-                    pickup, 
-                    gameSettings.pickupRadius
-                )
-            ) {
-
-                //effect determined by type
-                switch (pickup.type) {
-                    case "health":
-                        //if player not at max health
-                        if (player.health < gameSettings.playerTypes[player.type].maxHealth) {
-                            //give health and delete pickup
-                            player.health = Math.min(
-                                gameSettings.playerTypes[player.type].maxHealth,
-                                player.health + gameSettings.pickupHealthAmount
-                            );
-                            delete this.pickups[id];
-                        }
-                        break;
-
-                    case "life":
-                        //give another life to room
-                        this.livesCount++;
-                        delete this.pickups[id];
-                }
-            }
-        }
-    }
-
-    //collect info for clients
-    let pickup_info = {};
-
-    for (let id in this.pickups) {
-        let pickup = this.pickups[id];
-        pickup_info[id] = {
-            x: pickup.x,
-            y: pickup.y,
-            type: pickup.type,
-        }
-    }
-
-    return pickup_info;
-}
-
-
 
 // ADD SOCKET TO ROOM AND SET IT UP
 ///////////////////////////////////////////////////////////////////////////
@@ -687,8 +580,8 @@ Room.prototype.addPlayer = function (player) {
                 if (classShots.count <= 1) {
                     
                     //calculate velocity based on shot velocity and where the player clicked
-                    let velocity = physics.componentVector(
-                        angle(player.x, player.y, dest_x, dest_y), 
+                    let velocity = gamePhysics.componentVector(
+                        gamePhysics.angleBetween(player.x, player.y, dest_x, dest_y), 
                         classShots.velocity
                     );
 
@@ -710,8 +603,8 @@ Room.prototype.addPlayer = function (player) {
                     for (let i = 0; i < classShots.count; i++) {
 
                         //calculate velocity based on shot velocity and where the player clicked and spread
-                        let velocity = physics.componentVector(
-                            angle(
+                        let velocity = gamePhysics.componentVector(
+                            gamePhysics.angleBetween(
                                 player.x, player.y, 
                                 dest_x, dest_y
                             ) 
@@ -754,14 +647,7 @@ Room.prototype.addPlayer = function (player) {
                 this.shots = {};
                 this.pickups = {};
                 this.shotIdCounter = 0;
-                this.pickupIdCounter = 0;
                 this.enemyIdCounter = 0;
-
-                clearInterval(this.pickupSpawner);
-                this.pickupSpawner = setInterval(
-                    this.spawnPickup.bind(this), //bind to room scope
-                    gameSettings.pickupTime //interval from game settings
-                );
 
                 this.waveCount = 0;
                 this.playersSeen = this.playerCount();
@@ -803,39 +689,6 @@ Room.prototype.playerShoot = function (player) {
 
             //start cooldown
             player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
-    }
-}
-
-//spawns pickup into the room
-Room.prototype.spawnPickup = function () {
-   
-    if (Object.keys(this.pickups).length < this.playerCount() * gameSettings.pickupMax) {
-        //use id counter as id, then increase
-        let id = this.pickupIdCounter++;
-
-        //calculate type based on chances
-        let typeMax = 0
-        for (let type in gameSettings.pickupTypes) {
-            typeMax += gameSettings.pickupTypes[type].chance;
-        }
-        let typeNum = randint(0, typeMax);
-        let chosenType = '';
-        for (let type in gameSettings.pickupTypes) {
-            if (typeNum <= gameSettings.pickupTypes[type].chance) {
-                chosenType = type;
-                break;
-            }
-            else {
-                typeNum -= gameSettings.pickupTypes[type].chance;
-            }
-        }
-
-        //create pickup object
-        this.pickups[id] = {
-            type: chosenType,
-            x: randint(100, gameSettings.width-100),
-            y: randint(100, gameSettings.height-100),
-        }
     }
 }
 
@@ -896,7 +749,6 @@ Room.prototype.spawnWave = function () {
             },
             health: gameSettings.enemyTypes[type].maxHealth,
             cooldown: 0,
-            // hit:false,
         }
     }
 }
@@ -919,11 +771,6 @@ Room.prototype.isFull = function () {
 //checks if room is empty
 Room.prototype.isEmpty = function () {
     return this.playerCount() == 0;
-}
-
-//stops timing events for the room
-Room.prototype.shutdown = function () {
-    clearInterval(this.pickupSpawner);
 }
 
 

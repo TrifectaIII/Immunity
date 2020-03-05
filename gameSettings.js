@@ -10,8 +10,8 @@ var gameSettings = {
     tickRate: 20,
 
     //size of game area
-    width: 3000,
-    height: 3000,
+    width: 1000,
+    height: 1000,
 
     //starting lives for each room
     livesStart: 3,
