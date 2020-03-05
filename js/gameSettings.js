@@ -9,11 +9,11 @@ var gameSettings = {
     tickRate: 20,
 
     //size of game area
-    width: 1000,
-    height: 1000,
+    width: 3000,
+    height: 3000,
 
     //starting lives for each room
-    livesStart: 1,
+    livesStart: 2,
 
     // time in MS to respawn players
     respawnTime: 3000,
