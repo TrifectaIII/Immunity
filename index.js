@@ -86,18 +86,9 @@ function showRooms (Rooms) {
 ///////////////////////////////////////////////////
 io.sockets.on('connection', function (socket) {
 
-
-    // CONNECTION/DISCONNECT
-    ////////////////////////////////
-
-	//log a new connection
-	// console.log('NEW USER. ID: ',socket.id);
-
+    
     //handle disconnects
     socket.once('disconnect', function () {
-
-        //log a disconnect
-        // console.log('USER DC. ID: ',socket.id);
 
         //remove from room if in one
         if ('roomId' in socket) {

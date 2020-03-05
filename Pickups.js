@@ -1,14 +1,15 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gameSettings = require('./gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const Physics = require('./Physics.js');
+const Physics = require(__dirname + '/Physics.js');
+
 
 
 // object constructor for enemies
@@ -32,11 +33,16 @@ Pickups.prototype.update = function () {
 
     if (!this.room.gameOver) {
 
-        //create new pickup if time
-        this.spawnTimer -= gameSettings.tickRate;
-        if (this.spawnTimer <= 0) {
-            this.spawnPickup();
-            this.spawnTimer = gameSettings.pickupTime;
+        //subtract from spawnTimer if at least 1 player is alive
+        if (!this.room.players.allDead()) {
+
+            this.spawnTimer -= gameSettings.tickRate;
+
+            //create new pickup if time
+            if (this.spawnTimer <= 0) {
+                this.spawnPickup();
+                this.spawnTimer = gameSettings.pickupTime;
+            }
         }
     
         let players = this.room.players.players;

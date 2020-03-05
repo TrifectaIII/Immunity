@@ -1,24 +1,24 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gameSettings = require('./gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
+
 
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const Physics = require('./Physics.js');
+const Physics = require(__dirname + '/Physics.js');
+
 
 
 //Objects to control different game entities
 ///////////////////////////////////////////////////////////////////////////
 
-const Players = require('./Players.js');
-const Shots = require('./Shots.js');
-const Enemies = require('./Enemies.js');
-const Pickups = require('./Pickups.js');
-
-
+const Players = require(__dirname + '/Players.js');
+const Shots = require(__dirname + '/Shots.js');
+const Enemies = require(__dirname + '/Enemies.js');
+const Pickups = require(__dirname + '/Pickups.js');
 
 
 
@@ -30,7 +30,7 @@ function Room (roomId) {
 
     this.roomId = roomId;
 
-    //hold info about game objects
+    //objects to hold each type of game object
     this.players = new Players(this);
     this.shots = new Shots(this);
     this.pickups = new Pickups(this);
@@ -57,15 +57,13 @@ function Room (roomId) {
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
-    //update game objects
+    //update game
     this.players.update();
     this.shots.update();
     this.enemies.update();
     this.pickups.update();
 
-
-    //check for a game over
-    //if lives left or a player alive, not a game over
+    //if no lives and all players dead, game is over
     this.gameOver = this.players.allDead() && this.livesCount <= 0;
 
     //collect return game info for emit to clients in room
@@ -83,9 +81,12 @@ Room.prototype.update = function () {
     }
 }
 
-// ADD SOCKET TO ROOM AND SET IT UP
+
+
+// OTHER METHODS
 ///////////////////////////////////////////////////////////////////////////
 
+//adds player to room
 Room.prototype.addPlayer = function (player) {
     
     //join socketio room
@@ -108,10 +109,6 @@ Room.prototype.addPlayer = function (player) {
     player.emit('joined',this.roomId);
 }
 
-
-// OTHER ROOM METHODS
-///////////////////////////////////////////
-
 //remove socket if socket exists in room
 Room.prototype.removePlayer = function (player) {
     this.players.remove(player);
@@ -124,11 +121,12 @@ Room.prototype.reset = function () {
         //reset all players
         this.players.reset();
 
-        //reset room
+        //recreate other game objects
         this.enemies = new Enemies(this);
         this.shots = new Shots(this);
         this.pickups = new Pickups(this);
 
+        //reset attributes
         this.waveCount = 0;
         this.playersSeen = this.players.count();
         this.livesCount = gameSettings.livesStart + this.players.count();

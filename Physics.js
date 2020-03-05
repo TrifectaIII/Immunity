@@ -1,7 +1,7 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gameSettings = require('./gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 
 

@@ -1,14 +1,14 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gameSettings = require('./gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
-const Physics = require('./Physics.js');
+const Physics = require(__dirname + '/Physics.js');
 
 
 
@@ -207,12 +207,27 @@ Players.prototype.add = function (player) {
     //add to players object
     this.players[player.id] = player;
 
-    //start killStreak at 0
-    player.killStreak = 0;
     //give default class
     player.type = 'none';
+    //mark as not respawning
+    player.respawning = false;
+
+    //give no health
+    player.health = 0;
+    //start killStreak at 0
+    player.killStreak = 0;
+
     //give default direction
     player.direction = 'none';
+    //give default location
+    player.x = 0;
+    player.y = 0;
+    //give default velocities
+    player.velocity = {
+        x: 0,
+        y: 0,
+    }
+
     //give default click value
     player.clicking = false;
     //start with no shooting cooldown
@@ -285,12 +300,12 @@ Players.prototype.add = function (player) {
             //create shots
             this.room.shots.spawnShot(player, destX, destY);
         }
-    }.bind(this));//bind to room scope
+    }.bind(this));//bind to scope
 
     //restart game if client requests and game is over
     player.on('restart_game', function () {
         this.room.reset();
-    }.bind(this));//bind to room scope
+    }.bind(this));//bind to scope
 }
 
 //removes player from object
