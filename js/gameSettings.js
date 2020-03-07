@@ -73,7 +73,7 @@ var gameSettings = {
 
             radius: 20,
             maxHealth: 10,
-            acceleration: 2,
+            acceleration: 3,
             maxVelocity: 7,
             mass: 10,
 
@@ -97,8 +97,8 @@ var gameSettings = {
             
             radius: 30,
             maxHealth: 20,
-            acceleration: 1,
-            maxVelocity: 3,
+            acceleration: 0.2,
+            maxVelocity: 4,
             mass: 20,
 
             colors: { //green

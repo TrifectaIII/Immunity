@@ -85,7 +85,17 @@ Players.prototype.update = function () {
                     case 'none':
                         player.velocity.x *= 0.95;
                         player.velocity.y *= 0.95;
+
+                        //if slow enough, stop
+                        if (
+                            Math.abs(player.velocity.x) < 0.1) {
+                            player.velocity.x = 0;
+                        }
+                        if (Math.abs(player.velocity.y) < 0.1) {
+                            player.velocity.y = 0;
+                        }
                         break;
+
                     
                     //diagonal movements use component acceleration
                     case 'rightup':
@@ -110,27 +120,33 @@ Players.prototype.update = function () {
                     case 'right':
                         player.velocity.x += acceleration;
                         player.velocity.y *= 0.95;
+                        if (Math.abs(player.velocity.y) < 0.1) {
+                            player.velocity.y = 0;
+                        }
                         break;
                     case 'left':
                         player.velocity.x -= acceleration;
                         player.velocity.y *= 0.95;
+                        if (Math.abs(player.velocity.y) < 0.1) {
+                            player.velocity.y = 0;
+                        }
                         break;
                     case 'up':
                         player.velocity.y -= acceleration;
                         player.velocity.x *= 0.95;
+                        if (
+                            Math.abs(player.velocity.x) < 0.1) {
+                            player.velocity.x = 0;
+                        }
                         break;
                     case 'down':
                         player.velocity.y += acceleration;
                         player.velocity.x *= 0.95;
+                        if (
+                            Math.abs(player.velocity.x) < 0.1) {
+                            player.velocity.x = 0;
+                        }
                         break;
-                }
-
-                //if slow enough, stop
-                if (Math.abs(player.velocity.x) < 0.1) {
-                    player.velocity.x = 0;
-                }
-                if (Math.abs(player.velocity.y) < 0.1) {
-                    player.velocity.y = 0;
                 }
 
                 //cap velocity
