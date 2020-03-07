@@ -167,8 +167,8 @@ var gameSettings = {
             radius: 20,
             maxHealth: 5,
             acceleration: 0.5,
-            maxVelocity: 6,
-            mass: 5,
+            maxVelocity: 8,
+            mass: 1,
 
             attack: {
                 cooldown: 750,
