@@ -76,6 +76,21 @@ function collideAndDisplace (obj1, rad1, obj2, rad2) {
     }
 }
 
+//impart shot momentum to enemy
+function collideShotEnemy (shot, enemy) {
+
+    //get masses
+    let enemyMass = gameSettings.enemyTypes[enemy.type].mass;
+    let shotMass = gameSettings.playerTypes[shot.type].shots.mass;
+
+    //ratio of shot mass to enemy mass
+    let massRatio = shotMass/enemyMass;
+
+    //accelerate enemy based on shot velocity and mass ratio
+    enemy.velocity.x += shot.velocity.x * massRatio;
+    enemy.velocity.y += shot.velocity.y * massRatio;
+}
+
 function calCollisionVect(bullet, enemy){
 
     let dist = distance(bullet, enemy);
@@ -118,5 +133,6 @@ module.exports = {
     distance:distance,
     isColliding:isColliding,
     collideAndDisplace:collideAndDisplace,
+    collideShotEnemy:collideShotEnemy,
     calCollisionVect:calCollisionVect,
 }

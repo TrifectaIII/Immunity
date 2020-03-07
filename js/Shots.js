@@ -53,7 +53,7 @@ Shots.prototype.update = function () {
                             enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
                             destroyed = true;
 
-                            Physics.calCollisionVect(shot,enemy);
+                            Physics.collideShotEnemy(shot,enemy);
 
                             //check if enemy died
                             if (enemy.health <= 0) {

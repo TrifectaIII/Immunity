@@ -41,7 +41,7 @@ var gameSettings = {
                 range: 500,
                 cooldown: 100,
                 damage: 3,
-                mass: 2,
+                mass: 1,
             },
         },
 
@@ -63,8 +63,8 @@ var gameSettings = {
                 velocity: 15,
                 angle:Math.PI/6,
                 range: 300,
-                cooldown: 100,
-                damage: 1,
+                cooldown: 200,
+                damage: 2,
                 mass: 1,
             },
         },
@@ -111,8 +111,8 @@ var gameSettings = {
                 velocity: 15,
                 angle:Math.PI/4,
                 range: 200,
-                cooldown: 1000,
-                damage: 6,
+                cooldown: 500,
+                damage: 3,
                 mass: 5,
             },
         },
@@ -127,10 +127,10 @@ var gameSettings = {
         normal: {
 
             radius: 25,
-            maxHealth: 5,
+            maxHealth: 15,
             acceleration: 0.1,
             maxVelocity: 4,
-            mass: 10,
+            mass: 15,
 
             attack: {
                 cooldown: 500,
@@ -146,10 +146,10 @@ var gameSettings = {
         heavy: {
 
             radius: 40,
-            maxHealth: 15,
+            maxHealth: 25,
             acceleration: 0.1,
             maxVelocity: 3,
-            mass: 15,
+            mass: 30,
 
             attack: {
                 cooldown: 1000,
