@@ -99,6 +99,7 @@ function joinGame(menuChoices) {
             shotData = serverData.shot_info;
             pickupData = serverData.pickup_info;
             enemyData = serverData.enemy_info;
+            tree = serverData.tree_info;
         });
     });
 }

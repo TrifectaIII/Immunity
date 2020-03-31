@@ -1,15 +1,12 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
-
 const gameSettings = require(__dirname + '/gameSettings.js');
 
 
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
-
 const Physics = require(__dirname + '/Physics.js');
-
 
 
 //Objects to control different game entities
@@ -20,6 +17,13 @@ const Shots = require(__dirname + '/Shots.js');
 const Enemies = require(__dirname + '/Enemies.js');
 const Pickups = require(__dirname + '/Pickups.js');
 
+
+//Quadtree class
+const QT = require(__dirname +'/Qtree.js');
+
+
+//Performance.js for benchmarking 
+const { PerformanceObserver, performance } = require('perf_hooks');
 
 
 // ROOM CONSTRUCTOR
@@ -36,6 +40,9 @@ function Room (roomId) {
     this.pickups = new Pickups(this);
     this.enemies = new Enemies(this);
 
+    //create a Quad tree covering the game world with capacity of each node at 4
+    this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height, 4));
+
     //counts each enemy wave
     this.waveCount = 0;
 
@@ -47,8 +54,8 @@ function Room (roomId) {
 
     //switch for if the game is over
     this.gameOver = false;
-}
 
+}
 
 
 // ROOM UPDATE
@@ -57,11 +64,14 @@ function Room (roomId) {
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
+
     //update game
     this.players.update();
     this.shots.update();
     this.enemies.update();
     this.pickups.update();
+    this.update_Quadtree();
+
 
     //if no lives and all players dead, game is over
     this.gameOver = this.players.allDead() && this.livesCount <= 0;
@@ -78,9 +88,9 @@ Room.prototype.update = function () {
             livesCount: this.livesCount,
             gameOver: this.gameOver,
         },
+        tree_info:this.QT,
     }
 }
-
 
 
 // OTHER METHODS
@@ -147,6 +157,22 @@ Room.prototype.isFull = function () {
 //checks if room is empty
 Room.prototype.isEmpty = function () {
     return this.players.count() == 0;
+}
+
+Room.prototype.get_Allobj = function(){
+    return [...Object.values(this.enemies.enemies), ...Object.values(this.players.players),...Object.values(this.shots.shots)]; 
+}
+
+Room.prototype.update_Quadtree = function (){
+    this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height),4);
+
+    //reinsert objects into the new Quadtree
+    let objs = this.get_Allobj();
+    for (let i in objs){
+        this.Quadtree.insert(objs[i]);
+    }
+
+
 }
 
 

@@ -4,6 +4,8 @@ var playerData = {};
 var shotData = {};
 var pickupData = {};
 var enemyData = {};
+var tree = {};
+console.log("TREE in game.js:", tree);
 
 //object to hold info re: screen offset based on player position
 var screenOffset = {
@@ -80,6 +82,9 @@ function drawGame () {
 
         // draw crosshair
         drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
+
+        //draw tree boundries
+        // tree.render_boundaries();
     }
 
     //draw game if player not in game

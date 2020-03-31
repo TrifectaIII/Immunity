@@ -4,11 +4,11 @@
 const gameSettings = require(__dirname + '/gameSettings.js');
 
 
-
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
 const Physics = require(__dirname + '/Physics.js');
+const QT = require(__dirname +'/Qtree.js');
 
 
 
@@ -40,32 +40,35 @@ Shots.prototype.update = function () {
 
             // check for collisions with enemies
 
-            let enemies = this.room.enemies.enemies;
+            let nearby_objs = this.room.Quadtree.query(new QT.QT_bound(shot.x,shot.y,100,100));
 
-            for (let id in enemies) {
-                let enemy = enemies[id];
-                if (Physics.isColliding(
-                        enemy, gameSettings.enemyTypes[enemy.type].radius, 
-                        shot, 0 //shots have no radius
-                    )) {
-                        //remove health based on class
-                        if (enemy.health > 0) {
-                            enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
-                            destroyed = true;
+            for (let id in nearby_objs) {
+                let enemy = nearby_objs[id];
 
-                            Physics.collideShotEnemy(shot,enemy);
+                if (enemy.obj_type =="enemy" ) {
+                    if (Physics.isColliding(
+                            enemy, gameSettings.enemyTypes[enemy.type].radius, 
+                            shot, 0 //shots have no radius
+                        )) {
+                            //remove health based on class
+                            if (enemy.health > 0) {
+                                enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
+                                destroyed = true;
 
-                            //check if enemy died
-                            if (enemy.health <= 0) {
+                                Physics.collideShotEnemy(shot,enemy);
 
-                                //increase killStreak
-                                if (shot.playerId in this.room.players.players) {
-                                    this.room.players.players[shot.playerId].killStreak++;
+                                //check if enemy died
+                                if (enemy.health <= 0) {
+
+                                    //increase killStreak
+                                    if (shot.playerId in this.room.players.players) {
+                                        this.room.players.players[shot.playerId].killStreak++;
+                                    }
+                                    //delete enemy
+                                    delete this.room.enemies.enemies[this.findIndexOfEnemy(enemy)]
                                 }
-                                //delete enemy
-                                delete enemies[id];
                             }
-                        }
+                    }
                 } 
             }
 
@@ -157,6 +160,16 @@ Shots.prototype.collect = function () {
     }
 
     return shot_info;
+}
+
+Shots.prototype.findIndexOfEnemy = function (enemy) {
+
+    for( i in this.room.enemies.enemies){
+        let e= this.room.enemies.enemies[i]
+        if (e.x == enemy.x && e.y == enemy.y){
+            return i;
+        }
+    }
 }
 
 module.exports = Shots;

@@ -4,7 +4,6 @@
 const gameSettings = require(__dirname + '/gameSettings.js');
 
 
-
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 

@@ -1,6 +1,5 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
-
 const gameSettings = require(__dirname + '/gameSettings.js');
 
 
@@ -174,6 +173,7 @@ Players.prototype.update = function () {
                 player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
                 player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
             }
+
         }
     }
 }
@@ -222,7 +222,7 @@ Players.prototype.add = function (player) {
 
     //add to players object
     this.players[player.id] = player;
-
+    player.obj_type = "player";
     //give default class
     player.type = 'none';
     //mark as not respawning

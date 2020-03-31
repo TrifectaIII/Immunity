@@ -4,12 +4,10 @@
 const gameSettings = require(__dirname + '/gameSettings.js');
 
 
-
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
-
 const Physics = require(__dirname + '/Physics.js');
-
+const QT = require(__dirname +'/Qtree.js');
 
 
 // object constructor for enemies
@@ -122,29 +120,39 @@ Enemies.prototype.update = function () {
             //boundaries
             enemy.x = Math.min(Math.max(enemy.x, 0), gameSettings.width);
             enemy.y = Math.min(Math.max(enemy.y, 0), gameSettings.height);
+            let near_by_objects = this.room.Quadtree.query(new QT.QT_bound(enemy.x, enemy.y, 150,150  ));
 
             //check for collisions with other enemies
-            for (let eid in this.enemies) {
-                if (enemy.id != eid) {
-                    Physics.collideAndDisplace(
-                        enemy, gameSettings.enemyTypes[enemy.type].radius,
-                        this.enemies[eid], gameSettings.enemyTypes[this.enemies[eid].type].radius,
-                    );
-                }
-            }
-
-            //check for collisions with living players
-            for (let pid in players) {
-                if (players[pid].type != 'none' &&
-                    players[pid].health > 0) {
+            for (let i in near_by_objects) {
+                //recall that near_by_objects is a list of lists: [[object_id, object_data]...]
+                let obj = near_by_objects[i];
+                if (obj.obj_type == "enemy"){
+                    if (enemy.id != Object.values(this.enemies).indexOf(obj)){
                         Physics.collideAndDisplace(
                             enemy, 
                             gameSettings.enemyTypes[enemy.type].radius,
-                            players[pid], 
-                            gameSettings.playerTypes[players[pid].type].radius
+                            obj, 
+                            gameSettings.enemyTypes[obj.type].radius
                         );
+                    }
+                }
+                else if (obj.obj_type =="player"){
+
+                    if (obj.type != 'none' &&
+                        obj.health > 0) {
+                        Physics.collideAndDisplace(
+                            enemy, 
+                            gameSettings.enemyTypes[enemy.type].radius,
+                            obj, 
+                            gameSettings.playerTypes[obj.type].radius
+                        );
+                    }
+
+
                 }
             }
+
+
         }
     }
 }
@@ -203,6 +211,7 @@ Enemies.prototype.spawnEnemy = function () {
 
     //create enemy object
     this.enemies[id] = {
+        obj_type:"enemy",
         type: type,
         x: x,
         y: y,
@@ -232,6 +241,7 @@ Enemies.prototype.collect = function () {
     
     return enemy_info;
 }
+
 
 Enemies.prototype.count = function () {
     return Object.keys(this.enemies).length;
