@@ -2,8 +2,6 @@
 ///////////////////////////////////////////////////////////////////////////
 const gameSettings = require(__dirname + '/gameSettings.js');
 
-
-
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 const Physics = require(__dirname + '/Physics.js');
@@ -88,7 +86,6 @@ Room.prototype.update = function () {
             livesCount: this.livesCount,
             gameOver: this.gameOver,
         },
-        tree_info:this.QT,
     }
 }
 
