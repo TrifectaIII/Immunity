@@ -10,12 +10,18 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
+//object constructor for individual pickup
+function Pickup (type, x, y) {
+    this.type = type;
+    this.x = x;
+    this.y = y;
+}
 
-// object constructor for enemies
+// object constructor for pickups container
 function Pickups (room) {
 
     //hold individual pickup objects
-    this.pickups = {};
+    this.objects = {};
 
     //counter for object id's
     this.idCounter = 0;
@@ -44,11 +50,11 @@ Pickups.prototype.update = function () {
             }
         }
     
-        let players = this.room.players.players;
+        let players = this.room.players.objects;
 
         //loop through all pickups
-        for (let id in this.pickups) {
-            let pickup = this.pickups[id];
+        for (let id in this.objects) {
+            let pickup = this.objects[id];
 
             //find closest alive player
             let closestDistance = Infinity;
@@ -85,14 +91,14 @@ Pickups.prototype.update = function () {
                                 gameSettings.playerTypes[player.type].maxHealth,
                                 player.health + gameSettings.pickupHealthAmount
                             );
-                            delete this.pickups[id];
+                            delete this.objects[id];
                         }
                         break;
 
                     case "life":
                         //give another life to room
                         this.room.livesCount++;
-                        delete this.pickups[id];
+                        delete this.objects[id];
                 }
             }
         }
@@ -104,10 +110,10 @@ Pickups.prototype.spawnPickup = function () {
 
     //make sure we are under cap
     //cap is pickupMax * number of players
-    if (Object.keys(this.pickups).length < this.room.playerCount() * gameSettings.pickupMax) {
+    if (Object.keys(this.objects).length < this.room.playerCount() * gameSettings.pickupMax) {
 
         //use id counter as id, then increase
-        let id = this.idCounter++;
+        let id = 'pickup' + (this.idCounter++).toString();
 
         //calculate type based on chances
         let typeMax = 0
@@ -127,11 +133,16 @@ Pickups.prototype.spawnPickup = function () {
         }
 
         //create pickup object
-        this.pickups[id] = {
-            type: chosenType,
-            x: Math.floor(Math.random()*(gameSettings.width+1)),
-            y: Math.floor(Math.random()*(gameSettings.height+1)),
-        }
+        this.objects[id] = new Pickup(
+            chosenType, 
+            Math.floor(Math.random()*(gameSettings.width+1)),
+            Math.floor(Math.random()*(gameSettings.height+1)),
+        )
+        // this.objects[id] = {
+        //     type: chosenType,
+        //     x: Math.floor(Math.random()*(gameSettings.width+1)),
+        //     y: Math.floor(Math.random()*(gameSettings.height+1)),
+        // }
     }
 }
 
@@ -139,8 +150,8 @@ Pickups.prototype.spawnPickup = function () {
 Pickups.prototype.collect = function () {
     let pickup_info = {};
 
-    for (let id in this.pickups) {
-        let pickup = this.pickups[id];
+    for (let id in this.objects) {
+        let pickup = this.objects[id];
         pickup_info[id] = {
             x: pickup.x,
             y: pickup.y,

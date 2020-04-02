@@ -6,15 +6,29 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
+
 const Physics = require(__dirname + '/Physics.js');
 const QT = require(__dirname +'/Qtree.js');
 
 
-// object constructor for enemies
+//object constructor for individual enemy
+function Enemy (type, x, y) {
+    this.type = type;
+    this.x = x;
+    this.y = y;
+    this.velocity = {
+        x: 0,
+        y: 0,
+    }
+    this.health = gameSettings.enemyTypes[this.type].maxHealth;
+    this.cooldown = 0;
+} 
+
+// object constructor for enemies container
 function Enemies (room) {
 
     //hold individual enemy objects
-    this.enemies = {};
+    this.objects = {};
 
     //counter for object id's
     this.idCounter = 0;
@@ -33,11 +47,11 @@ Enemies.prototype.update = function () {
             this.spawnWave();
         }
 
-        let players = this.room.players.players;
+        let players = this.room.players.objects;
 
         //loop through all enemies
-        for (let id in this.enemies) {
-            let enemy = this.enemies[id];
+        for (let id in this.objects) {
+            let enemy = this.objects[id];
 
             //find closest player
             let closestDistance = Infinity;
@@ -126,8 +140,8 @@ Enemies.prototype.update = function () {
             for (let i in near_by_objects) {
                 //recall that near_by_objects is a list of lists: [[object_id, object_data]...]
                 let obj = near_by_objects[i];
-                if (obj.obj_type == "enemy"){
-                    if (enemy.id != Object.values(this.enemies).indexOf(obj)){
+                if (obj.constructor.name == "Enemy"){
+                    if (enemy.id != Object.values(this.objects).indexOf(obj)){
                         Physics.collideAndDisplace(
                             enemy, 
                             gameSettings.enemyTypes[enemy.type].radius,
@@ -136,7 +150,7 @@ Enemies.prototype.update = function () {
                         );
                     }
                 }
-                else if (obj.obj_type =="player"){
+                else if (obj.constructor.name == "Socket"){
 
                     if (obj.type != 'none' &&
                         obj.health > 0) {
@@ -175,7 +189,7 @@ Enemies.prototype.spawnWave = function () {
 Enemies.prototype.spawnEnemy = function () {
 
     //use id counter as id, then increase
-    let id = this.idCounter++;
+    let id = 'enemy' + (this.idCounter++).toString();
 
     //pick randoim type for this enemy
     let type = Object.keys(gameSettings.enemyTypes)[Math.floor(Math.random()*Object.keys(gameSettings.enemyTypes).length)];
@@ -210,18 +224,18 @@ Enemies.prototype.spawnEnemy = function () {
     }
 
     //create enemy object
-    this.enemies[id] = {
-        obj_type:"enemy",
-        type: type,
-        x: x,
-        y: y,
-        velocity: {
-            x:0,
-            y:0,
-        },
-        health: gameSettings.enemyTypes[type].maxHealth,
-        cooldown: 0,
-    }
+    this.objects[id] = new Enemy(type, x, y);
+    // this.objects[id] = {
+    //     type: type,
+    //     x: x,
+    //     y: y,
+    //     velocity: {
+    //         x:0,
+    //         y:0,
+    //     },
+    //     health: gameSettings.enemyTypes[type].maxHealth,
+    //     cooldown: 0,
+    // }
 }
 
 //collects info on enemies to send to clients
@@ -229,8 +243,8 @@ Enemies.prototype.collect = function () {
 
     let enemy_info = {};
 
-    for (let id in this.enemies) {
-        let enemy = this.enemies[id];
+    for (let id in this.objects) {
+        let enemy = this.objects[id];
         enemy_info[id] = {
             x: enemy.x,
             y: enemy.y,
@@ -244,7 +258,7 @@ Enemies.prototype.collect = function () {
 
 
 Enemies.prototype.count = function () {
-    return Object.keys(this.enemies).length;
+    return Object.keys(this.objects).length;
 }
 
 module.exports = Enemies;

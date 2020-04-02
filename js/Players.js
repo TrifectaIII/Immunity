@@ -1,7 +1,7 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
-const gameSettings = require(__dirname + '/gameSettings.js');
 
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 
 //Collision/Physics Functions from Physics.js
@@ -15,7 +15,7 @@ const Physics = require(__dirname + '/Physics.js');
 function Players (room) {
 
     //hold individual enemy objects
-    this.players = {};
+    this.objects = {};
 
     //save room that object exists in
     this.room = room;
@@ -25,8 +25,8 @@ function Players (room) {
 Players.prototype.update = function () {
 
     //respawn any dead players
-    for (let id in this.players) {
-        let player = this.players[id];
+    for (let id in this.objects) {
+        let player = this.objects[id];
         if (player.type != 'none' &&
             !player.respawning &&
             player.health <= 0) {
@@ -56,8 +56,8 @@ Players.prototype.update = function () {
 
     if (!this.room.gameOver) {
         //loop through all players
-        for (let id in this.players) {
-            let player = this.players[id];
+        for (let id in this.objects) {
+            let player = this.objects[id];
 
             //do not update if no class chosen
             if (player.type == 'none') {
@@ -156,15 +156,15 @@ Players.prototype.update = function () {
                 player.y += player.velocity.y;
 
                 //check for collisions with other players
-                for (let pid in this.players) {
+                for (let pid in this.objects) {
                     if (player.id != pid && 
                         player.type != 'none' &&
-                        this.players[pid].health > 0) {
+                        this.objects[pid].health > 0) {
                             Physics.collideAndDisplace(
                                 player, 
                                 gameSettings.playerTypes[player.type].radius,
-                                this.players[pid], 
-                                gameSettings.playerTypes[this.players[pid].type].radius
+                                this.objects[pid], 
+                                gameSettings.playerTypes[this.objects[pid].type].radius
                             );
                     }
                 }
@@ -183,8 +183,8 @@ Players.prototype.collect = function () {
     
     let player_info = {};
 
-    for (let id in this.players) {
-        let player = this.players[id];
+    for (let id in this.objects) {
+        let player = this.objects[id];
         player_info[id] = {
             x: player.x,
             y: player.y,
@@ -221,8 +221,8 @@ Players.prototype.shootRequest = function (player) {
 Players.prototype.add = function (player) {
 
     //add to players object
-    this.players[player.id] = player;
-    player.obj_type = "player";
+    this.objects[player.id] = player;
+
     //give default class
     player.type = 'none';
     //mark as not respawning
@@ -326,24 +326,24 @@ Players.prototype.add = function (player) {
 
 //removes player from object
 Players.prototype.remove = function (player) {
-    if (player.id in this.players) {
-        delete this.players[player.id];
+    if (player.id in this.objects) {
+        delete this.objects[player.id];
     }
 }
 
 //resets all players
 Players.prototype.reset = function () {
-    for (let id in this.players) {
-        this.players[id].health = 0;
-        this.players[id].type = 'none';
-        this.players[id].killStreak = 0;
+    for (let id in this.objects) {
+        this.objects[id].health = 0;
+        this.objects[id].type = 'none';
+        this.objects[id].killStreak = 0;
     }
 }
 
 //checks if all players are dead
 Players.prototype.allDead = function () {
-    for (let id in this.players) {
-        if (this.players[id].health > 0) {
+    for (let id in this.objects) {
+        if (this.objects[id].health > 0) {
             return false;
         }
     }
@@ -352,7 +352,7 @@ Players.prototype.allDead = function () {
 
 //counts players currently in room
 Players.prototype.count = function () {
-    return Object.keys(this.players).length;
+    return Object.keys(this.objects).length;
 }
 
 module.exports = Players;

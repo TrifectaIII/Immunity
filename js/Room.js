@@ -1,9 +1,12 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
+
 const gameSettings = require(__dirname + '/gameSettings.js');
+
 
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
+
 const Physics = require(__dirname + '/Physics.js');
 
 
@@ -156,15 +159,15 @@ Room.prototype.isEmpty = function () {
     return this.players.count() == 0;
 }
 
-Room.prototype.get_Allobj = function(){
-    return [...Object.values(this.enemies.enemies), ...Object.values(this.players.players),...Object.values(this.shots.shots)]; 
+Room.prototype.get_AllObj = function(){
+    return [...Object.values(this.enemies.objects), ...Object.values(this.players.objects),...Object.values(this.shots.objects)]; 
 }
 
 Room.prototype.update_Quadtree = function (){
     this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height),4);
 
     //reinsert objects into the new Quadtree
-    let objs = this.get_Allobj();
+    let objs = this.get_AllObj();
     for (let i in objs){
         this.Quadtree.insert(objs[i]);
     }

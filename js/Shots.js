@@ -11,12 +11,21 @@ const Physics = require(__dirname + '/Physics.js');
 const QT = require(__dirname +'/Qtree.js');
 
 
+//object constructor for individual shots
+function Shot (player, velocity) {
+    this.type = player.type;
+    this.x = player.x;
+    this.y = player.y;
+    this.playerId = player.id;
+    this.velocity = velocity;
+    this.range = gameSettings.playerTypes[player.type].shots.range;
+}
 
-// object constructor for enemies
+// object constructor for shots container
 function Shots (room) {
 
     //hold individual shot objects
-    this.shots = {};
+    this.objects = {};
 
     //counter for object id's
     this.idCounter = 0;
@@ -29,8 +38,8 @@ Shots.prototype.update = function () {
 
     if (!this.room.gameOver) {
         //loop through all shots
-        for (let id in this.shots) {
-            let shot = this.shots[id];
+        for (let id in this.objects) {
+            let shot = this.objects[id];
 
             //move based on velocity
             shot.x += shot.velocity.x;
@@ -45,7 +54,7 @@ Shots.prototype.update = function () {
             for (let id in nearby_objs) {
                 let enemy = nearby_objs[id];
 
-                if (enemy.obj_type =="enemy" ) {
+                if (enemy.constructor.name == "Enemy") {
                     if (Physics.isColliding(
                             enemy, gameSettings.enemyTypes[enemy.type].radius, 
                             shot, 0 //shots have no radius
@@ -61,11 +70,11 @@ Shots.prototype.update = function () {
                                 if (enemy.health <= 0) {
 
                                     //increase killStreak
-                                    if (shot.playerId in this.room.players.players) {
-                                        this.room.players.players[shot.playerId].killStreak++;
+                                    if (shot.playerId in this.room.players.objects) {
+                                        this.room.players.objects[shot.playerId].killStreak++;
                                     }
                                     //delete enemy
-                                    delete this.room.enemies.enemies[this.findIndexOfEnemy(enemy)]
+                                    delete this.room.enemies.objects[this.findIndexOfEnemy(enemy)];
                                 }
                             }
                     }
@@ -80,7 +89,7 @@ Shots.prototype.update = function () {
             
             //delete if destroyed
             if (destroyed) {
-                delete this.shots[id];
+                delete this.objects[id];
             }
         }
     }
@@ -103,9 +112,10 @@ Shots.prototype.spawnShot = function (player, destX, destY) {
         );
 
         //use id counter as id, then increase
-        let id = this.idCounter++;
+        let id = 'shot' + (this.idCounter++).toString();
+
         //create new object
-        this.shots[id] = {
+        this.objects[id] = {
             x: player.x,
             y: player.y,
             type: player.type,
@@ -133,14 +143,15 @@ Shots.prototype.spawnShot = function (player, destX, destY) {
             //use id counter as id, then increase
             let id = this.idCounter++;
             //create new object
-            this.shots[id] = {
-                x: player.x,
-                y: player.y,
-                type: player.type,
-                playerId: player.id,
-                velocity: velocity,
-                range: classShots.range,
-            };
+            this.objects[id] = new Shot(player, velocity);
+            // this.objects[id] = {
+            //     x: player.x,
+            //     y: player.y,
+            //     type: player.type,
+            //     playerId: player.id,
+            //     velocity: velocity,
+            //     range: classShots.range,
+            // };
         }
     }
 }  
@@ -150,8 +161,8 @@ Shots.prototype.collect = function () {
 
     var shot_info = {};
 
-    for (let id in this.shots) {
-        let shot = this.shots[id];
+    for (let id in this.objects) {
+        let shot = this.objects[id];
         shot_info[id] = {
             x: shot.x,
             y: shot.y,
@@ -164,8 +175,8 @@ Shots.prototype.collect = function () {
 
 Shots.prototype.findIndexOfEnemy = function (enemy) {
 
-    for( i in this.room.enemies.enemies){
-        let e= this.room.enemies.enemies[i]
+    for( i in this.room.enemies.objects){
+        let e = this.room.enemies.objects[i];
         if (e.x == enemy.x && e.y == enemy.y){
             return i;
         }
