@@ -160,7 +160,11 @@ Room.prototype.isEmpty = function () {
 }
 
 Room.prototype.get_AllObj = function(){
-    return [...Object.values(this.enemies.objects), ...Object.values(this.players.objects),...Object.values(this.shots.objects)]; 
+    return [
+        ...Object.values(this.enemies.objects), 
+        ...Object.values(this.players.objects),
+        ...Object.values(this.shots.objects),
+    ]; 
 }
 
 Room.prototype.update_Quadtree = function (){
