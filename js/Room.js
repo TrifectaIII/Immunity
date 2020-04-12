@@ -17,6 +17,7 @@ const Players = require(__dirname + '/Players.js');
 const Shots = require(__dirname + '/Shots.js');
 const Enemies = require(__dirname + '/Enemies.js');
 const Pickups = require(__dirname + '/Pickups.js');
+const Zones = require(__dirname + '/Zones.js');
 
 
 //Quadtree class
@@ -40,6 +41,7 @@ function Room (roomId) {
     this.shots = new Shots(this);
     this.pickups = new Pickups(this);
     this.enemies = new Enemies(this);
+    this.zones = new Zones(this);
 
     //create a Quad tree covering the game world with capacity of each node at 4
     this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height, 4));
@@ -71,6 +73,7 @@ Room.prototype.update = function () {
     this.shots.update();
     this.enemies.update();
     this.pickups.update();
+    this.zones.update();
     this.update_Quadtree();
 
 
@@ -83,6 +86,7 @@ Room.prototype.update = function () {
         shot_info: this.shots.collect(),
         pickup_info: this.pickups.collect(),
         enemy_info: this.enemies.collect(),
+        zone_info: this.zones.collect(),
 
         game_info: {
             waveCount: this.waveCount,

@@ -188,9 +188,6 @@ Enemies.prototype.spawnWave = function () {
 // spawn an individual enemy in
 Enemies.prototype.spawnEnemy = function () {
 
-    //use id counter as id, then increase
-    let id = 'enemy' + (this.idCounter++).toString();
-
     //pick randoim type for this enemy
     let type = Object.keys(gameSettings.enemyTypes)[Math.floor(Math.random()*Object.keys(gameSettings.enemyTypes).length)];
 
@@ -223,19 +220,11 @@ Enemies.prototype.spawnEnemy = function () {
             break;
     }
 
+    //use id counter as id, then increase
+    let id = 'enemy' + (this.idCounter++).toString();
+
     //create enemy object
     this.objects[id] = new Enemy(type, x, y);
-    // this.objects[id] = {
-    //     type: type,
-    //     x: x,
-    //     y: y,
-    //     velocity: {
-    //         x:0,
-    //         y:0,
-    //     },
-    //     health: gameSettings.enemyTypes[type].maxHealth,
-    //     cooldown: 0,
-    // }
 }
 
 //collects info on enemies to send to clients
@@ -256,7 +245,7 @@ Enemies.prototype.collect = function () {
     return enemy_info;
 }
 
-
+//get count of enemies
 Enemies.prototype.count = function () {
     return Object.keys(this.objects).length;
 }

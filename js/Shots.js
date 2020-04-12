@@ -34,6 +34,7 @@ function Shots (room) {
     this.room = room;
 }
 
+//updates all shots
 Shots.prototype.update = function () {
 
     if (!this.room.gameOver) {
@@ -115,14 +116,7 @@ Shots.prototype.spawnShot = function (player, destX, destY) {
         let id = 'shot' + (this.idCounter++).toString();
 
         //create new object
-        this.objects[id] = {
-            x: player.x,
-            y: player.y,
-            type: player.type,
-            playerId: player.id,
-            velocity: velocity,
-            range: classShots.range,
-        };
+        this.objects[id] = new Shot(player, velocity);
     }
 
     //multi-shot (shotgun) classes
@@ -141,17 +135,10 @@ Shots.prototype.spawnShot = function (player, destX, destY) {
             );
 
             //use id counter as id, then increase
-            let id = this.idCounter++;
+            let id = 'shot' + (this.idCounter++).toString();
+
             //create new object
             this.objects[id] = new Shot(player, velocity);
-            // this.objects[id] = {
-            //     x: player.x,
-            //     y: player.y,
-            //     type: player.type,
-            //     playerId: player.id,
-            //     velocity: velocity,
-            //     range: classShots.range,
-            // };
         }
     }
 }  

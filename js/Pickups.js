@@ -33,7 +33,7 @@ function Pickups (room) {
     this.spawnTimer = gameSettings.pickupTime;
 }
 
-//updates all enemies
+//updates all pickups
 Pickups.prototype.update = function () {
 
     if (!this.room.gameOver) {
@@ -112,9 +112,6 @@ Pickups.prototype.spawnPickup = function () {
     //cap is pickupMax * number of players
     if (Object.keys(this.objects).length < this.room.playerCount() * gameSettings.pickupMax) {
 
-        //use id counter as id, then increase
-        let id = 'pickup' + (this.idCounter++).toString();
-
         //calculate type based on chances
         let typeMax = 0
         for (let type in gameSettings.pickupTypes) {
@@ -132,17 +129,15 @@ Pickups.prototype.spawnPickup = function () {
             }
         }
 
+        //use id counter as id, then increase
+        let id = 'pickup' + (this.idCounter++).toString();
+
         //create pickup object
         this.objects[id] = new Pickup(
             chosenType, 
             Math.floor(Math.random()*(gameSettings.width+1)),
             Math.floor(Math.random()*(gameSettings.height+1)),
         )
-        // this.objects[id] = {
-        //     type: chosenType,
-        //     x: Math.floor(Math.random()*(gameSettings.width+1)),
-        //     y: Math.floor(Math.random()*(gameSettings.height+1)),
-        // }
     }
 }
 
