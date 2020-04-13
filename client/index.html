@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
+
         <title>Immunity</title>
 
         <!-- favicon.io -->
@@ -11,6 +12,7 @@
         <link rel="icon" type="image/png" sizes="16x16" href="client/icons/favicon-16x16.png">
         <link rel="manifest" href="client/icons/site.webmanifest">
 
+        <!-- load css file -->
         <link href="/client/style.css" rel="stylesheet" type="text/css"/>
 
         <!-- socket io exposed by server -->
@@ -21,7 +23,10 @@
     </head>
 
     <body>
+        <!-- div to hold game -->
         <div id='canvas-hold'></div>
+
+        <!-- load js files -->
         <script src="/js/gameSettings.js"></script>
         <script src="/client/js/errors.js"></script>
         <script src="/client/js/menu.js"></script>
