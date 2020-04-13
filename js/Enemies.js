@@ -42,11 +42,8 @@ Enemies.prototype.update = function () {
     
     //make sure game is not over
     if (!this.room.gameOver) {
-        //spawn new wave if all enemies dead
-        if (this.count() <= 0) {
-            this.spawnWave();
-        }
 
+        //get player objects from room
         let players = this.room.players.objects;
 
         //loop through all enemies
@@ -168,20 +165,6 @@ Enemies.prototype.update = function () {
 
 
         }
-    }
-}
-
-//spawn a wave in
-Enemies.prototype.spawnWave = function () {
-
-    //increase wavecount of room
-    this.room.waveCount++;
-
-    //number of enemies based on number of players and wave count
-    let enemyNum = this.room.playerCount() * (gameSettings.enemyMax + this.room.waveCount - 1);
-
-    for (let i = 0; i < enemyNum; i++) {
-        this.spawnEnemy();
     }
 }
 

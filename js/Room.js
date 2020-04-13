@@ -67,6 +67,10 @@ function Room (roomId) {
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
+    //spawn new wave if needed
+    if (!this.gameOver && this.enemies.count() <= 0) {
+        this.spawnWave();
+    }
 
     //update game
     this.players.update();
@@ -99,6 +103,20 @@ Room.prototype.update = function () {
 
 // OTHER METHODS
 ///////////////////////////////////////////////////////////////////////////
+
+//creates a wave of enemies
+Room.prototype.spawnWave = function () {
+
+    //increase wavecount
+    this.waveCount++;
+
+    //number of enemies based on number of players and wave count
+    let enemyNum = this.playerCount() * (gameSettings.enemyMax + this.waveCount - 1);
+
+    for (let i = 0; i < enemyNum; i++) {
+        this.enemies.spawnEnemy();
+    }
+}
 
 //adds player to room
 Room.prototype.addPlayer = function (player) {
