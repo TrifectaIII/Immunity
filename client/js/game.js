@@ -4,6 +4,7 @@ var playerData = {};
 var shotData = {};
 var pickupData = {};
 var enemyData = {};
+var zoneData = {};
 
 //object to hold info re: screen offset based on player position
 var screenOffset = {
@@ -50,6 +51,9 @@ function drawGame () {
 
         //draw enemies
         drawEnemies();
+
+        //draw zones
+        drawZones();
 
         //draw living players
         drawLiving();
@@ -109,6 +113,9 @@ function drawGame () {
 
         //draw enemies
         drawEnemies();
+
+        //draw zones
+        drawZones();
 
         //draw living players
         drawLiving();
@@ -374,6 +381,31 @@ function drawEnemies() {
                 );
         }   
     }
+    pop();
+}
+
+//draw zones
+function drawZones () {
+    
+    push();
+
+    //set up look
+    stroke('red');
+    strokeWeight(3);
+    fill(color(50,50,50,50));
+
+    //loop through every zone
+    for (let id in zoneData) {
+        let zone = zoneData[id];
+
+        //draw zones
+        circle(
+            zone.x - screenOffset.x, 
+            zone.y - screenOffset.y, 
+            zone.radius*2
+        );
+    }
+
     pop();
 }
 

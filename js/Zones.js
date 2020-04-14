@@ -28,6 +28,8 @@ function Zones (room) {
 
     //save room that object exists in
     this.room = room;
+
+    this.spawnZone(gameSettings.width/2,gameSettings.height/2,100);
 }
 
 //updates all enemies
