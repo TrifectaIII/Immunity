@@ -210,6 +210,17 @@ Enemies.prototype.spawnEnemy = function () {
     this.objects[id] = new Enemy(type, x, y);
 }
 
+//kills enemy based on it's id
+Enemies.prototype.killEnemy = function (id) {
+    let enemy = this.objects[id];
+
+    if (Math.random() < gameSettings.pickupChance) {
+        this.room.pickups.spawnPickup(enemy.x, enemy.y);
+    }
+
+    delete this.objects[id];
+}
+
 //collects info on enemies to send to clients
 Enemies.prototype.collect = function () {
 

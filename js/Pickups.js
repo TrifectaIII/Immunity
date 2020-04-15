@@ -28,27 +28,12 @@ function Pickups (room) {
 
     //save room that object exists in
     this.room = room;
-
-    //counts down to pickup spawn
-    this.spawnTimer = gameSettings.pickupTime;
 }
 
 //updates all pickups
 Pickups.prototype.update = function () {
 
     if (!this.room.gameOver) {
-
-        //subtract from spawnTimer if at least 1 player is alive
-        if (!this.room.players.allDead()) {
-
-            this.spawnTimer -= gameSettings.tickRate;
-
-            //create new pickup if time
-            if (this.spawnTimer <= 0) {
-                this.spawnPickup();
-                this.spawnTimer = gameSettings.pickupTime;
-            }
-        }
     
         let players = this.room.players.objects;
 
@@ -105,8 +90,8 @@ Pickups.prototype.update = function () {
     } 
 }
 
-//spawn a new pickup
-Pickups.prototype.spawnPickup = function () {
+//spawn a new pickup (called when enemy dies)
+Pickups.prototype.spawnPickup = function (x, y) {
 
     //make sure we are under cap
     //cap is pickupMax * number of players
@@ -133,11 +118,7 @@ Pickups.prototype.spawnPickup = function () {
         let id = 'pickup' + (this.idCounter++).toString();
 
         //create pickup object
-        this.objects[id] = new Pickup(
-            chosenType, 
-            Math.floor(Math.random()*(gameSettings.width+1)),
-            Math.floor(Math.random()*(gameSettings.height+1)),
-        )
+        this.objects[id] = new Pickup(chosenType, x, y);
     }
 }
 

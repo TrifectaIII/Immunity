@@ -50,16 +50,19 @@ Shots.prototype.update = function () {
 
             // check for collisions with enemies
 
+            //get nearby objects from qtree
             let nearby_objs = this.room.Quadtree.query(new QT.QT_bound(shot.x,shot.y,100,100));
 
+            //loop through nearby objects
             for (let id in nearby_objs) {
                 let enemy = nearby_objs[id];
 
-                if (enemy.constructor.name == "Enemy") {
-                    if (Physics.isColliding(
-                            enemy, gameSettings.enemyTypes[enemy.type].radius, 
-                            shot, 0 //shots have no radius
-                        )) {
+                //make sure object is enemy, and then check collision
+                if (enemy.constructor.name == "Enemy" &&
+                    Physics.isColliding(
+                        enemy, gameSettings.enemyTypes[enemy.type].radius, 
+                        shot, 0 //shots have no radius
+                    )) {
                             //remove health based on class
                             if (enemy.health > 0) {
                                 enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
@@ -74,12 +77,12 @@ Shots.prototype.update = function () {
                                     if (shot.playerId in this.room.players.objects) {
                                         this.room.players.objects[shot.playerId].killStreak++;
                                     }
-                                    //delete enemy
-                                    delete this.room.enemies.objects[this.findIndexOfEnemy(enemy)];
+                                    
+                                    //kill enemy
+                                    this.room.enemies.killEnemy(this.findIndexOfEnemy(enemy));
                                 }
                             }
-                    }
-                } 
+                }
             }
 
             //remove range based on velocity

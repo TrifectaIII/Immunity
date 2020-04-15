@@ -183,8 +183,8 @@ var gameSettings = {
         
     },
 
-    //time between spawns of pickups in ms
-    pickupTime: 6000,
+    //chance of enemy dropping a pickup (fraction of 1)
+    pickupChance: 0.2,
 
     //max pickups in the world at a time, per player
     pickupMax: 5,
