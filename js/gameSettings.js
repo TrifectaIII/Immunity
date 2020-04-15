@@ -51,7 +51,7 @@ var gameSettings = {
             maxHealth: 15,
             acceleration: 1,
             maxVelocity: 5,
-            mass: 15,
+            mass: 20,
 
             colors: { //yellow
                 light: '#FFEC27',
@@ -97,7 +97,7 @@ var gameSettings = {
             
             radius: 30,
             maxHealth: 20,
-            acceleration: 0.2,
+            acceleration: 0.3,
             maxVelocity: 4,
             mass: 20,
 
@@ -128,7 +128,7 @@ var gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            acceleration: 0.1,
+            acceleration: 0.2,
             maxVelocity: 4,
             mass: 15,
 
@@ -187,7 +187,7 @@ var gameSettings = {
     pickupChance: 0.2,
 
     //max pickups in the world at a time, per player
-    pickupMax: 5,
+    pickupMax: 3,
 
     //radius of pickup objects
     pickupRadius: 18,
@@ -195,11 +195,11 @@ var gameSettings = {
     //different types of pickups
     pickupTypes: {
         health: {
-            chance: 90,
+            chance: 95,
         },
 
         life: {
-            chance: 10,
+            chance: 5,
         },
     },
 
