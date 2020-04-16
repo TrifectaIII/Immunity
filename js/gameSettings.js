@@ -87,7 +87,7 @@ var gameSettings = {
                 velocity: 25,
                 angle: 0,
                 range: 1000,
-                cooldown: 1000,
+                cooldown: 500,
                 damage: 30,
                 mass: 20,
             },
@@ -111,7 +111,7 @@ var gameSettings = {
                 velocity: 15,
                 angle:Math.PI/4,
                 range: 200,
-                cooldown: 500,
+                cooldown: 250,
                 damage: 3,
                 mass: 5,
             },
@@ -184,7 +184,7 @@ var gameSettings = {
     },
 
     //chance of enemy dropping a pickup (fraction of 1)
-    pickupChance: 0.2,
+    pickupChance: 0.1,
 
     //max pickups in the world at a time, per player
     pickupMax: 3,
