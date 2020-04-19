@@ -15,6 +15,7 @@ function Zone (x, y, radius) {
     this.x = x;
     this.y = y;
     this.radius = radius;
+    this.closing = 0;
 }
 
 // object constructor for pickups container
@@ -29,7 +30,11 @@ function Zones (room) {
     //save room that object exists in
     this.room = room;
 
-    this.spawnZone(gameSettings.width/2,gameSettings.height/2,100);
+    this.spawnZone(
+        gameSettings.width/2,
+        gameSettings.height/2, 
+        1000
+    );
 }
 
 //updates all enemies
@@ -39,7 +44,35 @@ Zones.prototype.update = function () {
 
         //loop through all zones
         for (let id in this.objects) {
+            let zone = this.objects[id];
 
+            //assume no player contact
+            zone.closing = 0;
+
+            //loop through players
+            for (let pid in this.room.players.playing) {
+                let player = this.room.players.playing[pid];
+
+                //check to see if player is colliding with zone
+                if (Physics.isColliding(
+                        zone,
+                        zone.radius,
+                        player,
+                        0,//only care about center of player
+                    )) {
+
+                        //add one to closing count
+                        zone.closing++;
+                }
+            }
+
+            //shrink zone if it is closing
+            zone.radius -= zone.closing;
+
+            //delete zone if it gets small
+            if (zone.radius < 20) {
+                delete this.objects[id];
+            }
         }
     }
 }
@@ -63,6 +96,7 @@ Zones.prototype.collect = function () {
             x: zone.x,
             y: zone.y,
             radius: zone.radius,
+            closing: zone.closing,
         }
     }
 

@@ -394,13 +394,21 @@ function drawZones () {
     push();
 
     //set up look
-    stroke('red');
+    stroke('black');
     strokeWeight(3);
     fill(color(50,50,50,50));
 
     //loop through every zone
     for (let id in zoneData) {
         let zone = zoneData[id];
+
+        //check if zone is closing
+        if (zone.closing > 0) {
+            stroke('green');
+        }
+        else {
+            stroke('red');
+        }
 
         //draw zones
         circle(
