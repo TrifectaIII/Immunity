@@ -167,8 +167,8 @@ io.sockets.on('connection', function (socket) {
 setInterval(function () {
     //update each room in turn and emit results to players
     for (let roomId in Rooms) {
-        let game_info = Rooms[roomId].update();
-        io.to(roomId).emit('game_update', game_info);
+        let serverData = Rooms[roomId].update();
+        io.to(roomId).emit('game_update', serverData);
     }
 //frequency set by game settings in gameSettings.js
 }, gameSettings.tickRate);

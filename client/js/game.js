@@ -1,6 +1,11 @@
 //game info from server
 var gameData = {};
-var playerData = {};
+
+//holds info of playing and waiting players
+var playingData = {};
+var waitingData = {};
+
+//info for other game objects
 var shotData = {};
 var pickupData = {};
 var enemyData = {};
@@ -19,12 +24,11 @@ function drawGame () {
     //refresh screen
     clear();
 
-    //if player exists and has a class
-    if (socket.id in playerData &&
-        playerData[socket.id].type != 'none') {
+    //if player is actively playing
+    if (socket.id in playingData) {
         
         //get player object
-        let player = playerData[socket.id];
+        let player = playingData[socket.id];
 
         //calculate screen offset based on player position
         calcOffset(player);
@@ -73,7 +77,7 @@ function drawGame () {
         //draw info about the current Room
         drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
 
-        //draw names of playerData
+        //draw names of players
         drawPlayerInfo();
 
         //draw fps counter
@@ -414,10 +418,10 @@ function drawDead () {
 
     push();
 
-    for (let id in playerData) {
+    for (let id in playingData) {
         if (id != socket.id) {
-            let player = playerData[id];
-            if (player.type == 'none') continue;
+            let player = playingData[id];
+            // if (player.type == 'none') continue;
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -450,10 +454,10 @@ function drawLiving () {
     push();
 
     //draw players
-    for (let id in playerData) {
+    for (let id in playingData) {
         if (id != socket.id) {
-            let player = playerData[id];
-            if (player.type == 'none') continue;
+            let player = playingData[id];
+            // if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -474,10 +478,10 @@ function drawLiving () {
     }
 
     //draw healthbar
-    for (let id in playerData) {
+    for (let id in playingData) {
         if (id != socket.id) {
-            let player = playerData[id];
-            if (player.type == 'none') continue;
+            let player = playingData[id];
+            // if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -568,7 +572,7 @@ function drawMainbar (player, prog) {
     pop();
 }
 
-//draw client playerData healthbar
+//draw client player healthbar
 function drawHealthbar (player) {
     push();
     textAlign(CENTER, CENTER);
@@ -605,12 +609,12 @@ function drawMinimap (player) {
     );
 
     //draw other player pips
-    for (let id in playerData) {
+    for (let id in playingData) {
 
-        if (playerData[id].type == 'none') continue;
+        // if (playingData[id].type == 'none') continue;
 
-        if (id != socket.id && playerData[id].health > 0) {
-            let player = playerData[id];
+        if (id != socket.id && playingData[id].health > 0) {
+            let player = playingData[id];
             fill(gameSettings.playerTypes[player.type].colors.light);
             ellipse(
                 (player.x/gameSettings.width)*minimapWidth+minimapOffset.x,
@@ -657,7 +661,9 @@ function drawRoomInfo (color) {
     fill(color);
     text(`Game Code: ${roomId}`, 15, 20);
 
-    text(`Players: ${Object.keys(playerData).length}/${gameSettings.roomCap}`, 15, 60);
+    let playerCount = Object.keys(playingData).length + Object.keys(waitingData).length;
+
+    text(`Players: ${playerCount}/${gameSettings.roomCap}`, 15, 60);
 
     text(`Wave: ${gameData.waveCount}`, 15 ,100);
 
@@ -678,9 +684,14 @@ function drawPlayerInfo () {
     strokeWeight(0);
     textSize(30);
     let counter = 0;
-    for (let id in playerData) {
+
+    let cumulativeData = {};
+    Object.assign(cumulativeData, playingData);
+    Object.assign(cumulativeData, waitingData);
+
+    for (let id in cumulativeData) {
         //draw name and killstreak
-        let player = playerData[id];
+        let player = cumulativeData[id];
         if (player.type != 'none') {
             fill(gameSettings.playerTypes[player.type].colors.dark);
             text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);

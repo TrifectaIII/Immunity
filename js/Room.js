@@ -86,13 +86,13 @@ Room.prototype.update = function () {
 
     //collect return game info for emit to clients in room
     return {
-        player_info: this.players.collect(),
-        shot_info: this.shots.collect(),
-        pickup_info: this.pickups.collect(),
-        enemy_info: this.enemies.collect(),
-        zone_info: this.zones.collect(),
+        playerData: this.players.collect(),
+        shotData: this.shots.collect(),
+        pickupData: this.pickups.collect(),
+        enemyData: this.enemies.collect(),
+        zoneData: this.zones.collect(),
 
-        game_info: {
+        roomData: {
             waveCount: this.waveCount,
             livesCount: this.livesCount,
             gameOver: this.gameOver,

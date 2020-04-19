@@ -6,8 +6,8 @@ var clickInterval;
 //called by moveInterval 
 function directionHandler (socket) {
     if (state == "game" && 
-        socket.id in playerData && 
-        playerData[socket.id].health > 0) {
+        socket.id in playingData && 
+        playingData[socket.id].health > 0) {
             sendDirection(socket);
     }
 }
@@ -15,8 +15,8 @@ function directionHandler (socket) {
 //called by clickInterval 
 function clickHandler (socket) {
     if (state == "game" && 
-        socket.id in playerData && 
-        playerData[socket.id].health > 0) {
+        socket.id in playingData && 
+        playingData[socket.id].health > 0) {
             sendClicking(socket);
     }
 }

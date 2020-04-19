@@ -44,7 +44,7 @@ Enemies.prototype.update = function () {
     if (!this.room.gameOver) {
 
         //get player objects from room
-        let players = this.room.players.objects;
+        let players = this.room.players.playing;
 
         //loop through all enemies
         for (let id in this.objects) {
@@ -55,8 +55,7 @@ Enemies.prototype.update = function () {
             let closestId = 0;
 
             for (let pid in players) {
-                if (players[pid].type != 'none' &&
-                    players[pid].health > 0) {
+                if (players[pid].health > 0) {
                     let thisDistance = Physics.distance(players[pid], enemy);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
@@ -149,7 +148,7 @@ Enemies.prototype.update = function () {
                 }
                 else if (obj.constructor.name == "Socket"){
 
-                    if (obj.type != 'none' &&
+                    if (obj.id in this.room.players.playing &&
                         obj.health > 0) {
                         Physics.collideAndDisplace(
                             enemy, 

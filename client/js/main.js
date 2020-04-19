@@ -94,13 +94,13 @@ function joinGame(menuChoices) {
         //recieve player info from server
         socket.on ('game_update', function (serverData) {
             //save to objects (game.js)
-            gameData = serverData.game_info;
-            playerData = serverData.player_info;
-            shotData = serverData.shot_info;
-            pickupData = serverData.pickup_info;
-            enemyData = serverData.enemy_info;
-            zoneData = serverData.zone_info;
-            tree = serverData.tree_info;
+            gameData = serverData.roomData;
+            playingData = serverData.playerData.playing;
+            waitingData = serverData.playerData.waiting;
+            shotData = serverData.shotData;
+            pickupData = serverData.pickupData;
+            enemyData = serverData.enemyData;
+            zoneData = serverData.zoneData;
         });
     });
 }

@@ -35,7 +35,7 @@ Pickups.prototype.update = function () {
 
     if (!this.room.gameOver) {
     
-        let players = this.room.players.objects;
+        let players = this.room.players.playing;
 
         //loop through all pickups
         for (let id in this.objects) {
@@ -44,9 +44,9 @@ Pickups.prototype.update = function () {
             //find closest alive player
             let closestDistance = Infinity;
             let closestId = 0;
+
             for (let pid in players) {
-                if (players[pid].type != 'none' &&
-                    players[pid].health > 0) {
+                if (players[pid].health > 0) {
                     let thisDistance = Physics.distance(players[pid], pickup);
                     if (thisDistance < closestDistance) {
                         closestDistance = thisDistance;
@@ -95,7 +95,7 @@ Pickups.prototype.spawnPickup = function (x, y) {
 
     //make sure we are under cap
     //cap is pickupMax * number of players
-    if (Object.keys(this.objects).length < this.room.playerCount() * gameSettings.pickupMax) {
+    if (this.count() < this.room.playerCount() * gameSettings.pickupMax) {
 
         //calculate type based on chances
         let typeMax = 0
@@ -136,6 +136,11 @@ Pickups.prototype.collect = function () {
     }
 
     return pickup_info;
+}
+
+//get count of pickups
+Pickups.prototype.count = function () {
+    return Object.keys(this.objects).length;
 }
 
 module.exports = Pickups;
