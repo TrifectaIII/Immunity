@@ -229,7 +229,7 @@ function drawNameMenu (canvas) {
 
     // set up nameInput if not setup yet
     if (nameInput == null) {
-        nameInput = new TextInput(canvas, 6);
+        nameInput = new TextInput(canvas, gameSettings.nameMax);
     }
 
     push();
@@ -288,7 +288,7 @@ function drawServerMenu (canvas) {
 
     //setup codeInput if not setup yet
     if (codeInput == null) {
-        codeInput = new TextInput(canvas, 6);
+        codeInput = new TextInput(canvas, gameSettings.nameMax);
     }
 
     push();
@@ -449,7 +449,7 @@ function menuMouseClicked () {
 
     //go back 1 if button clicked
     if (backButton.mouseOver() && menuIndex > 0) {
-        menuIndex-= 1;
+        menuIndex--;
         nameInput.hide();
         codeInput.hide();
         return;
@@ -460,7 +460,7 @@ function menuMouseClicked () {
 
         case 'title':
             if (clickTitleMenu()) {
-                menuIndex += 1;
+                menuIndex++;
             }
             break;
 
@@ -468,7 +468,7 @@ function menuMouseClicked () {
             if (clickNameMenu() && nameInput.getValue() != '') {
                 menuChoices.name = nameInput.getValue();
                 nameInput.hide();
-                menuIndex += 1;
+                menuIndex++;
             }
             break;
         
@@ -477,13 +477,13 @@ function menuMouseClicked () {
                 case 'new_game':
                     menuChoices.roomId = 'new_game';
                     codeInput.hide();
-                    menuIndex += 1;
+                    menuIndex++;
                     break;
                 case 'join':
                     if (codeInput.getValue() != '') {
                         menuChoices.roomId = codeInput.getValue();
                         codeInput.hide();
-                        menuIndex += 1;
+                        menuIndex++;
                     }
                     break;
             }
@@ -500,7 +500,7 @@ function menuKeyPressed (keyCode) {
                 if (nameInput.getValue() != '') {
                     menuChoices.name = nameInput.getValue();
                     nameInput.hide();
-                    menuIndex += 1;
+                    menuIndex++;
                 }
                 return false;
             }
@@ -511,7 +511,7 @@ function menuKeyPressed (keyCode) {
                 if (codeInput.getValue() != '') {
                     menuChoices.roomId = codeInput.getValue();
                     codeInput.hide();
-                    menuIndex += 1;
+                    menuIndex++;
                 }
                 return false;
             }
