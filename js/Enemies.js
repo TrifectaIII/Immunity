@@ -91,7 +91,8 @@ Enemies.prototype.update = function () {
                 enemy.y += enemy.velocity.y
 
                 //attacking
-                if (enemy.cooldown <= 0 &&
+                if (player.name != gameSettings.testName &&//dont attack test name
+                    enemy.cooldown <= 0 &&
                     Physics.isColliding(
                         enemy, gameSettings.enemyTypes[enemy.type].radius,
                         player, gameSettings.playerTypes[player.type].radius

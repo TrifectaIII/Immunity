@@ -116,7 +116,7 @@ io.sockets.on('connection', function (socket) {
     socket.once ('join_game', function (roomId, name) {
 
         //set name of socket
-        socket.name = name.trim().substring(0,6);
+        socket.name = name.trim().substring(0, gameSettings.nameMax);
 
         //reject socket if room does not exist
         if (!(roomId in Rooms) && roomId != 'new_game') {

@@ -41,15 +41,18 @@ Players.prototype.update = function () {
 
                 //if game not over, wait for respawn time
                 if (!this.room.gameOver) {
+
                     //set to respawn and choose new class
                     setTimeout(function () {
+
                         //ask for new class choice on respawn
                         player.emit('player_died');
 
                         //move player to waiting
                         this.waitPlayer(player);
-
+                        
                     }.bind(this), //bind to object scope
+
                     //respawn time from settings
                     gameSettings.respawnTime);
                 }

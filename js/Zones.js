@@ -103,4 +103,9 @@ Zones.prototype.collect = function () {
     return zone_info;
 }
 
+//get count of zones
+Zones.prototype.count = function () {
+    return Object.keys(this.objects).length;
+}
+
 module.exports = Zones;

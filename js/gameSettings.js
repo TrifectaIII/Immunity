@@ -2,6 +2,12 @@ var gameSettings = {
     //title of game (WIP)
     title: "Immunity",
 
+    //maximum length of player names
+    nameMax: 10,
+
+    //player name for testing
+    testName: "cheater",
+
     //max players per room
     roomCap: 6,
 
