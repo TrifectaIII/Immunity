@@ -70,7 +70,7 @@ Zones.prototype.update = function () {
             zone.radius -= zone.closing;
 
             //delete zone if it gets small
-            if (zone.radius < 20) {
+            if (zone.radius < 30) {
                 delete this.objects[id];
             }
         }
