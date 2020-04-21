@@ -5,7 +5,7 @@ var gameSettings = {
     //maximum length of player names
     nameMax: 10,
 
-    //player name for testing
+    //player name for testing (not case sensitive)
     testName: "cheater",
 
     //max players per room
