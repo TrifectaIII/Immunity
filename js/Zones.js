@@ -29,12 +29,6 @@ function Zones (room) {
 
     //save room that object exists in
     this.room = room;
-
-    this.spawnZone(
-        gameSettings.width/2,
-        gameSettings.height/2, 
-        1000
-    );
 }
 
 //updates all enemies
@@ -77,7 +71,14 @@ Zones.prototype.update = function () {
     }
 }
 
-Zones.prototype.spawnZone = function (x, y, radius) {
+Zones.prototype.spawnZone = function () {
+
+    //get radius from settings
+    let radius = gameSettings.zoneRadius;
+
+    //place at random position still fully within game world
+    let x = Math.floor(Math.random()*((gameSettings.width - 2*radius)+1))+radius;
+    let y = Math.floor(Math.random()*((gameSettings.height - 2*radius)+1))+radius;
 
     //increment id counter and generate id for new object
     let id = 'zone' + (this.idCounter++).toString();

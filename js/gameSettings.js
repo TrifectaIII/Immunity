@@ -1,4 +1,8 @@
 var gameSettings = {
+
+    // GENERAL 
+    /////////////////////////////////////////////////
+
     //title of game (WIP)
     title: "Immunity",
 
@@ -20,6 +24,9 @@ var gameSettings = {
 
     //starting lives for each room
     livesStart: 2,
+
+    // PLAYERS
+    /////////////////////////////////////////////////
 
     // time in MS to respawn players
     respawnTime: 3000,
@@ -124,6 +131,9 @@ var gameSettings = {
         },
     },
 
+    // ENEMIES 
+    /////////////////////////////////////////////////
+
     //number of enemies per player per wave
     enemyMax: 10,
 
@@ -189,6 +199,9 @@ var gameSettings = {
         
     },
 
+    // PICKUPS
+    /////////////////////////////////////////////////
+
     //chance of enemy dropping a pickup (fraction of 1)
     pickupChance: 0.1,
 
@@ -212,6 +225,16 @@ var gameSettings = {
     //health pickup value
     pickupHealthAmount: 5,
 
+    // ZONES
+    /////////////////////////////////////////////////
+
+    //starting radius of zones
+    zoneRadius: 500,
+
+    // OTHER
+    /////////////////////////////////////////////////
+
+    //color palette
     colors: {
         black:"#000000",
         brown:"#AB5236",

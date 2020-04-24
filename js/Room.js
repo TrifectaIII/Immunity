@@ -68,8 +68,10 @@ function Room (roomId) {
 Room.prototype.update = function () {
 
     //spawn new wave if needed
-    if (!this.gameOver && this.enemies.count() <= 0) {
-        this.spawnWave();
+    if (!this.gameOver && 
+        this.enemies.count() <= 0 &&
+        this.zones.count() <= 0) {
+            this.spawnWave();
     }
 
     //update game
@@ -110,11 +112,18 @@ Room.prototype.spawnWave = function () {
     //increase wavecount
     this.waveCount++;
 
-    //number of enemies based on number of players and wave count
+    //spawn number of enemies based on number of players and wave count
     let enemyNum = this.playerCount() * (gameSettings.enemyMax + this.waveCount - 1);
 
     for (let i = 0; i < enemyNum; i++) {
         this.enemies.spawnEnemy();
+    }
+
+    //spawn zones
+    let zoneNum = 3;
+
+    for (let i = 0; i < zoneNum; i++) {
+        this.zones.spawnZone();
     }
 }
 
