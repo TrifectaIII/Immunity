@@ -135,7 +135,7 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //number of enemies per player per wave
-    enemyMax: 10,
+    enemyMax: 5,
 
     //info specific to each enemy type
     enemyTypes: {

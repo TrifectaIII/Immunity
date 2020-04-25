@@ -120,9 +120,8 @@ Room.prototype.spawnWave = function () {
                 this.enemies.spawnEnemy();
             }
 
-            //spawn zones
-            let zoneNum = 3;
-
+            //spawn zones (1 per person, plus 1)
+            let zoneNum = this.players.count() + 1;
             for (let i = 0; i < zoneNum; i++) {
                 this.zones.spawnZone();
             }
