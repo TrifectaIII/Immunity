@@ -16,6 +16,7 @@ function Zone (x, y, radius) {
     this.y = y;
     this.radius = radius;
     this.closing = 0;
+    this.cooldown = gameSettings.zoneCooldown;
 }
 
 // object constructor for pickups container
@@ -39,6 +40,16 @@ Zones.prototype.update = function () {
         //loop through all zones
         for (let id in this.objects) {
             let zone = this.objects[id];
+
+            //lower cooldown
+            zone.cooldown -= gameSettings.tickRate;
+
+            //spawn enemy if cooldown met
+            if (zone.cooldown <= 0) {
+                this.room.enemies.spawnEnemy();
+                //reset cd
+                zone.cooldown = gameSettings.zoneCooldown;
+            }
 
             //assume no player contact
             zone.closing = 0;
