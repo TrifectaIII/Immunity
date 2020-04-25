@@ -255,10 +255,9 @@ function drawPickups() {
             pickup.y-screenOffset.y > -50 &&
             pickup.y-screenOffset.y < windowHeight + 50) {
                 //draw circle
-                ellipse(
+                circle(
                     pickup.x-screenOffset.x,
                     pickup.y-screenOffset.y,
-                    gameSettings.pickupRadius*2,
                     gameSettings.pickupRadius*2,
                 )
                 //health pickups
@@ -316,10 +315,10 @@ function drawShots() {
             shot.y-screenOffset.y < windowHeight) {
                 fill(gameSettings.playerTypes[shot.type].colors.light);
                 stroke(gameSettings.playerTypes[shot.type].colors.dark);
-                ellipse(
+                circle(
                     shot.x-screenOffset.x, 
                     shot.y-screenOffset.y, 
-                    10, 10
+                    10,
                 );
         }
     }
@@ -344,11 +343,10 @@ function drawEnemies() {
                 fill(gameSettings.enemyTypes[enemy.type].colors.dark);
                 stroke(gameSettings.enemyTypes[enemy.type].colors.light);
                 strokeWeight(2);
-                ellipse(
+                circle(
                     enemy.x-screenOffset.x,
                     enemy.y-screenOffset.y,
                     gameSettings.enemyTypes[enemy.type].radius*2,
-                    gameSettings.enemyTypes[enemy.type].radius*2
                 );
         }   
     }
@@ -404,10 +402,10 @@ function drawZones () {
 
         //check if zone is closing
         if (zone.closing > 0) {
-            stroke('green');
+            stroke(gameSettings.colors.green);
         }
         else {
-            stroke('red');
+            stroke(gameSettings.colors.red);
         }
 
         //draw zones
@@ -443,11 +441,10 @@ function drawDead () {
                     fill(fillcolor);
                     stroke(strokecolor);
                     strokeWeight(2);
-                    ellipse(
+                    circle(
                         player.x-screenOffset.x, 
                         player.y-screenOffset.y, 
                         gameSettings.playerTypes[player.type].radius*2 - 1, 
-                        gameSettings.playerTypes[player.type].radius*2 - 1
                     );
             }
         }
@@ -475,11 +472,10 @@ function drawLiving () {
                     fill(gameSettings.playerTypes[player.type].colors.light);
                     stroke(gameSettings.playerTypes[player.type].colors.dark);
                     strokeWeight(2);
-                    ellipse(
+                    circle(
                         player.x-screenOffset.x, 
                         player.y-screenOffset.y, 
                         gameSettings.playerTypes[player.type].radius*2 - 1, 
-                        gameSettings.playerTypes[player.type].radius*2 - 1
                     );
             }
         }
@@ -534,11 +530,10 @@ function drawPlayer (player) {
         fill(gameSettings.playerTypes[player.type].colors.light);
         stroke(gameSettings.playerTypes[player.type].colors.dark);
         strokeWeight(2);
-        ellipse(
+        circle(
             player.x-screenOffset.x, 
             player.y-screenOffset.y, 
             gameSettings.playerTypes[player.type].radius*2 - 1, 
-            gameSettings.playerTypes[player.type].radius*2 - 1
         );
     }
     
@@ -551,11 +546,10 @@ function drawPlayer (player) {
         fill(fillcolor);
         stroke(strokecolor);
         strokeWeight(2);
-        ellipse(
+        circle(
             player.x-screenOffset.x, 
             player.y-screenOffset.y, 
             gameSettings.playerTypes[player.type].radius*2 - 1, 
-            gameSettings.playerTypes[player.type].radius*2 - 1
         );
     }
     pop();
@@ -595,6 +589,7 @@ function drawHealthbar (player) {
 
 //draws minimap, player argument optional
 function drawMinimap (player) {
+
     //settings for the minimap
     let minimapWidth = Math.min(250, Math.max(windowWidth/6, windowHeight/6));
     let minimapHeight = (minimapWidth/gameSettings.width) * gameSettings.height;
@@ -616,43 +611,58 @@ function drawMinimap (player) {
         minimapHeight + minimapOverflow*2
     );
 
+    //draw zones
+    strokeWeight(1);
+    fill(color(50,50,50,50));
+    for (let id in zoneData) {
+        let zone = zoneData[id];
+        if (zone.closing > 0) {
+            stroke(gameSettings.colors.green);
+        }
+        else {
+            stroke(gameSettings.colors.red);
+        }
+        circle(
+            (zone.x/gameSettings.width)*minimapWidth + minimapOffset.x,
+            (zone.y/gameSettings.height)*minimapHeight + minimapOffset.y,
+            zone.radius*2*(minimapWidth/gameSettings.width),
+        );
+    }
+
     //draw other player pips
+    strokeWeight(0);
     for (let id in playingData) {
-
-        // if (playingData[id].type == 'none') continue;
-
         if (id != socket.id && playingData[id].health > 0) {
             let player = playingData[id];
             fill(gameSettings.playerTypes[player.type].colors.light);
-            ellipse(
-                (player.x/gameSettings.width)*minimapWidth+minimapOffset.x,
+            circle(
+                (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
                 (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
-                minimapPipSize, minimapPipSize,
+                minimapPipSize,
             );
         }
     }
 
     //draw enemy pips
+    fill(gameSettings.colors.red);
     for (let id in enemyData) {
         let enemy = enemyData[id];
-        fill(gameSettings.colors.red);
-        ellipse(
-            (enemy.x/gameSettings.width)*minimapWidth+minimapOffset.x,
+        circle(
+            (enemy.x/gameSettings.width)*minimapWidth + minimapOffset.x,
             (enemy.y/gameSettings.height)*minimapHeight + minimapOffset.y,
-            minimapPipSize, minimapPipSize,
+            minimapPipSize,
         );
     }
 
     //draw client player pip with outline indicator + larger
     if (player != null) {
-
         strokeWeight(2);
         stroke(gameSettings.colors.white);
         fill(gameSettings.playerTypes[player.type].colors.light);
-        ellipse(
+        circle(
             (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
             (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
-            minimapPipSize*1.25, minimapPipSize*1.25,
+            minimapPipSize*1.25,
         );
     }
     
@@ -802,7 +812,7 @@ function drawCrosshair (color) {
     stroke(color);
     strokeWeight(2);
     fill(0,0);
-    ellipse(mouseX, mouseY, 30, 30);
+    circle(mouseX, mouseY, 30);
     line(mouseX+20, mouseY, mouseX-20, mouseY);
     line(mouseX, mouseY+20, mouseX, mouseY-20);
     pop();

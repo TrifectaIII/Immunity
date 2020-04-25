@@ -63,11 +63,10 @@ Zones.prototype.update = function () {
                         zone,
                         zone.radius,
                         player,
-                        0,//only care about center of player
+                        gameSettings.playerTypes[player.type].radius,
                     )) {
-
-                        //add one to closing count
-                        zone.closing++;
+                            //add one to closing count
+                            zone.closing++;
                 }
             }
 
