@@ -83,8 +83,12 @@ Zones.prototype.update = function () {
 
 Zones.prototype.spawnZone = function () {
 
-    //get radius from settings
-    let radius = gameSettings.zoneRadius;
+    //get radius from settings, plus 10 for each wave
+    let radius = Math.min(
+        gameSettings.zoneRadius + (this.room.waveCount-1)*10,
+        //capped at settings max
+        gameSettings.zoneRadiusMax,
+    );
 
     //place at random position still fully within game world
     let x = Math.floor(Math.random()*((gameSettings.width - 2*radius)+1))+radius;

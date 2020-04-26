@@ -231,8 +231,11 @@ var gameSettings = {
     //starting radius of zones
     zoneRadius: 500,
 
+    //maximum radius of zones
+    zoneRadiusMax: 1000,
+
     //cooldown on zones spawning enemies (ms)
-    zoneCooldown: 2000,
+    zoneCooldown: 2500,
 
     // OTHER
     /////////////////////////////////////////////////
