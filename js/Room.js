@@ -107,7 +107,7 @@ Room.prototype.spawnWave = function () {
 
     //check the old wave is gone
     if (!this.gameOver && 
-        this.enemies.count() <= 0 &&
+        // this.enemies.count() <= 0 &&
         this.zones.count() <= 0) {
 
             //increase wavecount
