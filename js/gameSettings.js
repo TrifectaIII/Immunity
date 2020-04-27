@@ -234,6 +234,12 @@ var gameSettings = {
     //maximum radius of zones
     zoneRadiusMax: 1000,
 
+    //rate of closing, per player in zone
+    zoneCloseRate: 1,
+
+    //rate of zone growing when no player in zone
+    zoneGrowRate: 0.25,
+
     //cooldown on zones spawning enemies (ms)
     zoneCooldown: 2500,
 

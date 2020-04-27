@@ -11,10 +11,14 @@ const Physics = require(__dirname + '/Physics.js');
 
 
 //object constructor for individual pickup
-function Zone (x, y, radius) {
+function Zone (x, y, startRadius) {
     this.x = x;
     this.y = y;
-    this.radius = radius;
+
+    //current and maximum radius
+    this.radius = startRadius;
+    this.maxRadius = startRadius;
+
     this.closing = 0;
     this.cooldown = gameSettings.zoneCooldown;
 }
@@ -70,8 +74,17 @@ Zones.prototype.update = function () {
                 }
             }
 
-            //shrink zone if it is closing
-            zone.radius -= zone.closing;
+            //close zone if players inside it
+            if (zone.closing > 0) {
+                zone.radius -= zone.closing*gameSettings.zoneCloseRate;
+            }
+            //other wise grow, up to maximum
+            else {
+                zone.radius = Math.min(
+                    zone.maxRadius, 
+                    zone.radius + gameSettings.zoneGrowRate,
+                );
+            }
 
             //delete zone if it gets small
             if (zone.radius < 30) {
@@ -84,21 +97,21 @@ Zones.prototype.update = function () {
 Zones.prototype.spawnZone = function () {
 
     //get radius from settings, plus 10 for each wave
-    let radius = Math.min(
+    let startRadius = Math.min(
         gameSettings.zoneRadius + (this.room.waveCount-1)*10,
         //capped at settings max
         gameSettings.zoneRadiusMax,
     );
 
     //place at random position still fully within game world
-    let x = Math.floor(Math.random()*((gameSettings.width - 2*radius)+1))+radius;
-    let y = Math.floor(Math.random()*((gameSettings.height - 2*radius)+1))+radius;
+    let x = Math.floor(Math.random()*((gameSettings.width - 2*startRadius)+1))+startRadius;
+    let y = Math.floor(Math.random()*((gameSettings.height - 2*startRadius)+1))+startRadius;
 
     //increment id counter and generate id for new object
     let id = 'zone' + (this.idCounter++).toString();
 
     //create new object
-    this.objects[id] = new Zone (x, y, radius);
+    this.objects[id] = new Zone (x, y, startRadius);
 }
 
 //collect info to send to clients
