@@ -98,7 +98,7 @@ Zones.prototype.spawnZone = function () {
 
     //get radius from settings, plus 10 for each wave
     let startRadius = Math.min(
-        gameSettings.zoneRadius + (this.room.waveCount-1)*10,
+        gameSettings.zoneRadiusStart + (this.room.waveCount-1) * gameSettings.zoneRadiusScale,
         //capped at settings max
         gameSettings.zoneRadiusMax,
     );

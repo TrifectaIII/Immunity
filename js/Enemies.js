@@ -214,7 +214,7 @@ Enemies.prototype.spawnEnemy = function () {
 Enemies.prototype.killEnemy = function (id) {
     let enemy = this.objects[id];
 
-    if (Math.random() < gameSettings.pickupChance) {
+    if (Math.random() < gameSettings.pickupDropChance) {
         this.room.pickups.spawnPickup(enemy.x, enemy.y);
     }
 

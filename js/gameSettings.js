@@ -134,8 +134,11 @@ var gameSettings = {
     // ENEMIES 
     /////////////////////////////////////////////////
 
-    //number of enemies per player per wave
-    enemyMax: 5,
+    //number of enemies per player per wave at start
+    enemyCountStart: 5,
+
+    //how many additional enemies per player each wave
+    enemyCountScale: 1,
 
     //info specific to each enemy type
     enemyTypes: {
@@ -203,7 +206,7 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //chance of enemy dropping a pickup (fraction of 1)
-    pickupChance: 0.1,
+    pickupDropChance: 0.1,
 
     //max pickups in the world at a time, per player
     pickupMax: 3,
@@ -228,8 +231,14 @@ var gameSettings = {
     // ZONES
     /////////////////////////////////////////////////
 
+    //number of zones per wave per person
+    zoneCount: 1,
+
     //starting radius of zones
-    zoneRadius: 500,
+    zoneRadiusStart: 500,
+
+    //how much zones grow each wave
+    zoneRadiusScale: 10,
 
     //maximum radius of zones
     zoneRadiusMax: 1000,

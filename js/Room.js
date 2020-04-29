@@ -114,13 +114,17 @@ Room.prototype.spawnWave = function () {
             this.waveCount++;
 
             //spawn number of enemies based on number of players and wave count
-            let enemyNum = this.playerCount() * (gameSettings.enemyMax + this.waveCount - 1);
+            let enemyNum = this.playerCount() * (
+                gameSettings.enemyCountStart + 
+                (this.waveCount - 1) * 
+                gameSettings.enemyCountScale
+            );
             for (let i = 0; i < enemyNum; i++) {
                 this.enemies.spawnEnemy();
             }
 
-            //spawn zones (1 per person)
-            let zoneNum = this.playerCount();
+            //spawn zones based on player count
+            let zoneNum = this.playerCount() * gameSettings.zoneCount;
             for (let i = 0; i < zoneNum; i++) {
                 this.zones.spawnZone();
             }
