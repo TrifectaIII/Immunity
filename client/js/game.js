@@ -602,7 +602,8 @@ function drawMinimap (player) {
 
     push();
     //draw minimap background
-    strokeWeight(0);
+    strokeWeight(2);
+    stroke('black');
     fill(0, 150);
     rect(
         minimapOffset.x - minimapOverflow,
