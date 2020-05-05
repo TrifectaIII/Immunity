@@ -44,23 +44,16 @@ Players.prototype.update = function () {
 
                     //set to respawn and choose new class
                     setTimeout(function () {
-
-                        //ask for new class choice on respawn
-                        player.emit('player_died');
-
                         //move player to waiting
                         this.waitPlayer(player);
-                        
                     }.bind(this), //bind to object scope
 
                     //respawn time from settings
                     gameSettings.respawnTime);
                 }
 
-                //if game over, do it automatically
+                //if game over, do it now
                 else {
-                    player.emit('player_died');
-
                     //move player to waiting
                     this.waitPlayer(player);
                 }
@@ -326,9 +319,6 @@ Players.prototype.add = function (player) {
 
                 //move to playing object
                 this.playPlayer(player);
-
-                //tell player he is spawned
-                player.emit('player_spawned');
         }
     }.bind(this));//bind to scope
 

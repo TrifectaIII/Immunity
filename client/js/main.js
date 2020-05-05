@@ -77,19 +77,8 @@ function joinGame(menuChoices) {
         //remove error message if shown
         errors.hideError();
 
-        //ask player to choose a class
-        inGameMenuState = 'dead';
-        state = 'ingamemenu';
-
-        //ask player again whenever server requests
-        socket.on('player_died', function () {
-            inGameMenuState = 'dead';
-            state = 'ingamemenu';
-        });
-
-        socket.on('player_spawned', function () {
-            state = 'game';
-        });
+        //change state
+        state = 'game';
 
         //recieve player info from server
         socket.on ('game_update', function (serverData) {
@@ -156,12 +145,10 @@ function draw () {
         //draw game (game.js)
         case 'game':
             drawGame();
-            break;
-
-        //draw in game menus over game (ingamemenu.js)
-        case 'ingamemenu':
-            drawGame();
-            drawInGameMenus();
+            //draw death menu when dead
+            if (socket.id in waitingData) {
+                drawDeathMenus();
+            }
             break;
     }
 
@@ -178,22 +165,22 @@ function mouseClicked () {
             menuMouseClicked(); //(menu.js)
             break;
 
-        case 'ingamemenu':
-            inGameMenuMouseClicked(socket);//(ingamemenu.js)
-            break;
+        case 'game':
+            //listen for clicks when player is dead
+            if (socket.id in waitingData) {
+                deathMenuMouseClicked(socket);
+            }
     }
 
 }
 
 //look for enter presses on menus
 function keyPressed () {
+
     switch (state) {
 
         case 'menu':
             menuKeyPressed(keyCode); //(menu.js)
             break;
-
-        // case 'ingamemenu':
-        //     break;
     }
 }

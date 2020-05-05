@@ -129,28 +129,22 @@ function clickGameOverMenu() {
 // In Game Menu State Machine
 //////////////////////////////////////////////////////////////////////////////
 
-var inGameMenuState;//can be 'dead'
-
 //draw in game menus
-function drawInGameMenus () {
+function drawDeathMenus () {
     //darken game screen
     background(0, 200);
 
-    switch (inGameMenuState) {
-        case 'dead':
-            //if game is over
-            if (gameData.gameOver) {
-                drawGameOverMenu();
-            }
-            //if lives left, select new class
-            else if (gameData.livesCount > 0) {
-                drawClassMenu();
-            }
-            //if no lives left
-            else {
-                drawNoLivesMenu();
-            }
-            break;
+    //if game is over
+    if (gameData.gameOver) {
+        drawGameOverMenu();
+    }
+    //if lives left, select new class
+    else if (gameData.livesCount > 0) {
+        drawClassMenu();
+    }
+    //if no lives left
+    else {
+        drawNoLivesMenu();
     }
 
     drawExitGameButton();
@@ -158,25 +152,20 @@ function drawInGameMenus () {
     drawMenuCrosshair();
 }
 
-function inGameMenuMouseClicked (socket) {
+function deathMenuMouseClicked (socket) {
     if(exitGameButton.mouseOver()) {
         errors.displayError('Left Game', 5000);
         restartMenus();
         socket.close();
         return;
     }
-
-    switch (inGameMenuState) {
-        case 'dead':
-            if (gameData.gameOver) {
-                if (clickGameOverMenu()) {
-                    socket.emit('restart_game');
-                }
-            }
-            else if (gameData.livesCount > 0 &&
-                clickClassMenu()) {
-                    socket.emit('class_choice', clickClassMenu());
-            }
-            break;
+    if (gameData.gameOver) {
+        if (clickGameOverMenu()) {
+            socket.emit('restart_game');
+        }
+    }
+    else if (gameData.livesCount > 0 &&
+            clickClassMenu()) {
+                socket.emit('class_choice', clickClassMenu());
     }
 }
