@@ -126,10 +126,10 @@ function clickGameOverMenu() {
     return restartButton.mouseOver();
 }
 
-// In Game Menu State Machine
+// Death Menu Functions
 //////////////////////////////////////////////////////////////////////////////
 
-//draw in game menus
+//draw death menus
 function drawDeathMenus () {
     //darken game screen
     background(0, 200);
