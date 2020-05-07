@@ -1,0 +1,17 @@
+/* settings menu */
+
+.settings {
+    position:fixed;
+    right: 0;
+    top: 0;
+    width:33%;
+    z-index: 1;
+    height:100%;
+    border-left: 4px solid black;
+
+    background-color:var(--p8-grey);
+
+    text-align:center;
+
+    font-family: 'Aldrich', sans-serif;
+}

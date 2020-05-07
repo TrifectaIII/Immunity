@@ -13,7 +13,8 @@
         <link rel="manifest" href="client/icons/site.webmanifest">
 
         <!-- load css file -->
-        <link href="/client/style.css" rel="stylesheet" type="text/css"/>
+        <link href="/client/main.css" rel="stylesheet" type="text/css"/>
+        <link href="/client/settings.css" rel="stylesheet" type="text/css"/>
 
         <!-- socket io exposed by server -->
         <script src="/socket.io/socket.io.js"></script>
@@ -26,12 +27,18 @@
         <!-- div to hold game -->
         <div id='canvas-hold'></div>
 
+        <div class='settings'>
+            
+            <h1>Settings</h1>
+
+        </div>
+
         <!-- load js files -->
         <script src="/js/gameSettings.js"></script>
         <script src="/client/js/errors.js"></script>
         <script src="/client/js/menu.js"></script>
         <script src="/client/js/deathmenu.js"></script>
-        <script src="/client/js/settingsmenu.js"></script>
+        <script src="/client/js/settings.js"></script>
         <script src="/client/js/movement.js"></script>
         <script src="/client/js/shoot.js"></script>
         <script src="/client/js/controls.js"></script>

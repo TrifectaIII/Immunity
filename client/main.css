@@ -25,6 +25,7 @@ html, body {
     height:100%; 
     margin:0; 
     padding:0; 
+    box-sizing: border-box;
 } 
 
 canvas {
@@ -43,13 +44,12 @@ canvas {
 }
 
 .gameInput {
-    box-sizing:border-box;
+    box-sizing: border-box;
     border: 5px solid black;
     outline: none;
     font-size: 35px;
     font-family: 'Aldrich', sans-serif;
-    text-align:center;
-    padding:0px;
-    margin:0px;
+    text-align: center;
+    padding: 0px;
+    margin: 0px;
 }
-
