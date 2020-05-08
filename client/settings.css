@@ -1,12 +1,13 @@
 /* settings menu */
 
 .settings {
+    z-index: 1;
     position:fixed;
     right: 0;
     top: 0;
-    width:33%;
-    z-index: 1;
-    height:100%;
+    max-width: 100%;
+    width: 400px;
+    height: 100%;
     border-left: 4px solid black;
 
     background-color:var(--p8-grey);
@@ -14,4 +15,31 @@
     text-align:center;
 
     font-family: 'Aldrich', sans-serif;
+}
+
+.settings hr {
+    border-style: solid;
+    border-color: black;
+    width: 80%;
+}
+
+/* close button */
+.settings .settingsClose {
+    border-right: 4px solid black;
+    border-bottom: 4px solid black;
+    border-top: 0px solid black;
+    border-left: 0px solid black;
+    border-radius: 0px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 45px;
+    height:40px;
+    font-size: 25px;
+    font-weight: 700;
+    background-color:var(--p8-white);
+}
+
+.settings .settingsClose:hover {
+    background-color: var(--p8-pink);
 }
