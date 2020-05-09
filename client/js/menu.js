@@ -522,8 +522,16 @@ function menuKeyPressed (keyCode) {
 
 //resets state to first menu
 function restartMenus () {
+
     //change global state to menu
     state = 'menu';
+
+    //reset menus
+    nameInput.hide();
+    codeInput.hide();
+
+    //return to first menu
+    menuIndex = 0;
 
     //remove game code input contents
     codeInput.clear();

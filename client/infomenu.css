@@ -1,6 +1,6 @@
-/* settings menu */
+/* info menu */
 
-.settings {
+.infomenu {
     z-index: 1;
     position:fixed;
     right: 0;
@@ -17,14 +17,14 @@
     font-family: 'Aldrich', sans-serif;
 }
 
-.settings hr {
+.infomenu hr {
     border-style: solid;
     border-color: black;
     width: 80%;
 }
 
 /* close button */
-.settings .settingsClose {
+.infomenu .infomenu-close {
     border-right: 4px solid black;
     border-bottom: 4px solid black;
     border-top: 0px solid black;
@@ -40,6 +40,20 @@
     background-color:var(--p8-white);
 }
 
-.settings .settingsClose:hover {
+.infomenu .infomenu-close:hover {
+    background-color: var(--p8-pink);
+}
+
+/* exit game button */
+.infomenu .infomenu-exit {
+    border: 4px solid black;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    font-size: 25px;
+    font-weight: 700;
+    background-color:var(--p8-white);
+}
+
+.infomenu .infomenu-exit:hover {
     background-color: var(--p8-pink);
 }

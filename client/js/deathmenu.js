@@ -164,8 +164,9 @@ function deathMenuMouseClicked (socket) {
             socket.emit('restart_game');
         }
     }
-    else if (gameData.livesCount > 0 &&
-            clickClassMenu()) {
-                socket.emit('class_choice', clickClassMenu());
+    else if (
+        gameData.livesCount > 0 &&
+        clickClassMenu()) {
+            socket.emit('class_choice', clickClassMenu());
     }
 }

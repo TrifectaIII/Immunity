@@ -14,7 +14,7 @@
 
         <!-- load css file -->
         <link href="/client/main.css" rel="stylesheet" type="text/css"/>
-        <link href="/client/settings.css" rel="stylesheet" type="text/css"/>
+        <link href="/client/infomenu.css" rel="stylesheet" type="text/css"/>
 
         <!-- socket io exposed by server -->
         <script src="/socket.io/socket.io.js"></script>
@@ -27,13 +27,19 @@
         <!-- div to hold game -->
         <div id='canvas-hold'></div>
 
-        <div class='settings'>
+        <div class='infomenu'>
 
             <!-- button to close settings -->
-            <button class='settingsClose'>X</button>
+            <button class='infomenu-close'>X</button>
             
             <h1>Info</h1>
+
             <hr>
+
+            <button class='infomenu-exit'>EXIT GAME</button>
+
+            <hr>
+
             <h2>Controls</h2>
             <p>Move - WASD</p>
             <p>Shoot - Click</p>
@@ -45,11 +51,11 @@
         <script src="/client/js/errors.js"></script>
         <script src="/client/js/menu.js"></script>
         <script src="/client/js/deathmenu.js"></script>
-        <script src="/client/js/settings.js"></script>
         <script src="/client/js/movement.js"></script>
         <script src="/client/js/shoot.js"></script>
         <script src="/client/js/controls.js"></script>
         <script src="/client/js/game.js"></script>
         <script src="/client/js/main.js"></script>
+        <script src="/client/js/infomenu.js"></script>
     </body>
 </html>
