@@ -427,7 +427,6 @@ function drawDead () {
     for (let id in playingData) {
         if (id != socket.id) {
             let player = playingData[id];
-            // if (player.type == 'none') continue;
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -462,7 +461,6 @@ function drawLiving () {
     for (let id in playingData) {
         if (id != socket.id) {
             let player = playingData[id];
-            // if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -485,7 +483,6 @@ function drawLiving () {
     for (let id in playingData) {
         if (id != socket.id) {
             let player = playingData[id];
-            // if (player.type == 'none') continue;
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -494,9 +491,9 @@ function drawLiving () {
                     let x_offset = 15
                     let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
                     let y_offset = y_offset_abs;
-                    if (player.y-screenOffset.y > windowHeight - 50) {
-                        y_offset = -y_offset_abs;
-                    }
+                    // if (player.y-screenOffset.y > windowHeight - 50) {
+                    //     y_offset = -y_offset_abs;
+                    // }
                     stroke(gameSettings.playerTypes[player.type].colors.dark);
                     strokeWeight(2);
                     fill('black');
@@ -514,6 +511,34 @@ function drawLiving () {
                         x_offset*2*(player.health/gameSettings.playerTypes[player.type].maxHealth), 
                         5*(y_offset/y_offset_abs),
                     );
+            }
+        }
+    }
+
+    //draw names
+    strokeWeight(2);
+    stroke('black');
+    textAlign(CENTER, BOTTOM);
+    textSize(22);
+    for (let id in playingData) {
+        if (id != socket.id) {
+            let player = playingData[id];
+            if (player.health > 0 &&
+                player.x-screenOffset.x > -50 &&
+                player.x-screenOffset.x < windowWidth + 50 &&
+                player.y-screenOffset.y > -50 &&
+                player.y-screenOffset.y < windowHeight + 50) {
+
+                    let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
+                    let y_offset = -y_offset_abs;
+                    
+                    fill(gameSettings.playerTypes[player.type].colors.light);
+
+                    text(
+                        player.name, 
+                        player.x-screenOffset.x,
+                        player.y-screenOffset.y+y_offset,
+                    )
             }
         }
     }

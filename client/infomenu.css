@@ -38,6 +38,7 @@
     font-size: 25px;
     font-weight: 700;
     background-color:var(--p8-white);
+    font-family: 'Aldrich', sans-serif;
 }
 
 .infomenu .infomenu-close:hover {
@@ -52,6 +53,7 @@
     font-size: 25px;
     font-weight: 700;
     background-color:var(--p8-white);
+    font-family: 'Aldrich', sans-serif;
 }
 
 .infomenu .infomenu-exit:hover {
