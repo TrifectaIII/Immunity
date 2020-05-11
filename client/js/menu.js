@@ -130,7 +130,7 @@ TextInput.prototype.showAt = function (x, y, w, h) {
     this.element.size(w,h);
     this.element.position(
         this.canvas.position().x + x - w/2,
-        this.canvas.position().y + y - h/2
+        window.pageYOffset + this.canvas.position().y + y - h/2
     )
     this.element.show();
 }
