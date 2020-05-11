@@ -2,12 +2,12 @@
 
 .infomenu {
     z-index: 1;
-    position:absolute;
-    right: 0;
-    top: 0;
+    position:fixed;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
     max-width: 100%;
     width: 400px;
-    min-height: 100%;
     border-left: 4px solid black;
 
     background-color:var(--p8-grey);
@@ -15,6 +15,11 @@
     text-align:center;
 
     font-family: 'Aldrich', sans-serif;
+}
+
+.infomenu .infomenu-inner {
+    overflow-y: auto;
+    height: 100%;
 }
 
 .infomenu hr {
