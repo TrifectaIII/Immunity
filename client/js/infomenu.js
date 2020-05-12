@@ -17,9 +17,6 @@ var infomenu = {
                 this.div.style.display = 'none';
         }
     },
-    
-    //button for toggle
-    toggleButton: '/',
 }
 
 //default is hidden
@@ -27,7 +24,7 @@ infomenu.div.style.display = 'none';
 
 //toggle display of infomenu when button pressed
 window.addEventListener('keypress', function (event) {
-    if (event.keyCode == infomenu.toggleButton.charCodeAt(0)) {
+    if (event.keyCode == gameSettings.menuToggleButton.charCodeAt(0)) {
         infomenu.toggle();
     }
 });

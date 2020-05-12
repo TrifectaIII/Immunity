@@ -198,11 +198,18 @@ function drawTitleMenu () {
     textSize(100);
     text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
 
-    //draw credits
+    //draw controls
     strokeWeight(2);
     fill('black');
     textSize(40);
     text("WASD to Move\nClick to Shoot", windowWidth/2, windowHeight/2);
+
+    //draw menu hint
+    textSize(35);
+    text(
+        "Press " + gameSettings.menuToggleButton + " to open the info menu at any time.",
+        windowWidth/2, 30,
+    );
 
     pop();
 }
