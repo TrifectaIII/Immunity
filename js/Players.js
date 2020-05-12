@@ -407,4 +407,14 @@ Players.prototype.count = function () {
     return Object.keys(this.objects).length;
 }
 
+//counts players currently in room & playing
+Players.prototype.playingCount = function () {
+    return Object.keys(this.playing).length;
+}
+
+//counts players currently in room & waiting
+Players.prototype.waitingCount = function () {
+    return Object.keys(this.waiting).length;
+}
+
 module.exports = Players;

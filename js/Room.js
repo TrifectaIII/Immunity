@@ -67,17 +67,24 @@ function Room (roomId) {
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
-    //spawn new wave if needed
-    this.spawnWave();
-
-    //update game
+    //update players always
     this.players.update();
-    this.shots.update();
-    this.enemies.update();
-    this.pickups.update();
-    this.zones.update();
-    this.update_Quadtree();
 
+    //only update game if active
+    if (!this.gameOver && 
+        this.players.playingCount() > 0) {
+
+            //spawn new wave if needed
+            this.spawnWave();
+
+            //update
+            this.shots.update();
+            this.enemies.update();
+            this.pickups.update();
+            this.zones.update();
+            this.update_Quadtree();
+    }
+    
 
     //if no lives and all players dead, game is over
     this.gameOver = this.players.allDead() && this.livesCount <= 0;
@@ -170,6 +177,7 @@ Room.prototype.reset = function () {
         this.enemies = new Enemies(this);
         this.shots = new Shots(this);
         this.pickups = new Pickups(this);
+        this.zones = new Zones(this);
 
         //reset attributes
         this.waveCount = 0;
@@ -199,6 +207,7 @@ Room.prototype.get_AllObj = function(){
         ...Object.values(this.enemies.objects), 
         ...Object.values(this.players.objects),
         ...Object.values(this.shots.objects),
+        ...Object.values(this.zones.objects),
     ]; 
 }
 
@@ -210,8 +219,6 @@ Room.prototype.update_Quadtree = function (){
     for (let i in objs){
         this.Quadtree.insert(objs[i]);
     }
-
-
 }
 
 
