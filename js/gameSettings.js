@@ -140,6 +140,9 @@ var gameSettings = {
     //how many additional enemies per player each wave
     enemyCountScale: 1,
 
+    //chance of a mono-wave (wave with only 1 enemy type)
+    enemyMonoChance: 1/3,
+
     //info specific to each enemy type
     enemyTypes: {
 

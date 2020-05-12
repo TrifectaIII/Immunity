@@ -96,6 +96,7 @@ Zones.prototype.update = function () {
     }
 }
 
+//create a zone
 Zones.prototype.spawnZone = function () {
 
     //get radius from settings, plus 10 for each wave

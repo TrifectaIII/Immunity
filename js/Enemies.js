@@ -171,8 +171,17 @@ Enemies.prototype.update = function () {
 // spawn an individual enemy in
 Enemies.prototype.spawnEnemy = function () {
 
-    //pick randoim type for this enemy
-    let type = Object.keys(gameSettings.enemyTypes)[Math.floor(Math.random()*Object.keys(gameSettings.enemyTypes).length)];
+    var type;
+    //if mono wave, choose that type
+    if (this.room.waveType in gameSettings.enemyTypes) {
+        type = this.room.waveType;
+    }
+    //otherwise choose randomly
+    else {
+        //pick random type for this enemy
+        type = Object.keys(gameSettings.enemyTypes)[Math.floor(Math.random()*Object.keys(gameSettings.enemyTypes).length)];
+    }
+    
 
     //determine side that enemy will spawn on
     let side = Math.floor(Math.random()*4);

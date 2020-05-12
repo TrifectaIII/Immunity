@@ -49,6 +49,9 @@ function Room (roomId) {
     //counts each enemy wave
     this.waveCount = 0;
 
+    //type of current wave
+    this.waveType = 'random';
+
     //how many lives the players have
     this.livesCount = gameSettings.livesStart;
 
@@ -119,6 +122,15 @@ Room.prototype.spawnWave = function () {
 
             //increase wavecount
             this.waveCount++;
+
+            //roll for mono wave chance
+            if (Math.random() > gameSettings.enemyMonoChance) {
+                this.waveType = 'random';
+            }
+            else {
+                let typeList = Object.keys(gameSettings.enemyTypes);
+                this.waveType = typeList[Math.floor(Math.random()*typeList.length)];
+            }
 
             //spawn number of enemies based on number of players and wave count
             let enemyNum = this.playerCount() * (
