@@ -560,6 +560,22 @@ function drawPlayer (player) {
             player.y-screenOffset.y, 
             gameSettings.playerTypes[player.type].radius*2 - 1, 
         );
+
+        //draw name
+        stroke('black');
+        textAlign(CENTER, BOTTOM);
+        textSize(22);
+        
+        let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
+        let y_offset = -y_offset_abs;
+        
+        fill(gameSettings.playerTypes[player.type].colors.light);
+
+        text(
+            player.name, 
+            player.x-screenOffset.x,
+            player.y-screenOffset.y+y_offset,
+        )
     }
     
     //draw player as transparent if dead
@@ -577,7 +593,6 @@ function drawPlayer (player) {
             gameSettings.playerTypes[player.type].radius*2 - 1, 
         );
     }
-    pop();
 }
 
 //draws the main bar at bottom of the screen
