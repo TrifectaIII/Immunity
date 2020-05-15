@@ -48,7 +48,22 @@ EnemyShots.prototype.update = function () {
             let destroyed = false;
 
             // check for collisions with players
+            for (let id in this.room.players.playing) {
+                let player = this.room.players.playing[id];
 
+                if (Physics.isColliding(
+                        player, gameSettings.playerdTypes[player.type].radius, 
+                        enemyshot, 0 //enemy shots have no radius
+                    )) {
+                        destroyed = true;
+
+                        //do damage to player
+                        player.health -= gameSettings.enemyTypes[enemyshot.type].shots.damage;
+
+                        //if player died, do not allow negative life
+                        player.health = Math.max(player.health, 0);
+                }
+            }
 
             //remove range based on velocity
             enemyshot.range -= gameSettings.enemyTypes[enemyshot.type].shots.velocity;
@@ -66,7 +81,7 @@ EnemyShots.prototype.update = function () {
 
 
 //create a new enemy shot
-EnemyShots.prototype.spawnShot = function (enemy, direction) {
+EnemyShots.prototype.spawnShot = function (enemy, destX, destY) {
 
     //each class shoots differently
     let classShots = gameSettings.enemyTypes[enemy.type].shots;
@@ -74,8 +89,11 @@ EnemyShots.prototype.spawnShot = function (enemy, direction) {
     //single-shot classes
     if (classShots.count <= 1) {
         
-        //calculate velocity based on direction
-        let velocity = 
+        //calculate velocity based on player location and shot speed
+        let velocity = Physics.componentVector(
+            Physics.angleBetween(enemy.x, enemy.y, destX, destY), 
+            classShots.velocity
+        );
 
         //use id counter as id, then increase
         let id = 'enemyshot' + (this.idCounter++).toString();
@@ -88,8 +106,16 @@ EnemyShots.prototype.spawnShot = function (enemy, direction) {
     else {
         for (let i = 0; i < classShots.count; i++) {
 
-            //calculate velocity based on direction and spread
-            let velocity = 
+            //calculate velocity based on player location, shot speed and spread
+            let velocity = Physics.componentVector(
+                Physics.angleBetween(
+                    enemy.x, enemy.y, 
+                    destX, destY
+                ) 
+                + (i - classShots.count/2 + 0.5) 
+                * (classShots.angle/(classShots.count-1)),
+                classShots.velocity
+            );
 
             //use id counter as id, then increase
             let id = 'enemyshot' + (this.idCounter++).toString();
