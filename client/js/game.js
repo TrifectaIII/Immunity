@@ -536,7 +536,6 @@ function drawLiving () {
 
     //draw names
     strokeWeight(2);
-    stroke('black');
     textAlign(CENTER, BOTTOM);
     textSize(22);
     for (let id in playingData) {
@@ -552,6 +551,7 @@ function drawLiving () {
                     let y_offset = -y_offset_abs;
                     
                     fill(gameSettings.playerTypes[player.type].colors.light);
+                    stroke(gameSettings.playerTypes[player.type].colors.dark);
 
                     text(
                         player.name, 
@@ -581,7 +581,6 @@ function drawPlayer (player) {
         );
 
         //draw name
-        stroke('black');
         textAlign(CENTER, BOTTOM);
         textSize(22);
         
@@ -589,6 +588,7 @@ function drawPlayer (player) {
         let y_offset = -y_offset_abs;
         
         fill(gameSettings.playerTypes[player.type].colors.light);
+        stroke(gameSettings.playerTypes[player.type].colors.dark);
 
         text(
             player.name, 
