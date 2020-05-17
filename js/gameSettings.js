@@ -202,6 +202,25 @@ var gameSettings = {
             },
         },
 
+        boxer: {
+
+            radius: 30,
+            maxHealth: 20,
+            acceleration: 1,
+            maxVelocity: 6,
+            mass: 20,
+
+            attack: {
+                cooldown: 500,
+                damage: 2,
+            },
+
+            colors: {
+                dark: "#000000",
+                light: "#FFEC27",
+            },
+        },
+
         scout: {
 
             radius: 20,
@@ -235,7 +254,7 @@ var gameSettings = {
     //radius of pickup objects
     pickupRadius: 18,
 
-    //different types of pickups
+    //different types of pickups & relative drop chance
     pickupTypes: {
         health: {
             chance: 95,
