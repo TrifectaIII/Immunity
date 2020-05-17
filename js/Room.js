@@ -16,6 +16,7 @@ const Physics = require(__dirname + '/Physics.js');
 const Players = require(__dirname + '/Players.js');
 const Shots = require(__dirname + '/Shots.js');
 const Enemies = require(__dirname + '/Enemies.js');
+const EnemyShots = require(__dirname + '/EnemyShots.js');
 const Pickups = require(__dirname + '/Pickups.js');
 const Zones = require(__dirname + '/Zones.js');
 
@@ -39,8 +40,9 @@ function Room (roomId) {
     //objects to hold each type of game object
     this.players = new Players(this);
     this.shots = new Shots(this);
-    this.pickups = new Pickups(this);
     this.enemies = new Enemies(this);
+    this.enemyShots = new EnemyShots(this);
+    this.pickups = new Pickups(this);
     this.zones = new Zones(this);
 
     //create a Quad tree covering the game world with capacity of each node at 4
@@ -83,6 +85,7 @@ Room.prototype.update = function () {
             //update
             this.shots.update();
             this.enemies.update();
+            this.enemyShots.update();
             this.pickups.update();
             this.zones.update();
             this.update_Quadtree();
@@ -96,8 +99,9 @@ Room.prototype.update = function () {
     return {
         playerData: this.players.collect(),
         shotData: this.shots.collect(),
-        pickupData: this.pickups.collect(),
         enemyData: this.enemies.collect(),
+        enemyShotData: this.enemyShots.collect(),
+        pickupData: this.pickups.collect(),
         zoneData: this.zones.collect(),
 
         roomData: {
@@ -186,8 +190,9 @@ Room.prototype.reset = function () {
         this.players.reset();
 
         //recreate other game objects
-        this.enemies = new Enemies(this);
         this.shots = new Shots(this);
+        this.enemies = new Enemies(this);
+        this.enemyShots = new EnemyShots(this);
         this.pickups = new Pickups(this);
         this.zones = new Zones(this);
 

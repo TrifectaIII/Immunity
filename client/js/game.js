@@ -7,6 +7,7 @@ var waitingData = {};
 
 //info for other game objects
 var shotData = {};
+var enemyShotData = {};
 var pickupData = {};
 var enemyData = {};
 var zoneData = {};
@@ -306,7 +307,25 @@ function drawShots() {
 
     push();
     strokeWeight(2);
+
+    //draw enemy shots
+    for (let id in enemyShotData) {
+        let shot = enemyShotData[id];
+        if (shot.x-screenOffset.x > 0 &&
+            shot.x-screenOffset.x < windowWidth &&
+            shot.y-screenOffset.y > 0 &&
+            shot.y-screenOffset.y < windowHeight) {
+                fill(gameSettings.enemyTypes[shot.type].colors.dark);
+                stroke(gameSettings.enemyTypes[shot.type].colors.light);
+                circle(
+                    shot.x-screenOffset.x, 
+                    shot.y-screenOffset.y, 
+                    10,
+                );
+        }
+    }
     
+    //draw player shots
     for (let id in shotData) {
         let shot = shotData[id];
         if (shot.x-screenOffset.x > 0 &&

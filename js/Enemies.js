@@ -91,21 +91,38 @@ Enemies.prototype.update = function () {
                 enemy.y += enemy.velocity.y
 
                 //attacking
-                if (player.name.toUpperCase() != gameSettings.testName.toUpperCase() &&//dont attack test name
-                    enemy.cooldown <= 0 &&
-                    Physics.isColliding(
-                        enemy, gameSettings.enemyTypes[enemy.type].radius,
-                        player, gameSettings.playerTypes[player.type].radius
-                    )) {
 
-                        //reset enemy cooldown
-                        enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
-                        
-                        //do damage to player
-                        player.health -= gameSettings.enemyTypes[enemy.type].attack.damage;
-                        
-                        //if player died, do not allow negative life
-                        player.health = Math.max(player.health, 0);
+                //check for off cooldown
+                if (enemy.cooldown <= 0) {
+
+                    //shoot if enemy type has shots are are in range
+                    if ('shots' in gameSettings.enemyTypes[enemy.type] &&
+                        gameSettings.enemyTypes[enemy.type].shots.range >= Physics.distance(enemy, player) - gameSettings.playerTypes[player.type].radius) {
+
+                            //reset enemy cooldown
+                            enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
+
+                            //shoot at player
+                            this.room.enemyShots.spawnShot(enemy, player.x, player.y);
+                    }
+
+                    else if (Physics.isColliding(
+                            enemy, gameSettings.enemyTypes[enemy.type].radius,
+                            player, gameSettings.playerTypes[player.type].radius
+                            )) {
+
+                                //reset enemy cooldown
+                                enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
+                                
+                                //do damage to player if not cheating
+                                if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
+                                    player.health -= gameSettings.enemyTypes[enemy.type].attack.damage;
+                                
+                                    //if player died, do not allow negative life
+                                    player.health = Math.max(player.health, 0);
+                                }   
+                                
+                    }
                 }
             }
 

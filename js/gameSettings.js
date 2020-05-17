@@ -156,12 +156,21 @@ var gameSettings = {
 
             attack: {
                 cooldown: 500,
-                damage: 1,
+                // damage: 1,
             },
 
             colors: {
                 dark: "#000000",
                 light: "#29ADFF",
+            },
+
+            shots: {
+                count: 1,
+                velocity: 15,
+                angle: 0,
+                range: 500,
+                damage: 1,
+                mass: 1,
             },
         },
 
@@ -175,12 +184,21 @@ var gameSettings = {
 
             attack: {
                 cooldown: 1000,
-                damage: 3,
+                // damage: 3,
             },
 
             colors: {
                 dark: "#000000",
                 light: "#00E436",
+            },
+
+            shots: {
+                count: 5,
+                velocity: 15,
+                angle:Math.PI/4,
+                range: 200,
+                damage: 1,
+                mass: 5,
             },
         },
 
