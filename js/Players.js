@@ -345,7 +345,7 @@ Players.prototype.add = function (player) {
                 player.readyShots--;
 
                 //create shots
-                this.room.shots.spawnShot(player, destX, destY);
+                this.room.shots.spawnPlayerShot(player, destX, destY);
         }
     }.bind(this));//bind to scope
 

@@ -103,7 +103,7 @@ Enemies.prototype.update = function () {
                             enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
 
                             //shoot at player
-                            this.room.enemyShots.spawnShot(enemy, player.x, player.y);
+                            this.room.shots.spawnEnemyShot(enemy, player.x, player.y);
                     }
 
                     else if (Physics.isColliding(

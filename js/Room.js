@@ -16,7 +16,6 @@ const Physics = require(__dirname + '/Physics.js');
 const Players = require(__dirname + '/Players.js');
 const Shots = require(__dirname + '/Shots.js');
 const Enemies = require(__dirname + '/Enemies.js');
-const EnemyShots = require(__dirname + '/EnemyShots.js');
 const Pickups = require(__dirname + '/Pickups.js');
 const Zones = require(__dirname + '/Zones.js');
 
@@ -41,7 +40,6 @@ function Room (roomId) {
     this.players = new Players(this);
     this.shots = new Shots(this);
     this.enemies = new Enemies(this);
-    this.enemyShots = new EnemyShots(this);
     this.pickups = new Pickups(this);
     this.zones = new Zones(this);
 
@@ -85,7 +83,6 @@ Room.prototype.update = function () {
             //update
             this.shots.update();
             this.enemies.update();
-            this.enemyShots.update();
             this.pickups.update();
             this.zones.update();
             this.update_Quadtree();
@@ -100,7 +97,6 @@ Room.prototype.update = function () {
         playerData: this.players.collect(),
         shotData: this.shots.collect(),
         enemyData: this.enemies.collect(),
-        enemyShotData: this.enemyShots.collect(),
         pickupData: this.pickups.collect(),
         zoneData: this.zones.collect(),
 
@@ -192,7 +188,6 @@ Room.prototype.reset = function () {
         //recreate other game objects
         this.shots = new Shots(this);
         this.enemies = new Enemies(this);
-        this.enemyShots = new EnemyShots(this);
         this.pickups = new Pickups(this);
         this.zones = new Zones(this);
 
@@ -223,7 +218,8 @@ Room.prototype.get_AllObj = function(){
     return [
         ...Object.values(this.enemies.objects), 
         ...Object.values(this.players.objects),
-        ...Object.values(this.shots.objects),
+        //BUG IF YOU INCLUDE ENEMY SHOTS
+        ...Object.values(this.shots.playershots),
         ...Object.values(this.zones.objects),
     ]; 
 }
