@@ -82,9 +82,10 @@ Shots.prototype.update = function () {
                             //remove health based on class
                             if (enemy.health > 0) {
                                 enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
+                                
                                 destroyed = true;
 
-                                Physics.collideShotEnemy(shot,enemy);
+                                Physics.collideShotEnemy(shot, enemy);
 
                                 //check if enemy died
                                 if (enemy.health <= 0) {
@@ -132,7 +133,10 @@ Shots.prototype.update = function () {
                         player, gameSettings.playerTypes[player.type].radius, 
                         enemyshot, 0 //enemy shots have no radius
                     )) {
+
                         destroyed = true;
+
+                        Physics.collideShotPlayer(enemyshot, player);
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){

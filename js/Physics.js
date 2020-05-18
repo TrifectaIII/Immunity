@@ -91,6 +91,22 @@ function collideShotEnemy (shot, enemy) {
     enemy.velocity.y += shot.velocity.y * massRatio;
 }
 
+//impart shot momentum to player
+function collideShotPlayer (shot, player) {
+
+    //get masses
+    let playerMass = gameSettings.playerTypes[player.type].mass;
+    let shotMass = gameSettings.enemyTypes[shot.type].shots.mass;
+
+    //ratio of shot mass to player mass
+    let massRatio = shotMass/playerMass;
+
+    //accelerate player based on shot velocity and mass ratio
+    player.velocity.x += shot.velocity.x * massRatio;
+    player.velocity.y += shot.velocity.y * massRatio;
+}
+
+
 function calCollisionVect(bullet, enemy){
 
     let dist = distance(bullet, enemy);
@@ -134,5 +150,6 @@ module.exports = {
     isColliding:isColliding,
     collideAndDisplace:collideAndDisplace,
     collideShotEnemy:collideShotEnemy,
+    collideShotPlayer:collideShotPlayer,
     calCollisionVect:calCollisionVect,
 }
