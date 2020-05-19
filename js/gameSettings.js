@@ -25,6 +25,9 @@ var gameSettings = {
     //starting lives for each room
     livesStart: 2,
 
+    //time before next wave after current is complete
+    waveTime: 3000,
+
     // PLAYERS
     /////////////////////////////////////////////////
 

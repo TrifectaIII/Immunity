@@ -52,6 +52,9 @@ function Room (roomId) {
     //type of current wave
     this.waveType = 'random';
 
+    //timer until next wave
+    this.waveTimer = gameSettings.waveTime;
+
     //how many lives the players have
     this.livesCount = gameSettings.livesStart;
 
@@ -104,6 +107,7 @@ Room.prototype.update = function () {
             waveCount: this.waveCount,
             livesCount: this.livesCount,
             gameOver: this.gameOver,
+            waveTimer: this.waveTimer,
         },
     }
 }
@@ -115,13 +119,23 @@ Room.prototype.update = function () {
 //creates a wave of enemies
 Room.prototype.spawnWave = function () {
 
-    //check the old wave is gone
-    if (!this.gameOver && 
-        // this.enemies.count() <= 0 &&
-        this.zones.count() <= 0) {
+    //countdown wave timer
+    if (this.zones.count() <= 0) {
+        this.waveTimer = Math.max(
+            0,
+            this.waveTimer - gameSettings.tickRate,
+        );
+    }
+
+    //check the old wave is gone and that timer is off
+    if (this.zones.count() <= 0 &&
+        this.waveTimer == 0) {
 
             //increase wavecount
             this.waveCount++;
+            
+            //restart timer for next time
+            this.waveTimer = gameSettings.waveTime;
 
             //roll for mono wave chance
             if (Math.random() > gameSettings.enemyMonoChance) {
@@ -193,6 +207,7 @@ Room.prototype.reset = function () {
 
         //reset attributes
         this.waveCount = 0;
+        this.waveTimer = gameSettings.waveTime;
         this.playersSeen = this.players.count();
         this.livesCount = gameSettings.livesStart + this.players.count();
         this.gameOver = false;
