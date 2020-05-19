@@ -87,6 +87,27 @@ function drawNoLivesMenu () {
     pop();
 }
 
+// RESPAWNING MENU
+//////////////////////////////////////////////////////////////////////////////
+
+function drawRespawnMenu (player) {
+
+    push();
+
+    textAlign(CENTER, CENTER);
+    fill(gameSettings.colors.red);
+    stroke('black');
+    strokeWeight(3);
+    textSize(60);
+    text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
+    drawMainbar(
+        gameSettings.colors.red, 
+        1-player.respawnTimer/gameSettings.respawnTime
+    );
+
+    pop();
+}
+
 // GAME OVER MENU
 //////////////////////////////////////////////////////////////////////////////
 
@@ -131,12 +152,19 @@ function clickGameOverMenu() {
 
 //draw death menus
 function drawDeathMenus () {
+
+    let player = waitingData[socket.id];
+
     //darken game screen
     background(0, 200);
 
     //if game is over
     if (gameData.gameOver) {
         drawGameOverMenu();
+    }
+    //if player is respawning
+    else if (player.respawnTimer > 0) {
+        drawRespawnMenu(player);
     }
     //if lives left, select new class
     else if (gameData.livesCount > 0) {

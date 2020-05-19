@@ -84,9 +84,6 @@ function drawGame () {
         //draw fps counter
         drawFPS(gameSettings.playerTypes[player.type].colors.dark);
 
-        //draw Death screen if player is dead
-        drawDeathMsg(player);
-
         // draw crosshair
         drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
 
@@ -615,7 +612,7 @@ function drawPlayer (player) {
 }
 
 //draws the main bar at bottom of the screen
-function drawMainbar (player, prog) {
+function drawMainbar (color, prog) {
     //prog is ratio from 0 to 1
     prog = Math.min(1,Math.max(0,prog));
     push();
@@ -625,7 +622,7 @@ function drawMainbar (player, prog) {
         windowWidth/4-2, windowHeight - 27,
         windowWidth/2+4, 24,
     );
-    fill(gameSettings.playerTypes[player.type].colors.light);
+    fill(color);
     rect(
         windowWidth/4, windowHeight - 25,
         windowWidth/2*(prog), 20
@@ -637,7 +634,10 @@ function drawMainbar (player, prog) {
 function drawHealthbar (player) {
     push();
     textAlign(CENTER, CENTER);
-    drawMainbar(player, player.health/gameSettings.playerTypes[player.type].maxHealth);
+    drawMainbar(
+        gameSettings.playerTypes[player.type].colors.light, 
+        player.health/gameSettings.playerTypes[player.type].maxHealth
+    );
     stroke('black');
     strokeWeight(4);
     textSize(20);
@@ -763,23 +763,15 @@ function drawPlayerInfo () {
     textSize(30);
     let counter = 0;
 
-    let cumulativeData = {};
-    Object.assign(cumulativeData, playingData);
-    Object.assign(cumulativeData, waitingData);
+    //draw living players first
+    let sortedPlaying = Object.keys(playingData).sort();
+    for (let id of sortedPlaying) {
+        
+        let player = playingData[id];
 
-    for (let id in cumulativeData) {
         //draw name and killstreak
-        let player = cumulativeData[id];
-        if (player.type != 'none') {
-            fill(gameSettings.playerTypes[player.type].colors.dark);
-            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
-        }
-        else {
-            fill(gameSettings.colors.darkgrey);
-            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
-            counter++;
-            continue;
-        }
+        fill(gameSettings.playerTypes[player.type].colors.dark);
+        text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
         
         //draw healthbar
         let barWidth = 110;
@@ -801,6 +793,42 @@ function drawPlayerInfo () {
 
         counter++;
     }
+
+    let sortedWaiting = Object.keys(waitingData).sort();
+    for (let id of sortedWaiting) {
+        
+        let player = waitingData[id];
+
+        //draw name and killstreak
+        fill(gameSettings.colors.darkgrey);
+        text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+        
+        //draw healthbar
+        let barWidth = 110;
+        let barHeight = 6;
+        let barOffset = 15;
+        fill('black');
+        stroke(gameSettings.colors.darkgrey);
+        strokeWeight(2);
+        rect(
+            windowWidth-(barWidth+barOffset), 40+counter*50, 
+            windowWidth-(barOffset), 40+counter*50 + barHeight
+        );
+        strokeWeight(0);
+        if (player.respawnTimer == 0) {
+            fill(gameSettings.colors.white);
+        }
+        else {
+            fill(gameSettings.colors.red);
+        }
+        rect(
+            windowWidth-barOffset - barWidth*(1-(player.respawnTimer/gameSettings.respawnTime)), 40+counter*50, 
+            windowWidth-(barOffset), 40+counter*50 + barHeight
+        );
+
+        counter++;
+    }
+
     pop();
 }
 
@@ -832,38 +860,6 @@ function drawFPS (color) {
         windowHeight-30
     );
     pop();
-}
-
-// hold time of death
-var deathStart;
-
-//tint screen and display message when player is dead
-function drawDeathMsg (player) {
-
-    //reset death timer if living
-    if (player.health > 0) {
-        deathStart = 0;
-    }
-
-    //if dead
-    else {
-        push();
-        textAlign(CENTER, CENTER);
-        background(0, 200);
-        fill(gameSettings.playerTypes[player.type].colors.light);
-        stroke('black');
-        strokeWeight(3);
-        textSize(60);
-        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
-        pop();
-
-        //note time of death, then draw respawn bar
-        if (deathStart == 0) {
-            deathStart = (new Date()).getTime();
-        }
-        let deathTime = (new Date()).getTime() - deathStart;
-        drawMainbar(player, deathTime/gameSettings.respawnTime);
-    }
 }
 
 //draw cosshair

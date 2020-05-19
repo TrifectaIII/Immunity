@@ -33,30 +33,31 @@ Players.prototype.update = function () {
     //respawn any dead players
     for (let id in this.playing) {
         let player = this.playing[id];
-        if (!player.respawning &&
-            player.health <= 0) {
-
-                //mark as respawning
-                player.respawning = true;
-
-                //if game not over, wait for respawn time
+        if (player.health <= 0) {
+                //start respawn timer if game not over
                 if (!this.room.gameOver) {
-
-                    //set to respawn and choose new class
-                    setTimeout(function () {
-                        //move player to waiting
-                        this.waitPlayer(player);
-                    }.bind(this), //bind to object scope
-
-                    //respawn time from settings
-                    gameSettings.respawnTime);
+                    player.respawnTimer = gameSettings.respawnTime;
                 }
 
-                //if game over, do it now
-                else {
-                    //move player to waiting
-                    this.waitPlayer(player);
-                }
+                //move player to waiting
+                this.waitPlayer(player);
+        }
+    }
+
+    //countdown respawn timer of dead players
+    for (let id in this.waiting) {
+        let player = this.waiting[id];
+
+        if (this.room.gameOver) {
+            player.respawnTimer = 0;
+        }
+
+        //otherwise subtract from timer, to min of 0
+        else {
+            player.respawnTimer = Math.max(
+                player.respawnTimer - gameSettings.tickRate,
+                0,
+            );
         }
     }
 
@@ -205,9 +206,9 @@ Players.prototype.collect = function () {
             x: player.x,
             y: player.y,
             type: player.type,
-            health: player.health,
             name: player.name,
             killStreak: player.killStreak,
+            respawnTimer: player.respawnTimer,
         };
     }
 
@@ -250,7 +251,7 @@ Players.prototype.add = function (player) {
     player.type = 'none';
 
     //mark as not respawning
-    player.respawning = false;
+    player.respawnTimer = 0;
 
     //give no health
     player.health = 0;
@@ -288,6 +289,7 @@ Players.prototype.add = function (player) {
         //only change if valid choice and a life exists
         if (this.room.livesCount > 0 &&
             player.id in this.waiting &&
+            player.respawnTimer == 0 &&
             type in gameSettings.playerTypes) {
 
                 //set class
@@ -297,7 +299,7 @@ Players.prototype.add = function (player) {
                 this.room.livesCount--;
 
                 //mark as not respawning
-                player.respawning = false;
+                player.respawnTimer = 0;
 
 
                 //give default direction & velocities
