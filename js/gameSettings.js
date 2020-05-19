@@ -26,7 +26,7 @@ var gameSettings = {
     livesStart: 2,
 
     //time before next wave after current is complete
-    waveTime: 3000,
+    waveTime: 5000,
 
     // PLAYERS
     /////////////////////////////////////////////////

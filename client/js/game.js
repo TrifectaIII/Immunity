@@ -67,7 +67,6 @@ function drawGame () {
         if (player.health > 0) {
             drawPlayer(player);
             drawHealthbar(player);
-            deathStart = 0;
         }
 
         //draw UI
@@ -80,6 +79,9 @@ function drawGame () {
 
         //draw names of players
         drawPlayerInfo();
+
+        //draw countdown to next wave
+        drawWaveCountdown();
 
         //draw fps counter
         drawFPS(gameSettings.playerTypes[player.type].colors.dark);
@@ -132,6 +134,9 @@ function drawGame () {
 
         //draw names of players
         drawPlayerInfo();
+
+        //draw countdown to next wave
+        drawWaveCountdown();
 
         //draw fps counter
         drawFPS(gameSettings.colors.darkgrey);
@@ -827,6 +832,32 @@ function drawPlayerInfo () {
         );
 
         counter++;
+    }
+
+    pop();
+}
+
+//draw countdown to next wave
+function drawWaveCountdown () {
+
+    push();
+
+    //make sure countdown is going
+    if (gameData.waveTimer > 0 &&
+        Object.keys(zoneData).length == 0) {
+
+            let countdownNum = Math.ceil(gameData.waveTimer/1000);
+
+            textAlign(CENTER, CENTER);
+            textSize(75);
+            stroke(0);
+            fill('black');
+
+            text(
+                countdownNum,
+                windowWidth/2,
+                windowHeight/4,
+            );
     }
 
     pop();
