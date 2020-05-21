@@ -249,7 +249,7 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //chance of enemy dropping a pickup (fraction of 1)
-    pickupDropChance: 0.025,
+    pickupDropChance: 0.05,
 
     //max pickups in the world at a time, per player
     pickupMax: 3,
