@@ -169,9 +169,9 @@ var gameSettings = {
 
             shots: {
                 count: 1,
-                velocity: 15,
+                velocity: 10,
                 angle: 0,
-                range: 500,
+                range: 300,
                 damage: 1,
                 mass: 1,
             },
@@ -196,10 +196,10 @@ var gameSettings = {
             },
 
             shots: {
-                count: 5,
-                velocity: 15,
+                count: 3,
+                velocity: 10,
                 angle:Math.PI/4,
-                range: 200,
+                range: 150,
                 damage: 1,
                 mass: 5,
             },
