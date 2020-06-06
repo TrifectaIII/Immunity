@@ -18,6 +18,7 @@ const Shots = require(__dirname + '/Shots.js');
 const Enemies = require(__dirname + '/Enemies.js');
 const Pickups = require(__dirname + '/Pickups.js');
 const Zones = require(__dirname + '/Zones.js');
+const Bosses = require(__dirname + '/Bosses.js');
 
 
 //Quadtree class
