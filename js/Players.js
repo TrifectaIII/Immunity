@@ -34,6 +34,8 @@ Players.prototype.update = function () {
     for (let id in this.playing) {
         let player = this.playing[id];
         if (player.health <= 0) {
+                player.health = 0;
+
                 //start respawn timer if game not over
                 if (!this.room.gameOver) {
                     player.respawnTimer = gameSettings.respawnTime;
@@ -192,7 +194,7 @@ Players.prototype.collect = function () {
             x: player.x,
             y: player.y,
             type: player.type,
-            health: player.health,
+            health: Math.max(0, player.health),
             name: player.name,
             killStreak: player.killStreak,
         };

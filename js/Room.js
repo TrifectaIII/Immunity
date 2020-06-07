@@ -84,14 +84,13 @@ Room.prototype.update = function () {
             //spawn new wave if needed
             this.spawnWave();
 
-            //update
+            //update game objects
             this.shots.update();
             this.enemies.update();
             this.pickups.update();
             this.zones.update();
             this.update_Quadtree();
     }
-    
 
     //if no lives and all players dead, game is over
     this.gameOver = this.players.allDead() && this.livesCount <= 0;

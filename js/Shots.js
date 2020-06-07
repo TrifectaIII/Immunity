@@ -141,9 +141,6 @@ Shots.prototype.update = function () {
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
                             player.health -= gameSettings.enemyTypes[enemyshot.type].shots.damage;
-
-                            //if player died, do not allow negative life
-                            player.health = Math.max(player.health, 0);
                         }
                 }
             }

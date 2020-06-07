@@ -117,9 +117,6 @@ Enemies.prototype.update = function () {
                                 //do damage to player if not cheating
                                 if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
                                     player.health -= gameSettings.enemyTypes[enemy.type].attack.damage;
-                                
-                                    //if player died, do not allow negative life
-                                    player.health = Math.max(player.health, 0);
                                 }   
                                 
                     }
@@ -240,7 +237,7 @@ Enemies.prototype.spawnEnemy = function () {
 Enemies.prototype.killEnemy = function (id) {
     let enemy = this.objects[id];
 
-    if (Math.random() < gameSettings.pickupDropChance) {
+    if (Math.random() < gameSettings.enemyDropChance) {
         this.room.pickups.spawnPickup(enemy.x, enemy.y);
     }
 

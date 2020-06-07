@@ -242,14 +242,16 @@ var gameSettings = {
                 light: "#FF77A8",
             },
         },
-        
     },
 
     // PICKUPS
     /////////////////////////////////////////////////
 
     //chance of enemy dropping a pickup (fraction of 1)
-    pickupDropChance: 0.05,
+    enemyDropChance: 0.05,
+
+    //chance of boss dropping a pickup (fraction of 1)
+    bossDropChance: 1,
 
     //max pickups in the world at a time, per player
     pickupMax: 3,

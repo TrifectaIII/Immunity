@@ -59,7 +59,7 @@ Bosses.prototype.spawnBoss = function () {
 Bosses.prototype.killEnemy = function (id) {
     let boss = this.objects[id];
 
-    if (Math.random() < gameSettings.pickupDropChance) {
+    if (Math.random() < gameSettings.enemyDropChance) {
         this.room.pickups.spawnPickup(boss.x, boss.y);
     }
 
