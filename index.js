@@ -106,7 +106,12 @@ io.sockets.on('connection', function (socket) {
             //show current room status
             showRooms(Rooms);
         }     
-    })
+    });
+
+    //set up ping listener
+    socket.on ('ping2', function () {
+        socket.emit('pong2');
+    });
 
 
     // JOIN ROOM

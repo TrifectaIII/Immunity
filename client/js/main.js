@@ -10,6 +10,15 @@ var roomId;
 // socket object
 var socket;
 
+// ping checker interval
+var pingInterval;
+
+// time of last ping
+var pingTime;
+
+//ping value
+var ping = 0;
+
 // function to join the game
 function joinGame(menuChoices) {
 
@@ -20,6 +29,24 @@ function joinGame(menuChoices) {
     socket = io({
         //no reconnection allowed
         reconnection:false,
+    });
+
+    //remove old ping checker
+    clearInterval(pingInterval);
+
+    //start ping checker
+    pingInterval = setInterval(function () {
+        if (state != 'menu') {
+            console.log('sending ping')
+            pingTime = (new Date()).getTime();
+            socket.emit('ping2');
+        }
+    }, 1000);
+
+    //recieve pong from server
+    socket.on('pong2', function () {
+        ping = (new Date()).getTime() - pingTime;
+        console.log('ping',ping);
     });
 
     //capture socket errors
