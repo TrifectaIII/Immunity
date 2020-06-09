@@ -18,6 +18,9 @@ var gameSettings = {
     //space between server updates in MS
     tickRate: 20,
 
+    //time between ping checks in MS
+    pingRate: 1000,
+
     //size of game area
     width: 3000,
     height: 3000,

@@ -84,7 +84,7 @@ function drawGame () {
         drawWaveCountdown();
 
         //draw fps counter
-        drawFPS(gameSettings.playerTypes[player.type].colors.dark);
+        drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
 
         // draw crosshair
         drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
@@ -139,7 +139,7 @@ function drawGame () {
         drawWaveCountdown();
 
         //draw fps counter
-        drawFPS(gameSettings.colors.darkgrey);
+        drawFPSandPing(gameSettings.colors.darkgrey);
 
         // draw crosshair
         drawCrosshair(gameSettings.colors.darkgrey);
@@ -866,7 +866,7 @@ function drawWaveCountdown () {
 var fpsList = [];
 
 //draw framerate
-function drawFPS (color) {
+function drawFPSandPing (color) {
     //add fps to list
     fpsList.push(frameRate());
     //remove oldest if above 0.5 seconds
@@ -884,11 +884,17 @@ function drawFPS (color) {
     textSize(30);
     strokeWeight(0);
     fill(color);
-    //get fps from p5 and draw
+    //draw fps
     text(
         `FPS: ${fps}`, 
         windowWidth-15, 
-        windowHeight-30
+        windowHeight-30,
+    );
+    //draw ping
+    text(
+        `Ping: ${ping.value}`,
+        windowWidth-15,
+        windowHeight - 70,
     );
     pop();
 }

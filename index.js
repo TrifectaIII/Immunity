@@ -69,13 +69,13 @@ function generateRoomId(Rooms) {
 function showRooms (Rooms) {
     console.log('\n');
     if (Object.keys(Rooms).length > 0) {
-        console.log("ROOM STATUS #############");
+        console.log("ROOM STATUS ######################");
         for (let roomId in Rooms) {
             console.log(
                 `Game Room ${roomId}: ${Rooms[roomId].playerCount()} Players`
             );
         }
-        console.log("#########################");
+        console.log("##################################");
     }
     else {
         console.log("ROOM STATUS: No Rooms Active");
@@ -109,8 +109,8 @@ io.sockets.on('connection', function (socket) {
     });
 
     //set up ping listener
-    socket.on ('ping2', function () {
-        socket.emit('pong2');
+    socket.on ('pinging', function () {
+        socket.emit('ponging');
     });
 
 
