@@ -891,10 +891,11 @@ function drawFPSandPing (color) {
         windowHeight-30,
     );
     //draw ping
+    let ms = Ping.value;
     text(
-        `Ping: ${ping.value}`,
+        `Ping: ${ms}`,
         windowWidth-15,
-        windowHeight - 70,
+        windowHeight-70,
     );
     pop();
 }

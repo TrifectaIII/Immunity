@@ -1,6 +1,6 @@
 // Error Message System
 
-var errors = {
+var Errors = {
     //switch for whether or not error is shown
     active: false,
 
@@ -17,8 +17,8 @@ var errors = {
             this.message = msg;
             clearTimeout(this.timer);
             this.timer = setTimeout(function () {
-                errors.active = false;
-            }, time);
+                this.active = false;
+            }.bind(this), time);
         }
     },
 
@@ -48,4 +48,4 @@ var errors = {
 }
 
 // EXAMPLE ERROR EMIT
-// errors.displayError('Testing Testing 123',3000);
+// Errors.displayError('Testing Testing 123',3000);

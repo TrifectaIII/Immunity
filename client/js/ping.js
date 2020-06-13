@@ -1,4 +1,6 @@
-var ping = {
+// Ping checking system
+
+var Ping = {
 
     interval: 0,
 
@@ -12,26 +14,30 @@ var ping = {
 
         //recieve pong from server
         socket.on('ponging', function () {
-            ping.waiting = false;
-            ping.value = Date.now() - ping.time;
-        });
+            this.waiting = false;
+            this.value = Date.now() - this.time;
+        }.bind(this));
 
         //clear old interval
-        clearInterval(ping.interval);
+        clearInterval(this.interval);
 
         //first ping
-        ping.waiting = true,
-        ping.time = Date.now();
+        this.waiting = true,
+        this.time = Date.now();
         socket.emit('pinging');
 
         //start interval
-        ping.interval = setInterval(function () {
-            if (!ping.waiting) {
-                ping.waiting = true;
-                ping.time = Date.now();
+        this.interval = setInterval(function () {
+            if (!this.waiting) {
+                this.waiting = true;
+                this.time = Date.now();
                 socket.emit('pinging');
             }
         //get rate from settings
-        }, gameSettings.pingRate);
+        }.bind(this), gameSettings.pingRate);
     },
+
+    stop : function () {
+        clearInterval(this.interval);
+    }.bind(this),
 }

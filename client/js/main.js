@@ -23,31 +23,31 @@ function joinGame(menuChoices) {
     });
 
     //start pinging
-    ping.start(socket);
+    Ping.start(socket);
 
     //capture socket errors
     socket.once('connect_error', function (error) {
         console.log('connect_error', error);
-        errors.displayError('Server Connection Error', 5000);
+        Errors.displayError('Server Connection Error', 5000);
         restartMenus();
         socket.close();
     });
     socket.once('connect_timeout', function (timeout) {
         console.log('connect_timeout', timeout);
-        errors.displayError('Server Connection Timeout', 5000);
+        Errors.displayError('Server Connection Timeout', 5000);
         restartMenus();
         socket.close();
     });
     socket.on('error', function (error) {
         console.log('error', error);
-        errors.displayError('Socket Error', 5000);
+        Errors.displayError('Socket Error', 5000);
     });
 
     //return to server menu if disconnected
     socket.once('disconnect', function (reason) {
         console.log('disconnect', reason);
-        if(!errors.active) {
-            errors.displayError('Server Disconnected', 5000);
+        if(!Errors.active) {
+            Errors.displayError('Server Disconnected', 5000);
         }
         restartMenus();
         socket.close();
@@ -63,7 +63,7 @@ function joinGame(menuChoices) {
     //if socket rejected, send back to menu and display reason error
     socket.once('rejection', function (reason) {
         console.log('rejection', reason);
-        errors.displayError(`REJECTED: ${reason}`, 5000);
+        Errors.displayError(`REJECTED: ${reason}`, 5000);
         restartMenus();
         socket.close();
     });
@@ -78,7 +78,7 @@ function joinGame(menuChoices) {
         startControls(socket);
 
         //remove error message if shown
-        errors.hideError();
+        Errors.hideError();
 
         //change state
         state = 'game';
@@ -157,7 +157,7 @@ function draw () {
     }
 
     //no matter state, draw error if active (error.js)
-    errors.drawError();
+    Errors.drawError();
 }
 
 //look for button clicks during menus

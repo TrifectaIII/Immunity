@@ -39,7 +39,7 @@ document.querySelector('.infomenu .infomenu-close').addEventListener(
 document.querySelector('.infomenu .infomenu-exit').addEventListener(
     'click', 
     function () {
-        errors.displayError('Left Game', 5000);
+        Errors.displayError('Left Game', 5000);
         restartMenus();
         socket.close();
         return;

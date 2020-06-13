@@ -182,7 +182,7 @@ function drawDeathMenus () {
 
 function deathMenuMouseClicked (socket) {
     if(exitGameButton.mouseOver()) {
-        errors.displayError('Left Game', 5000);
+        Errors.displayError('Left Game', 5000);
         restartMenus();
         socket.close();
         return;
