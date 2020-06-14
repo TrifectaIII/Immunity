@@ -1,51 +1,57 @@
-//holds setInterval for movement
-var moveInterval;
-//holds setInterval for clicking
-var clickInterval;
+//handles controls
+var Controls = {
 
-//called by moveInterval 
-function directionHandler (socket) {
-    if (state == "game" &&
-        socket.id in playingData && 
-        playingData[socket.id].health > 0) {
-            sendDirection(socket);
-    }
-}
+    moveInterval: null,
 
-//called by clickInterval 
-function clickHandler (socket) {
-    if (state == "game" &&
-        socket.id in playingData && 
-        playingData[socket.id].health > 0) {
-            sendClicking(socket);
-    }
-}
+    clickInterval: null,
 
-// adds listeners for shooting
-function startControls (socket) {
+    directionHandler: function (socket) {
+        if (state == "game" &&
+            socket.id in playingData && 
+            playingData[socket.id].health > 0) {
+                sendDirection(socket);
+        }
+    },
 
-    //execute direction emits from movement.js
-    clearInterval(moveInterval);
-    moveInterval = setInterval(
-        function () {directionHandler(socket)},
-        //uses half of games tickRate
-        gameSettings.tickRate/2 
-    );
+    clickHandler: function (socket) {
+        if (state == "game" &&
+            socket.id in playingData && 
+            playingData[socket.id].health > 0) {
+                sendClicking(socket);
+        }
+    },
 
-    //execute click emits from shoot.js
-    clearInterval(clickInterval);
-    clickInterval = setInterval(
-        function () {clickHandler(socket)},
-        //uses half of games tickRate
-        gameSettings.tickRate/2 
-    );
-
-    //recieve and respond to shoot requests
-    socket.on('shoot_request', function () {
-        socket.emit(
-            'shoot',
-            mouseX+screenOffset.x,
-            mouseY+screenOffset.y
+    start: function (socket) {
+        //execute direction emits from movement.js
+        clearInterval(this.moveInterval);
+        this.moveInterval = setInterval(
+            function () {this.directionHandler(socket)}.bind(this),
+            //uses half of games tickRate
+            gameSettings.tickRate/2 
         );
-    });
+
+        //execute click emits from shoot.js
+        clearInterval(this.clickInterval);
+        this.clickInterval = setInterval(
+            function () {this.clickHandler(socket)}.bind(this),
+            //uses half of games tickRate
+            gameSettings.tickRate/2 
+        );
+
+        //recieve and respond to shoot requests
+        socket.on('shoot_request', function () {
+            socket.emit(
+                'shoot',
+                mouseX+screenOffset.x,
+                mouseY+screenOffset.y
+            );
+        });
+    },
+
+    stop: function () {
+        clearInterval(this.moveInterval);
+        this.moveInterval = null;
+        clearInterval(this.clickInterval);
+        this.clickInterval = null;
+    },
 }

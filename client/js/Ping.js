@@ -2,7 +2,7 @@
 
 var Ping = {
 
-    interval: 0,
+    interval: null,
 
     waiting: false,
 
@@ -37,7 +37,8 @@ var Ping = {
         }.bind(this), gameSettings.pingRate);
     },
 
-    stop : function () {
+    stop: function () {
         clearInterval(this.interval);
+        this.interval = null;
     }.bind(this),
 }

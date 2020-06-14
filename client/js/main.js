@@ -10,6 +10,14 @@ var roomId;
 // socket object
 var socket;
 
+//function to close game and return to menus
+function endGame() {
+    Ping.stop();
+    Controls.stop();
+    restartMenus();
+    socket.close();
+}
+
 // function to join the game
 function joinGame(menuChoices) {
 
@@ -29,14 +37,12 @@ function joinGame(menuChoices) {
     socket.once('connect_error', function (error) {
         console.log('connect_error', error);
         Errors.displayError('Server Connection Error', 5000);
-        restartMenus();
-        socket.close();
+        endGame();
     });
     socket.once('connect_timeout', function (timeout) {
         console.log('connect_timeout', timeout);
         Errors.displayError('Server Connection Timeout', 5000);
-        restartMenus();
-        socket.close();
+        endGame();
     });
     socket.on('error', function (error) {
         console.log('error', error);
@@ -49,8 +55,7 @@ function joinGame(menuChoices) {
         if(!Errors.active) {
             Errors.displayError('Server Disconnected', 5000);
         }
-        restartMenus();
-        socket.close();
+        endGame();
     })
 
     //attempt to join game
@@ -64,8 +69,7 @@ function joinGame(menuChoices) {
     socket.once('rejection', function (reason) {
         console.log('rejection', reason);
         Errors.displayError(`REJECTED: ${reason}`, 5000);
-        restartMenus();
-        socket.close();
+        endGame();
     });
 
     //confirm room joining
@@ -75,7 +79,7 @@ function joinGame(menuChoices) {
         roomId = newId;
 
         //Start controls (controls.js)
-        startControls(socket);
+        Controls.start(socket);
 
         //remove error message if shown
         Errors.hideError();
