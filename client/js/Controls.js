@@ -25,7 +25,7 @@ var Controls = {
         //execute direction emits from movement.js
         clearInterval(Controls.moveInterval);
         Controls.moveInterval = setInterval(
-            function () {Controls.directionHandler(socket);console.log('controlling!')},
+            function () {Controls.directionHandler(socket)},
             //uses half of games tickRate
             gameSettings.tickRate/2 
         );
@@ -33,7 +33,7 @@ var Controls = {
         //execute click emits from shoot.js
         clearInterval(Controls.clickInterval);
         Controls.clickInterval = setInterval(
-            function () {Controls.clickHandler(socket);console.log('controlling!')},
+            function () {Controls.clickHandler(socket)},
             //uses half of games tickRate
             gameSettings.tickRate/2 
         );
