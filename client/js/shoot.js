@@ -1,32 +1,36 @@
-//variable to keep track of clicking
-var clicking = false;
+//tracks player shooting inputs
+var Shoot = {
 
-//tracks previously send clicking
-var oldClicking = false;
+    //keep track of clicking
+    clicking: false,
+
+    //track previously sent clicking state
+    previous: false,
+
+    sendClicking: function (socket) {
+        if (Shoot.clicking != Shoot.previous) {
+            socket.emit('click', Shoot.clicking);
+            Shoot.previous = Shoot.clicking;
+        }
+    }
+}
 
 //clicking when mousedown
 document.addEventListener('mousedown', function () {
-    clicking = true;
+    Shoot.clicking = true;
 });
 
 //stop clicking when mouseup
 document.addEventListener('mouseup', function () {
-    clicking = false;
+    Shoot.clicking = false;
 });
 
 //stop clicking when mouse leaves window
 document.addEventListener('mouseleave', function () {
-    clicking = false;
+    Shoot.clicking = false;
 });
 
 //stop clicking when window loses focus
 window.addEventListener('blur', function () {
-    clicking = false;
+    Shoot.clicking = false;
 });
-
-function sendClicking (socket) {
-    if (clicking != oldClicking) {
-        socket.emit('click', clicking);
-        oldClicking = clicking;
-    }
-}

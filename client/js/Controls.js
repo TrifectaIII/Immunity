@@ -9,7 +9,7 @@ var Controls = {
         if (state == "game" &&
             socket.id in playingData && 
             playingData[socket.id].health > 0) {
-                sendDirection(socket);
+                Movement.sendDirection(socket);
         }
     },
 
@@ -17,7 +17,7 @@ var Controls = {
         if (state == "game" &&
             socket.id in playingData && 
             playingData[socket.id].health > 0) {
-                sendClicking(socket);
+                Shoot.sendClicking(socket);
         }
     },
 

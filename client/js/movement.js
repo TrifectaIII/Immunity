@@ -1,39 +1,69 @@
-// Movement keys
+// tracks player movement inputs
+var Movement = {
 
-//variables to track pressing
-var right = false;
-var left = false;
-var up = false;
-var down = false;
+    //variables to track pressing
+    right: false,
+    left: false,
+    up: false,
+    down: false,
 
-var direction = 'none';
+    //current direction
+    direction: 'none',
 
-//executes func after 100ms
-// x = setTimeout(func, 100);
+    //move based on currently pressed keys
+    //NOTE: this is called in a setInterval in Controls.js
+    sendDirection: function (socket) {
 
-//executes func every 100ms
-// y = setInterval(func, 100);
+        let newDirection = 'none';
 
-//stops a timeout from executing
-// clearTimeout(x);
+        if (Movement.right && !Movement.left && Movement.up && !Movement.down) {
+            newDirection = 'rightup';
+        }
+        else if (!Movement.right && Movement.left && Movement.up && !Movement.down) {
+            newDirection = 'leftup';
+        }
+        else if (Movement.right && !Movement.left && !Movement.up && Movement.down) {
+            newDirection = 'rightdown';
+        }
+        else if (!Movement.right && Movement.left && !Movement.up && Movement.down) {
+            newDirection = 'leftdown';
+        }
+        else if (Movement.right && !Movement.left) {
+            newDirection = 'right';
+        }
+        else if (!Movement.right && Movement.left) {
+            newDirection = 'left';
+        }
+        else if (Movement.up && !Movement.down) {
+            newDirection = 'up';
+        }
+        else if (!Movement.up && Movement.down) {
+            newDirection = 'down';
+        }
 
-//stops an interval from continuing to execute
-// clearInterval(y);
+        //if any change, send to server
+        if (newDirection != Movement.direction) {
+            socket.emit('direction', newDirection);
+            //update current direction to new direction
+            Movement.direction = newDirection;
+        }
+    },
+}
 
 //track key downs
 document.addEventListener('keydown', function (event) {
     switch (event.keyCode) {
         case 68: // D
-            right = true;
+            Movement.right = true;
             break;
         case 65: // A
-            left = true;
+            Movement.left = true;
             break;
         case 87: // W
-            up = true;
+            Movement.up = true;
             break;
         case 83: // S
-            down = true;
+            Movement.down = true;
             break;
     }
 });
@@ -42,63 +72,24 @@ document.addEventListener('keydown', function (event) {
 document.addEventListener('keyup', function (event) {
     switch (event.keyCode) {
         case 68: // D
-            right = false;
+            Movement.right = false;
             break;
         case 65: // A
-            left = false;
+            Movement.left = false;
             break;
         case 87: // W
-            up = false;
+            Movement.up = false;
             break;
         case 83: // S
-            down = false;
+            Movement.down = false;
             break;
     }
 });
 
-//remove all movements when window loses focus
+//remove all keys when window loses focus
 window.addEventListener('blur', function () {
-    right = false;
-    left = false;
-    up = false;
-    down = false;
+    Movement.right = false;
+    Movement.left = false;
+    Movement.up = false;
+    Movement.down = false;
 });
-
-//move based on currently pressed keys
-
-//NOTE: this is called in a setInterval in controls.js
-function sendDirection (socket) {
-
-    let newDirection = 'none';
-
-    if (right && !left && up && !down) {
-        newDirection = ('rightup');
-    }
-    else if (!right && left && up && !down) {
-        newDirection = ('leftup');
-    }
-    else if (right && !left && !up && down) {
-        newDirection = ('rightdown');
-    }
-    else if (!right && left && !up && down) {
-        newDirection = ('leftdown');
-    }
-    else if (right && !left) {
-        newDirection = ('right');
-    }
-    else if (!right && left) {
-        newDirection = ('left');
-    }
-    else if (up && !down) {
-        newDirection = ('up');
-    }
-    else if (!up && down) {
-        newDirection = ('down');
-    }
-
-    //if any change, send to server
-    if (newDirection != direction) {
-        socket.emit('direction', newDirection);
-        direction = newDirection;
-    }
-}
