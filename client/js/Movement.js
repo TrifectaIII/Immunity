@@ -7,45 +7,45 @@ var Movement = {
     up: false,
     down: false,
 
-    //current direction
-    direction: 'none',
+    //current angle
+    angle: 'none',
 
     //move based on currently pressed keys
     //NOTE: this is called in a setInterval in Controls.js
-    sendDirection: function (socket) {
+    sendAngle: function (socket) {
 
-        let newDirection = 'none';
+        let newAngle = 'none';
 
         if (Movement.right && !Movement.left && Movement.up && !Movement.down) {
-            newDirection = 'rightup';
+            newAngle = Math.PI*(7/4);
         }
         else if (!Movement.right && Movement.left && Movement.up && !Movement.down) {
-            newDirection = 'leftup';
+            newAngle = Math.PI*(5/4);
         }
         else if (Movement.right && !Movement.left && !Movement.up && Movement.down) {
-            newDirection = 'rightdown';
+            newAngle = Math.PI*(1/4);
         }
         else if (!Movement.right && Movement.left && !Movement.up && Movement.down) {
-            newDirection = 'leftdown';
+            newAngle = Math.PI*(3/4);
         }
         else if (Movement.right && !Movement.left) {
-            newDirection = 'right';
+            newAngle = 0;
         }
         else if (!Movement.right && Movement.left) {
-            newDirection = 'left';
+            newAngle = Math.PI;
         }
         else if (Movement.up && !Movement.down) {
-            newDirection = 'up';
+            newAngle = Math.PI*(3/2);
         }
         else if (!Movement.up && Movement.down) {
-            newDirection = 'down';
+            newAngle = Math.PI*(1/2);
         }
 
         //if any change, send to server
-        if (newDirection != Movement.direction) {
-            socket.emit('direction', newDirection);
-            //update current direction to new direction
-            Movement.direction = newDirection;
+        if (newAngle != Movement.angle) {
+            socket.emit('angle', newAngle);
+            //update current angle to new angle
+            Movement.angle = newAngle;
         }
     },
 }

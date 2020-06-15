@@ -80,12 +80,11 @@ Players.prototype.update = function () {
 
                 //acceleration is set by class
                 let acceleration = gameSettings.playerTypes[player.type].acceleration;
-                let accelerationComponent = acceleration/(Math.sqrt(2));
 
-                //accelerate based on direction sent by client
-                switch (player.direction) {
+                //accelerate based on angle sent by client
+                switch (player.angle) {
                     
-                    //degrade velocities when no direction
+                    //degrade velocities when no angle
                     case 'none':
                         player.velocity.x *= 0.95;
                         player.velocity.y *= 0.95;
@@ -100,57 +99,28 @@ Players.prototype.update = function () {
                         }
                         break;
 
-                    
-                    //diagonal movements use component acceleration
-                    case 'rightup':
-                        player.velocity.x += accelerationComponent;
-                        player.velocity.y -= accelerationComponent;
-                        break;
-                    case 'leftup':
-                        player.velocity.x -= accelerationComponent;
-                        player.velocity.y -= accelerationComponent;
-                        break;
-                    case 'rightdown':
-                        player.velocity.x += accelerationComponent;
-                        player.velocity.y += accelerationComponent;
-                        break;
-                    case 'leftdown':
-                        player.velocity.x -= accelerationComponent;
-                        player.velocity.y += accelerationComponent;
-                        break;
-                    
-                    //cardinal movements use raw acceleration
-                    //and degrade unused velocity
-                    case 'right':
-                        player.velocity.x += acceleration;
-                        player.velocity.y *= 0.95;
-                        if (Math.abs(player.velocity.y) < 0.1) {
-                            player.velocity.y = 0;
+                    //otherwise accelerate based on angle
+                    default:
+                        //x with cos
+                        if (Math.abs(Math.cos(player.angle)) < 0.1) {
+                            player.velocity.x *= 0.95;
+                            if (Math.abs(player.velocity.x) < 0.1) {
+                                player.velocity.x = 0;
+                            }
                         }
-                        break;
-                    case 'left':
-                        player.velocity.x -= acceleration;
-                        player.velocity.y *= 0.95;
-                        if (Math.abs(player.velocity.y) < 0.1) {
-                            player.velocity.y = 0;
+                        else {
+                            player.velocity.x += Math.cos(player.angle)*acceleration;
                         }
-                        break;
-                    case 'up':
-                        player.velocity.y -= acceleration;
-                        player.velocity.x *= 0.95;
-                        if (
-                            Math.abs(player.velocity.x) < 0.1) {
-                            player.velocity.x = 0;
+                        //y win sin
+                        if (Math.abs(Math.sin(player.angle)) < 0.1) {
+                            player.velocity.y *= 0.95;
+                            if (Math.abs(player.velocity.y) < 0.1) {
+                                player.velocity.y = 0;
+                            }
                         }
-                        break;
-                    case 'down':
-                        player.velocity.y += acceleration;
-                        player.velocity.x *= 0.95;
-                        if (
-                            Math.abs(player.velocity.x) < 0.1) {
-                            player.velocity.x = 0;
+                        else {
+                            player.velocity.y += Math.sin(player.angle)*acceleration;
                         }
-                        break;
                 }
 
                 //cap velocity
@@ -261,8 +231,8 @@ Players.prototype.add = function (player) {
     //start killStreak at 0
     player.killStreak = 0;
 
-    //give default direction
-    player.direction = 'none';
+    //give default angle
+    player.angle = 'none';
 
     //give default location
     player.x = 0;
@@ -304,8 +274,8 @@ Players.prototype.add = function (player) {
                 player.respawnTimer = 0;
 
 
-                //give default direction & velocities
-                player.direction = 'none';
+                //give default angle & velocities
+                player.angle = 'none';
                 player.velocity = {
                     x: 0,
                     y: 0,
@@ -326,9 +296,9 @@ Players.prototype.add = function (player) {
         }
     }.bind(this));//bind to scope
 
-    //switch player direction
-    player.on('direction', function (direction) {
-        player.direction = direction;
+    //switch player movement angle
+    player.on('angle', function (angle) {
+        player.angle = angle;
     });
 
     //switch clicking state
