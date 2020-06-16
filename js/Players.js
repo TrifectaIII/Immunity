@@ -78,49 +78,45 @@ Players.prototype.update = function () {
             //move player
             if (player.health > 0) {
 
-                //acceleration is set by class
-                let acceleration = gameSettings.playerTypes[player.type].acceleration;
+                //degrade velocities when no angle
+                if (player.angle == 'none') {
+                    player.velocity.x *= 0.95;
+                    player.velocity.y *= 0.95;
 
-                //accelerate based on angle sent by client
-                switch (player.angle) {
-                    
-                    //degrade velocities when no angle
-                    case 'none':
+                    //if slow enough, stop
+                    if (Math.abs(player.velocity.x) < 0.1) {
+                        player.velocity.x = 0;
+                    }
+                    if (Math.abs(player.velocity.y) < 0.1) {
+                        player.velocity.y = 0;
+                    }
+                }
+                //otherwise accelerate based on players angle and magnitude from settings
+                else {
+                    let acceleration = Physics.componentVector(
+                        player.angle,
+                        gameSettings.playerTypes[player.type].acceleration,
+                    )
+                    //x with cos
+                    if (Math.abs(Math.cos(player.angle)) < 0.1) {
                         player.velocity.x *= 0.95;
-                        player.velocity.y *= 0.95;
-
-                        //if slow enough, stop
-                        if (
-                            Math.abs(player.velocity.x) < 0.1) {
+                        if (Math.abs(player.velocity.x) < 0.1) {
                             player.velocity.x = 0;
                         }
+                    }
+                    else {
+                        player.velocity.x += acceleration.x;
+                    }
+                    //y win sin
+                    if (Math.abs(Math.sin(player.angle)) < 0.1) {
+                        player.velocity.y *= 0.95;
                         if (Math.abs(player.velocity.y) < 0.1) {
                             player.velocity.y = 0;
                         }
-                        break;
-
-                    //otherwise accelerate based on angle
-                    default:
-                        //x with cos
-                        if (Math.abs(Math.cos(player.angle)) < 0.1) {
-                            player.velocity.x *= 0.95;
-                            if (Math.abs(player.velocity.x) < 0.1) {
-                                player.velocity.x = 0;
-                            }
-                        }
-                        else {
-                            player.velocity.x += Math.cos(player.angle)*acceleration;
-                        }
-                        //y win sin
-                        if (Math.abs(Math.sin(player.angle)) < 0.1) {
-                            player.velocity.y *= 0.95;
-                            if (Math.abs(player.velocity.y) < 0.1) {
-                                player.velocity.y = 0;
-                            }
-                        }
-                        else {
-                            player.velocity.y += Math.sin(player.angle)*acceleration;
-                        }
+                    }
+                    else {
+                        player.velocity.y += acceleration.y;
+                    }
                 }
 
                 //cap velocity
@@ -148,7 +144,6 @@ Players.prototype.update = function () {
                 player.x = Math.min(Math.max(player.x, 0), gameSettings.width);
                 player.y = Math.min(Math.max(player.y, 0), gameSettings.height);
             }
-
         }
     }
 }

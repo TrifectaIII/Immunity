@@ -190,10 +190,7 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
 
             //calculate velocity based on shot velocity and where the player clicked and spread
             let velocity = Physics.componentVector(
-                Physics.angleBetween(
-                    player.x, player.y, 
-                    destX, destY
-                ) 
+                Physics.angleBetween(player.x, player.y, destX, destY) 
                 + (i - classShots.count/2 + 0.5) 
                 * (classShots.angle/(classShots.count-1)),
                 classShots.velocity
@@ -238,10 +235,7 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
 
             //calculate velocity based on destination, shot speed and spread
             let velocity = Physics.componentVector(
-                Physics.angleBetween(
-                    enemy.x, enemy.y, 
-                    destX, destY
-                ) 
+                Physics.angleBetween(enemy.x, enemy.y, destX, destY) 
                 + (i - classShots.count/2 + 0.5) 
                 * (classShots.angle/(classShots.count-1)),
                 classShots.velocity

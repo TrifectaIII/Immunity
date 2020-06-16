@@ -7,14 +7,14 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 
 //calculates angle of vector between 2 points
 function angleBetween (x1, y1, x2, y2) {
-    return Math.atan2(x2 - x1, y2 - y1);
+    return Math.atan2(y2 - y1, x2 - x1);
 }
 
 //calculates x/y component vectors based on angle and magnitude of vector
 function componentVector (angle, magnitude) {
     return {
-        x: Math.sin(angle) * magnitude,
-        y: Math.cos(angle) * magnitude,
+        x: Math.cos(angle) * magnitude,
+        y: Math.sin(angle) * magnitude,
     };
 }
 
