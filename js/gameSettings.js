@@ -247,6 +247,31 @@ var gameSettings = {
         },
     },
 
+    // BOSSES
+    /////////////////////////////////////////////////
+
+    boss: {
+        
+        radius: 150,
+        maxHealth: 100,
+        acceleration: 0.05,
+        maxVelocity: 2,
+        mass: 200,
+
+        attack: {
+            cooldown: 50,
+        },
+
+        shots: {
+            count: 5,
+            velocity: 10,
+            angle:Math.PI*2,
+            range: 400,
+            damage: 1,
+            mass: 5,
+        },
+    },
+
     // PICKUPS
     /////////////////////////////////////////////////
 
