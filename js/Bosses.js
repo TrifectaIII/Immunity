@@ -12,16 +12,16 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual boss
-function Boss (type, x, y) {
+function Boss (type, x, y, playerCount) {
     this.type = type;
     this.x = x;
     this.y = y;
-    // this.velocity = {
-    //     x: 0,
-    //     y: 0,
-    // }
-    // this.health = gameSettings.bossTypes[this.type].maxHealth;
-    // this.cooldown = 0;
+    this.velocity = {
+        x: 0,
+        y: 0,
+    }
+    this.health = gameSettings.boss.maxHealth * playerCount;
+    this.cooldown = 0;
 } 
 
 // object constructor for bosses container
@@ -43,20 +43,21 @@ Bosses.prototype.update = function () {
     //make sure game is not over
     if (!this.room.gameOver) {
 
-        
+        //loop through objects
+        for (let id in this.objects) {
+
+        }
     }
 }
 
 // spawn an individual boss in
 Bosses.prototype.spawnBoss = function () {
-
-    var type;
  
-    this.objects[id] = new Boss(type, x, y);
+    this.objects[id] = new Boss(type, x, y, this.room.playerCount());
 }
 
 //kills boss based on it's id
-Bosses.prototype.killEnemy = function (id) {
+Bosses.prototype.killBoss = function (id) {
     let boss = this.objects[id];
 
     if (Math.random() < gameSettings.enemyDropChance) {

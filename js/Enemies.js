@@ -114,11 +114,8 @@ Enemies.prototype.update = function () {
                                 //reset enemy cooldown
                                 enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
                                 
-                                //do damage to player if not cheating
-                                if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
-                                    player.health -= gameSettings.enemyTypes[enemy.type].attack.damage;
-                                }   
-                                
+                                //do damage to player
+                                this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemy.type].attack.damage);
                     }
                 }
             }

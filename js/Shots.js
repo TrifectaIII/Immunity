@@ -140,7 +140,7 @@ Shots.prototype.update = function () {
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
-                            player.health -= gameSettings.enemyTypes[enemyshot.type].shots.damage;
+                            this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemyshot.type].shots.damage);
                         }
                 }
             }

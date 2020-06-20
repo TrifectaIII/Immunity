@@ -72,10 +72,7 @@ Pickups.prototype.update = function () {
                         //if player not at max health
                         if (player.health < gameSettings.playerTypes[player.type].maxHealth) {
                             //give health and delete pickup
-                            player.health = Math.min(
-                                gameSettings.playerTypes[player.type].maxHealth,
-                                player.health + gameSettings.pickupHealthAmount
-                            );
+                            this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
                             delete this.objects[id];
                         }
                         break;

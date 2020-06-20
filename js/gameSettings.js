@@ -253,13 +253,13 @@ var gameSettings = {
     boss: {
         
         radius: 150,
-        maxHealth: 100,
+        maxHealth: 100,//multiplied by number of players
         acceleration: 0.05,
         maxVelocity: 2,
         mass: 200,
 
         attack: {
-            cooldown: 50,
+            cooldown: 60,
         },
 
         shots: {

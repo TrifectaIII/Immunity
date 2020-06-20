@@ -30,22 +30,6 @@ function Players (room) {
 //updates all player objects
 Players.prototype.update = function () {
 
-    //respawn any dead players
-    for (let id in this.playing) {
-        let player = this.playing[id];
-        if (player.health <= 0) {
-                player.health = 0;
-
-                //start respawn timer if game not over
-                if (!this.room.gameOver) {
-                    player.respawnTimer = gameSettings.respawnTime;
-                }
-
-                //move player to waiting
-                this.waitPlayer(player);
-        }
-    }
-
     //countdown respawn timer of dead players
     for (let id in this.waiting) {
         let player = this.waiting[id];
@@ -183,6 +167,41 @@ Players.prototype.collect = function () {
         playing: playing_info,
         waiting: waiting_info,
     };
+}
+
+//deal damage to a player
+Players.prototype.damagePlayer = function (player, amount) {
+
+    //make sure player is alive, and not cheating
+    if (player.id in this.playing && 
+        player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
+            player.health = Math.max(0, player.health - amount);
+
+            //handle death
+            if (player.health <= 0) {
+
+                //start respawn timer if game not over
+                if (!this.room.gameOver) {
+                    player.respawnTimer = gameSettings.respawnTime;
+                }
+
+                //move player to waiting
+                this.waitPlayer(player);
+            }
+    }
+}
+
+//add life to a player
+Players.prototype.healPlayer = function (player, amount) {
+
+    //make sure player is alive
+    if (player.id in this.playing) {
+        //heal up to maximum for class
+        player.health = Math.min(
+            gameSettings.playerTypes[player.type].maxHealth,
+            player.health + amount
+        );
+    }
 }
 
 //request shoot for player if appropriate
