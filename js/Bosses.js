@@ -12,8 +12,7 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual boss
-function Boss (type, x, y, playerCount) {
-    this.type = type;
+function Boss (x, y, playerCount) {
     this.x = x;
     this.y = y;
     this.velocity = {
@@ -22,6 +21,9 @@ function Boss (type, x, y, playerCount) {
     }
     this.health = gameSettings.boss.maxHealth * playerCount;
     this.cooldown = 0;
+
+    this.focusCooldown = 0;
+    this.focus = 'none';
 } 
 
 // object constructor for bosses container
@@ -45,15 +47,65 @@ Bosses.prototype.update = function () {
 
         //loop through objects
         for (let id in this.objects) {
+            let boss = this.objects[id];
 
+            //countdown focus cooldown
+            if (boss.focusCooldown > 0) {
+                boss.focusCooldown -= gameSettings.tickRate;
+            }
+
+            //change focus if needed
+            if (
+                (!(boss.focus in this.room.players.playing) || this.focusCooldown <= 0) &&
+                this.room.players.playingCount() > 0
+            ) {
+                    //choose new focus randomly from playing 
+                    let playingIds = Object.keys(this.room.players.playing);
+                    boss.focus = playingIds[Math.floor(Math.random()*playingIds.length)];
+                    //reset cooldown
+                    boss.focusCooldown = gameSettings.boss.focusTime;
+            }
+
+            //countdown attack cooldown
+            if (boss.cooldown > 0) {
+                boss.cooldown -= gameSettings.tickRate;
+            }
+
+            //if focus exists
+            if (boss.focus in this.room.players.playing) {
+                player = this.room.players.playing[boss.focus];
+
+                //accelerate in direction of focus
+                let acceleration = Physics.componentVector(
+                    Physics.angleBetween(boss.x, boss.y, player.x, player.y), 
+                    gameSettings.boss.acceleration
+                );
+                boss.velocity.x += acceleration.x;
+                boss.velocity.y += acceleration.y;
+
+                //reduce velocity to max, if needed
+                Physics.capVelocity(boss, gameSettings.boss.maxVelocity);
+
+                //move based on velocity
+                boss.x += boss.velocity.x
+                boss.y += boss.velocity.y
+            }
         }
     }
 }
 
 // spawn an individual boss in
 Bosses.prototype.spawnBoss = function () {
- 
-    this.objects[id] = new Boss(type, x, y, this.room.playerCount());
+
+    //increment id counter
+    let id = 'boss' + (this.idCounter++).toString();
+
+    //position boss to spawn at middle of game area
+    let x = gameSettings.width/2;
+    let y = gameSettings.height/2;
+
+    //create object
+    this.objects[id] = new Boss(x, y, this.room.playerCount());
 }
 
 //kills boss based on it's id
@@ -77,7 +129,6 @@ Bosses.prototype.collect = function () {
         boss_info[id] = {
             x: boss.x,
             y: boss.y,
-            type: boss.type,
             health: boss.health,
         };
     }

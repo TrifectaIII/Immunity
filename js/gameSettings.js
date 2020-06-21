@@ -250,6 +250,10 @@ var gameSettings = {
     // BOSSES
     /////////////////////////////////////////////////
 
+    //frequency of boss waves (value of 5 would be every 5 waves)
+    bossFrequency: 1,
+
+    //info about bosses
     boss: {
         
         radius: 150,
@@ -257,6 +261,7 @@ var gameSettings = {
         acceleration: 0.05,
         maxVelocity: 2,
         mass: 200,
+        focusTime: 10000,//time in ms that the boss will focus a given player
 
         attack: {
             cooldown: 60,
@@ -269,6 +274,11 @@ var gameSettings = {
             range: 400,
             damage: 1,
             mass: 5,
+        },
+
+        colors: {
+            dark: "#000000",
+            light: "#FF004D",
         },
     },
 

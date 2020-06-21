@@ -97,6 +97,7 @@ function joinGame(menuChoices) {
             enemyShotData = serverData.shotData.enemyshots;
             pickupData = serverData.pickupData;
             enemyData = serverData.enemyData;
+            bossData = serverData.bossData;
             zoneData = serverData.zoneData;
         });
     });

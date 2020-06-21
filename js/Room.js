@@ -41,6 +41,7 @@ function Room (roomId) {
     this.players = new Players(this);
     this.shots = new Shots(this);
     this.enemies = new Enemies(this);
+    this.bosses = new Bosses(this);
     this.pickups = new Pickups(this);
     this.zones = new Zones(this);
 
@@ -74,9 +75,6 @@ function Room (roomId) {
 //called every gameSettings.tickRate ms in index.js
 Room.prototype.update = function () {
 
-    //update players always
-    this.players.update();
-
     //only update game if active
     if (!this.gameOver && 
         this.players.playingCount() > 0) {
@@ -87,10 +85,14 @@ Room.prototype.update = function () {
             //update game objects
             this.shots.update();
             this.enemies.update();
+            this.bosses.update();
             this.pickups.update();
             this.zones.update();
             this.update_Quadtree();
     }
+
+    //update players always
+    this.players.update();
 
     //if no lives and all players dead, game is over
     this.gameOver = this.players.allDead() && this.livesCount <= 0;
@@ -100,6 +102,7 @@ Room.prototype.update = function () {
         playerData: this.players.collect(),
         shotData: this.shots.collect(),
         enemyData: this.enemies.collect(),
+        bossData: this.bosses.collect(),
         pickupData: this.pickups.collect(),
         zoneData: this.zones.collect(),
 
@@ -119,8 +122,9 @@ Room.prototype.update = function () {
 //creates a wave of enemies
 Room.prototype.spawnWave = function () {
 
-    //countdown wave timer
-    if (this.zones.count() <= 0) {
+    //countdown wave timer when no zones or bosses
+    if (this.zones.count() <= 0 &&
+        this.bosses.count() <= 0) {
         this.waveTimer = Math.max(
             0,
             this.waveTimer - gameSettings.tickRate,
@@ -128,15 +132,16 @@ Room.prototype.spawnWave = function () {
     }
 
     //check the old wave is gone and that timer is off
-    if (this.zones.count() <= 0 &&
-        this.waveTimer == 0) {
+    if (this.waveTimer <= 0) {
 
-            //increase wavecount
-            this.waveCount++;
-            
-            //restart timer for next time
-            this.waveTimer = gameSettings.waveTime;
+        //increase wavecount
+        this.waveCount++;
+        
+        //restart timer for next time
+        this.waveTimer = gameSettings.waveTime;
 
+        //usually spawn enemy/zone wave
+        if (this.waveCount%gameSettings.bossFrequency != 0) {
             //roll for mono wave chance
             if (Math.random() > gameSettings.enemyMonoChance) {
                 this.waveType = 'random';
@@ -161,6 +166,11 @@ Room.prototype.spawnWave = function () {
             for (let i = 0; i < zoneNum; i++) {
                 this.zones.spawnZone();
             }
+        }
+        //otherwise spawn boss wave
+        else {
+            this.bosses.spawnBoss();
+        }
     }
 }
 
@@ -204,6 +214,7 @@ Room.prototype.reset = function () {
         this.enemies = new Enemies(this);
         this.pickups = new Pickups(this);
         this.zones = new Zones(this);
+        this.bosses = new Bosses(this);
 
         //reset attributes
         this.waveCount = 0;

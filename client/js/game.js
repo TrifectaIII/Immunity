@@ -10,6 +10,7 @@ var shotData = {};
 var enemyShotData = {};
 var pickupData = {};
 var enemyData = {};
+var bossData = {};
 var zoneData = {};
 
 //object to hold info re: screen offset based on player position
@@ -56,6 +57,9 @@ function drawGame () {
 
         //draw enemies
         drawEnemies();
+
+        //draw bosses
+        drawBosses();
 
         //draw zones
         drawZones();
@@ -117,6 +121,9 @@ function drawGame () {
 
         //draw enemies
         drawEnemies();
+
+        //draw bosses
+        drawBosses();
 
         //draw zones
         drawZones();
@@ -407,6 +414,34 @@ function drawEnemies() {
     pop();
 }
 
+//draw bosses
+function drawBosses () {
+
+    push();
+
+    //draw enemies
+    for (let id in bossData) {
+        let boss = bossData[id];
+        if (boss.x-screenOffset.x > -200 &&
+            boss.x-screenOffset.x < windowWidth + 200 &&
+            boss.y-screenOffset.y > -200 &&
+            boss.y-screenOffset.y < windowHeight + 200) {
+
+                //draw circle
+                fill(gameSettings.boss.colors.dark);
+                stroke(gameSettings.boss.colors.light);
+                strokeWeight(2);
+                circle(
+                    boss.x-screenOffset.x,
+                    boss.y-screenOffset.y,
+                    gameSettings.boss.radius*2,
+                );
+        }   
+    }
+
+    pop();
+}
+
 //draw zones
 function drawZones () {
     
@@ -694,19 +729,8 @@ function drawMinimap (player) {
         );
     }
 
-    //draw other player pips
+    //reguklar pips dont need outline
     strokeWeight(0);
-    for (let id in playingData) {
-        if (id != socket.id && playingData[id].health > 0) {
-            let player = playingData[id];
-            fill(gameSettings.playerTypes[player.type].colors.light);
-            circle(
-                (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
-                (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
-                minimapPipSize,
-            );
-        }
-    }
 
     //draw enemy pips
     fill(gameSettings.colors.red);
@@ -717,6 +741,30 @@ function drawMinimap (player) {
             (enemy.y/gameSettings.height)*minimapHeight + minimapOffset.y,
             minimapPipSize,
         );
+    }
+
+    //draw boss pips
+    fill(gameSettings.colors.red);
+    for (let id in bossData) {
+        let boss = bossData[id];
+        circle(
+            (boss.x/gameSettings.width)*minimapWidth + minimapOffset.x,
+            (boss.y/gameSettings.height)*minimapHeight + minimapOffset.y,
+            minimapPipSize*2.25,
+        );
+    }
+
+    //draw other player pips
+    for (let id in playingData) {
+        if (id != socket.id && playingData[id].health > 0) {
+            let player = playingData[id];
+            fill(gameSettings.playerTypes[player.type].colors.light);
+            circle(
+                (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
+                (player.y/gameSettings.height)*minimapHeight + minimapOffset.y,
+                minimapPipSize,
+            );
+        }
     }
 
     //draw client player pip with outline indicator + larger
@@ -844,7 +892,8 @@ function drawWaveCountdown () {
 
     //make sure countdown is going
     if (gameData.waveTimer > 0 &&
-        Object.keys(zoneData).length == 0) {
+        Object.keys(zoneData).length == 0 &&
+        Object.keys(bossData).length == 0) {
 
             let countdownNum = Math.ceil(gameData.waveTimer/1000);
 
