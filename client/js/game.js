@@ -67,6 +67,9 @@ function drawGame () {
         //draw living players
         drawLiving();
 
+        //draw boss healthbar
+        drawBossbar();
+
         // then draw client player on top if living
         if (player.health > 0) {
             drawPlayer(player);
@@ -130,6 +133,9 @@ function drawGame () {
 
         //draw living players
         drawLiving();
+
+        //draw boss healthbar
+        drawBossbar();
 
         //draw UI
 
@@ -682,8 +688,52 @@ function drawHealthbar (player) {
     strokeWeight(4);
     textSize(20);
     fill(gameSettings.colors.white);
-    text(player.health.toString()+' / '+gameSettings.playerTypes[player.type].maxHealth.toString() ,windowWidth/2,windowHeight-17);
+    text(
+        player.health.toString()+' / '+ gameSettings.playerTypes[player.type].maxHealth.toString(),
+        windowWidth/2,
+        windowHeight-17
+    );
     pop();
+}
+
+//draw boss's healthbar
+function drawBossbar () {
+    if (Object.keys(bossData).length > 0) {
+        push();
+
+        let boss = bossData[Object.keys(bossData)[0]];
+
+        //draw bar
+        let prog = boss.health/boss.maxHealth;
+        prog = Math.min(1,Math.max(0,prog));
+        push();
+        strokeWeight(0);
+        fill('black');
+        rect(
+            windowWidth/4-2, 3,
+            windowWidth/2+4, 24
+        );
+        fill(gameSettings.boss.colors.light);
+        rect(
+            windowWidth/4, 5,
+            windowWidth/2*(prog), 20
+        );
+        pop();
+
+        //draw text
+        textAlign(CENTER, CENTER);
+        stroke('black');
+        strokeWeight(4);
+        textSize(20);
+        fill(gameSettings.colors.white);
+        text(
+            boss.health.toString()+' / '+ boss.maxHealth.toString(),
+            windowWidth/2,
+            13
+        );
+
+        pop();
+    }
 }
 
 //draws minimap, player argument optional

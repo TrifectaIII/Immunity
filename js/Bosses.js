@@ -19,7 +19,8 @@ function Boss (x, y, playerCount) {
         x: 0,
         y: 0,
     }
-    this.health = gameSettings.boss.maxHealth * playerCount;
+    this.maxHealth = gameSettings.boss.maxHealth * playerCount;
+    this.health = this.maxHealth;
     this.cooldown = 0;
 
     this.focusCooldown = 0;
@@ -130,6 +131,7 @@ Bosses.prototype.collect = function () {
             x: boss.x,
             y: boss.y,
             health: boss.health,
+            maxHealth: boss.maxHealth,
         };
     }
     
