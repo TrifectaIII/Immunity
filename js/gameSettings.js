@@ -155,6 +155,8 @@ var gameSettings = {
         normal: {
 
             radius: 25,
+            spineCount: 8,
+            spineLength: 5,
             maxHealth: 15,
             acceleration: 0.2,
             maxVelocity: 4,
@@ -183,6 +185,8 @@ var gameSettings = {
         heavy: {
 
             radius: 40,
+            spineCount: 12,
+            spineLength: 5,
             maxHealth: 25,
             acceleration: 0.1,
             maxVelocity: 3,
@@ -211,6 +215,8 @@ var gameSettings = {
         boxer: {
 
             radius: 30,
+            spineCount: 8,
+            spineLength: 5,
             maxHealth: 20,
             acceleration: 1,
             maxVelocity: 6,
@@ -230,6 +236,8 @@ var gameSettings = {
         scout: {
 
             radius: 20,
+            spineCount: 8,
+            spineLength: 5,
             maxHealth: 5,
             acceleration: 0.5,
             maxVelocity: 8,
@@ -251,12 +259,14 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 1,
+    bossFrequency: 2,
 
     //info about bosses
     boss: {
         
         radius: 150,
+        spineCount: 40,
+        spineLength: 15,
         maxHealth: 100,//multiplied by number of players
         acceleration: 0.05,
         maxVelocity: 2,

@@ -373,10 +373,25 @@ function drawEnemies() {
             enemy.y-screenOffset.y > -50 &&
             enemy.y-screenOffset.y < windowHeight + 50) {
 
-                //draw circle
+                //setup
                 fill(gameSettings.enemyTypes[enemy.type].colors.dark);
                 stroke(gameSettings.enemyTypes[enemy.type].colors.light);
-                strokeWeight(2);
+                strokeWeight(4);
+
+                //draw spines
+                for (let i = 0; i < gameSettings.enemyTypes[enemy.type].spineCount; i++) {
+                    let angle = Math.PI * (i/gameSettings.enemyTypes[enemy.type].spineCount);
+                    let spineX = Math.cos(angle) * (gameSettings.enemyTypes[enemy.type].radius + gameSettings.enemyTypes[enemy.type].spineLength);
+                    let spineY = Math.sin(angle) * (gameSettings.enemyTypes[enemy.type].radius + gameSettings.enemyTypes[enemy.type].spineLength);
+                    line(
+                        -spineX + enemy.x - screenOffset.x, 
+                        -spineY + enemy.y - screenOffset.y, 
+                        spineX + enemy.x - screenOffset.x, 
+                        spineY + enemy.y - screenOffset.y
+                    );
+                }
+
+                //draw circle
                 circle(
                     enemy.x-screenOffset.x,
                     enemy.y-screenOffset.y,
@@ -392,6 +407,7 @@ function drawEnemies() {
             enemy.x-screenOffset.x < windowWidth + 50 &&
             enemy.y-screenOffset.y > -50 &&
             enemy.y-screenOffset.y < windowHeight + 50) {
+
                 let x_offset = 15
                 let y_offset_abs = gameSettings.enemyTypes[enemy.type].radius + 10;
                 let y_offset = y_offset_abs;
@@ -433,14 +449,29 @@ function drawBosses () {
             boss.y-screenOffset.y > -200 &&
             boss.y-screenOffset.y < windowHeight + 200) {
 
-                //draw circle
+                //setup
                 fill(gameSettings.boss.colors.dark);
                 stroke(gameSettings.boss.colors.light);
-                strokeWeight(2);
+                strokeWeight(4);
+
+                //draw spines
+                for (let i = 0; i < gameSettings.boss.spineCount; i++) {
+                    let angle = Math.PI * (i/gameSettings.boss.spineCount);
+                    let spineX = Math.cos(angle) * (gameSettings.boss.radius + gameSettings.boss.spineLength);
+                    let spineY = Math.sin(angle) * (gameSettings.boss.radius + gameSettings.boss.spineLength);
+                    line(
+                        -spineX + boss.x - screenOffset.x, 
+                        -spineY + boss.y - screenOffset.y, 
+                        spineX + boss.x - screenOffset.x, 
+                        spineY + boss.y - screenOffset.y
+                    );
+                }
+
+                //draw circle
                 circle(
-                    boss.x-screenOffset.x,
-                    boss.y-screenOffset.y,
-                    gameSettings.boss.radius*2,
+                    boss.x - screenOffset.x,
+                    boss.y - screenOffset.y,
+                    gameSettings.boss.radius * 2,
                 );
         }   
     }
@@ -501,7 +532,7 @@ function drawDead () {
                     strokecolor.setAlpha(100)
                     fill(fillcolor);
                     stroke(strokecolor);
-                    strokeWeight(2);
+                    strokeWeight(4);
                     circle(
                         player.x-screenOffset.x, 
                         player.y-screenOffset.y, 
@@ -531,7 +562,7 @@ function drawLiving () {
                     
                     fill(gameSettings.playerTypes[player.type].colors.light);
                     stroke(gameSettings.playerTypes[player.type].colors.dark);
-                    strokeWeight(2);
+                    strokeWeight(4);
                     circle(
                         player.x-screenOffset.x, 
                         player.y-screenOffset.y, 
@@ -578,7 +609,7 @@ function drawLiving () {
     }
 
     //draw names
-    strokeWeight(2);
+    strokeWeight(4);
     textAlign(CENTER, BOTTOM);
     textSize(22);
     for (let id in playingData) {
@@ -616,7 +647,7 @@ function drawPlayer (player) {
     if (player.health > 0) {
         fill(gameSettings.playerTypes[player.type].colors.light);
         stroke(gameSettings.playerTypes[player.type].colors.dark);
-        strokeWeight(2);
+        strokeWeight(4);
         circle(
             player.x-screenOffset.x, 
             player.y-screenOffset.y, 
@@ -624,6 +655,7 @@ function drawPlayer (player) {
         );
 
         //draw name
+        strokeWeight(4);
         textAlign(CENTER, BOTTOM);
         textSize(22);
         
@@ -648,7 +680,7 @@ function drawPlayer (player) {
         strokecolor.setAlpha(100)
         fill(fillcolor);
         stroke(strokecolor);
-        strokeWeight(2);
+        strokeWeight(4);
         circle(
             player.x-screenOffset.x, 
             player.y-screenOffset.y, 
@@ -698,7 +730,10 @@ function drawHealthbar (player) {
 
 //draw boss's healthbar
 function drawBossbar () {
+
+    //only draw in boss exists
     if (Object.keys(bossData).length > 0) {
+
         push();
 
         let boss = bossData[Object.keys(bossData)[0]];
