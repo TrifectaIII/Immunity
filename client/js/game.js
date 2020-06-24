@@ -452,7 +452,7 @@ function drawBosses () {
                 //setup
                 fill(gameSettings.boss.colors.dark);
                 stroke(gameSettings.boss.colors.light);
-                strokeWeight(4);
+                strokeWeight(8);
 
                 //draw spines
                 for (let i = 0; i < gameSettings.boss.spineCount; i++) {

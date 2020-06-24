@@ -259,14 +259,14 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 2,
+    bossFrequency: 1,
 
     //info about bosses
     boss: {
         
         radius: 150,
-        spineCount: 40,
-        spineLength: 15,
+        spineCount: 30,
+        spineLength: 20,
         maxHealth: 100,//multiplied by number of players
         acceleration: 0.05,
         maxVelocity: 2,
