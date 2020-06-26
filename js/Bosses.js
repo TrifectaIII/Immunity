@@ -91,6 +91,34 @@ Bosses.prototype.update = function () {
                 boss.x += boss.velocity.x
                 boss.y += boss.velocity.y
             }
+
+            //boundaries
+            boss.x = Math.min(Math.max(boss.x, 0), gameSettings.width);
+            boss.y = Math.min(Math.max(boss.y, 0), gameSettings.height);
+
+            //check for collision with enemies
+            for (let eid in this.room.enemies.objects) {
+                let enemy = this.room.enemies.objects[eid];
+
+                Physics.collideAndDisplace(
+                    boss, 
+                    gameSettings.boss.radius,
+                    enemy, 
+                    gameSettings.enemyTypes[enemy.type].radius
+                );
+            }
+
+            //check for collision with players
+            for (let pid in this.room.players.playing) {
+                let player = this.room.players.playing[pid];
+
+                Physics.collideAndDisplace(
+                    boss, 
+                    gameSettings.boss.radius,
+                    player, 
+                    gameSettings.playerTypes[player.type].radius
+                );
+            }
         }
     }
 }

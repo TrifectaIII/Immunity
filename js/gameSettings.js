@@ -259,7 +259,7 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 1,
+    bossFrequency: 2,
 
     //info about bosses
     boss: {
