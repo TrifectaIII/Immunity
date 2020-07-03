@@ -11,7 +11,8 @@ const Physics = require(__dirname + '/Physics.js');
 
 
 //object constructor for individual pickup
-function Pickup (type, x, y) {
+function Pickup (id, type, x, y) {
+    this.id = id;
     this.type = type;
     this.x = x;
     this.y = y;
@@ -115,7 +116,7 @@ Pickups.prototype.spawnPickup = function (x, y) {
         let id = 'pickup' + (this.idCounter++).toString();
 
         //create pickup object
-        this.objects[id] = new Pickup(chosenType, x, y);
+        this.objects[id] = new Pickup(id, chosenType, x, y);
     }
 }
 

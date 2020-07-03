@@ -12,7 +12,8 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual player shots
-function PlayerShot (player, velocity) {
+function PlayerShot (id, player, velocity) {
+    this.id = id;
     this.type = player.type;
     this.x = player.x;
     this.y = player.y;
@@ -22,7 +23,8 @@ function PlayerShot (player, velocity) {
 }
 
 //object constructor for individual enemy shots
-function EnemyShot (enemy, velocity) {
+function EnemyShot (id, enemy, velocity) {
+    this.id = id;
     this.type = enemy.type;
     this.x = enemy.x;
     this.y = enemy.y;
@@ -79,26 +81,17 @@ Shots.prototype.update = function () {
                         enemy, gameSettings.enemyTypes[enemy.type].radius, 
                         shot, 0 //shots have no radius
                     )) {
-                            //remove health based on class
-                            if (enemy.health > 0) {
-                                enemy.health -= gameSettings.playerTypes[shot.type].shots.damage;
-                                
-                                destroyed = true;
+                            destroyed = true;
 
-                                Physics.collideShotEnemy(shot, enemy);
+                            //calculate physics collision
+                            Physics.collideShotEnemy(shot, enemy);
 
-                                //check if enemy died
-                                if (enemy.health <= 0) {
-
-                                    //increase killStreak
-                                    if (shot.playerId in this.room.players.objects) {
-                                        this.room.players.objects[shot.playerId].killStreak++;
-                                    }
-                                    
-                                    //kill enemy
-                                    this.room.enemies.killEnemy(this.findIndexOfEnemy(enemy));
-                                }
-                            }
+                            //damage enemy
+                            this.room.enemies.damageEnemy(
+                                enemy, 
+                                gameSettings.playerTypes[shot.type].shots.damage, 
+                                shot.playerId
+                            );
                 }
             }
 
@@ -180,7 +173,7 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
         let id = 'playershot' + (this.idCounter++).toString();
 
         //create new object
-        this.objects[id] = new PlayerShot(player, velocity);
+        this.objects[id] = new PlayerShot(id, player, velocity);
         this.playershots[id] = this.objects[id];
     }
 
@@ -200,7 +193,7 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
             let id = 'playershot' + (this.idCounter++).toString();
 
             //create new object
-            this.objects[id] = new PlayerShot(player, velocity);
+            this.objects[id] = new PlayerShot(id, player, velocity);
             this.playershots[id] = this.objects[id];
         }
     }
@@ -225,7 +218,7 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
         let id = 'enemyshot' + (this.idCounter++).toString();
 
         //create new object
-        this.objects[id] = new EnemyShot(enemy, velocity);
+        this.objects[id] = new EnemyShot(id, enemy, velocity);
         this.enemyshots[id] = this.objects[id];
     }
 
@@ -245,7 +238,7 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
             let id = 'enemyshot' + (this.idCounter++).toString();
 
             //create new object
-            this.objects[id] = new EnemyShot(enemy, velocity);
+            this.objects[id] = new EnemyShot(id, enemy, velocity);
             this.enemyshots[id] = this.objects[id];
         }
     }

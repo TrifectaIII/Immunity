@@ -11,7 +11,8 @@ const Physics = require(__dirname + '/Physics.js');
 
 
 //object constructor for individual pickup
-function Zone (x, y, startRadius) {
+function Zone (id, x, y, startRadius) {
+    this.id = id;
     this.x = x;
     this.y = y;
 
@@ -114,7 +115,7 @@ Zones.prototype.spawnZone = function () {
     let id = 'zone' + (this.idCounter++).toString();
 
     //create new object
-    this.objects[id] = new Zone (x, y, startRadius);
+    this.objects[id] = new Zone (id, x, y, startRadius);
 }
 
 //collect info to send to clients

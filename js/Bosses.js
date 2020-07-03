@@ -12,7 +12,8 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual boss
-function Boss (x, y, playerCount) {
+function Boss (id, x, y, playerCount) {
+    this.id = id;
     this.x = x;
     this.y = y;
     this.velocity = {
@@ -134,7 +135,7 @@ Bosses.prototype.spawnBoss = function () {
     let y = gameSettings.height/2;
 
     //create object
-    this.objects[id] = new Boss(x, y, this.room.playerCount());
+    this.objects[id] = new Boss(id, x, y, this.room.playerCount());
 }
 
 //kills boss based on it's id

@@ -12,7 +12,8 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual enemy
-function Enemy (type, x, y) {
+function Enemy (id, type, x, y) {
+    this.id = id;
     this.type = type;
     this.x = x;
     this.y = y;
@@ -227,18 +228,31 @@ Enemies.prototype.spawnEnemy = function () {
     let id = 'enemy' + (this.idCounter++).toString();
 
     //create enemy object
-    this.objects[id] = new Enemy(type, x, y);
+    this.objects[id] = new Enemy(id, type, x, y);
 }
 
 //kills enemy based on it's id
-Enemies.prototype.killEnemy = function (id) {
-    let enemy = this.objects[id];
+Enemies.prototype.damageEnemy = function (enemy, amount, playerId) {
 
-    if (Math.random() < gameSettings.enemyDropChance) {
-        this.room.pickups.spawnPickup(enemy.x, enemy.y);
+    //subtract health
+    enemy.health -= amount;
+
+    // if enemy died
+    if (enemy.health <= 0) {
+
+        //increase player killStreak
+        if (playerId in this.room.players.objects) {
+            this.room.players.objects[playerId].killStreak++;
+        }
+        
+        //drop pickup based on chance
+        if (Math.random() < gameSettings.enemyDropChance) {
+            this.room.pickups.spawnPickup(enemy.x, enemy.y);
+        }
+    
+        //delete enemy
+        delete this.objects[enemy.id];
     }
-
-    delete this.objects[id];
 }
 
 //collects info on enemies to send to clients
