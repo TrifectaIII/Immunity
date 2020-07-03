@@ -141,7 +141,8 @@ Room.prototype.spawnWave = function () {
         this.waveTimer = gameSettings.waveTime;
 
         //usually spawn enemy/zone wave
-        if (this.waveCount%gameSettings.bossFrequency != 0) {
+        if (!gameSettings.bossEnabled ||
+            this.waveCount%gameSettings.bossFrequency != 0) {
             //roll for mono wave chance
             if (Math.random() > gameSettings.enemyMonoChance) {
                 this.waveType = 'random';
