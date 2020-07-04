@@ -100,6 +100,10 @@ io.sockets.on('connection', function (socket) {
 
             //delete room if empty
             if (Rooms[socket.roomId].isEmpty()) {
+
+                //properly shut down room
+                Rooms[socket.roomId].shutDown();
+
                 delete Rooms[socket.roomId];
             }
 
@@ -139,7 +143,7 @@ io.sockets.on('connection', function (socket) {
             let newRoomId = generateRoomId(Rooms);
             
             //create room object
-            Rooms[newRoomId] = new Room(newRoomId);
+            Rooms[newRoomId] = new Room(newRoomId, io);
 
             //place socket into room
             Rooms[newRoomId].addPlayer(socket);
@@ -163,17 +167,3 @@ io.sockets.on('connection', function (socket) {
         }
     });
 });
-
-
-
-// MAIN GAME LOOP
-///////////////////////////////////////////////////
-
-setInterval(function () {
-    //update each room in turn and emit results to players
-    for (let roomId in Rooms) {
-        let serverData = Rooms[roomId].update();
-        io.to(roomId).emit('game_update', serverData);
-    }
-//frequency set by game settings in gameSettings.js
-}, gameSettings.tickRate);

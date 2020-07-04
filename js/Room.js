@@ -33,9 +33,11 @@ const { PerformanceObserver, performance } = require('perf_hooks');
 ///////////////////////////////////////////////////////////////////////////
 
 //constructor for room objects
-function Room (roomId) {
+function Room (roomId, io) {
 
     this.roomId = roomId;
+
+    this.io = io;
 
     //objects to hold each type of game object
     this.players = new Players(this);
@@ -66,6 +68,16 @@ function Room (roomId) {
     //switch for if the game is over
     this.gameOver = false;
 
+    //interval for updating game
+    this.updateInterval = setInterval(function () {
+
+        //update game
+        let serverData = this.update();
+
+        //send game info to clients
+        this.io.to(this.roomId).emit('game_update', serverData);
+    //tickrate from settings
+    }.bind(this), gameSettings.tickRate);
 }
 
 
@@ -224,6 +236,11 @@ Room.prototype.reset = function () {
         this.livesCount = gameSettings.livesStart + this.players.count();
         this.gameOver = false;
     }
+}
+
+//shut down room in preparation for deletion
+Room.prototype.shutDown = function () {
+    clearInterval(this.updateInterval);
 }
 
 //get current population of room
