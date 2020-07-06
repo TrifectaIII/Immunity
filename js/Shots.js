@@ -32,6 +32,15 @@ function EnemyShot (id, enemy, velocity) {
     this.range = gameSettings.enemyTypes[enemy.type].shots.range;
 }
 
+//object constructor for individual enemy shots
+function BossShot (id, boss, velocity) {
+    this.id = id;
+    this.x = boss.x;
+    this.y = boss.y;
+    this.velocity = velocity;
+    this.range = gameSettings.boss.shots.range;
+}
+
 // object constructor for shots container
 function Shots (room) {
 
@@ -43,6 +52,9 @@ function Shots (room) {
 
     //hold player shot objects
     this.enemyshots = {};
+
+    //hold boss shot objects
+    this.bossshots = {};
 
     //counter for object id's
     this.idCounter = 0;
@@ -147,6 +159,49 @@ Shots.prototype.update = function () {
             //delete if destroyed
             if (destroyed) {
                 delete this.enemyshots[id];
+                delete this.objects[id];
+            }
+        }
+
+        //loop through all boss shots
+        for (let id in this.bossshots) {
+            let bossshot = this.bossshots[id];
+
+            //move based on velocity
+            bossshot.x += bossshot.velocity.x;
+            bossshot.y += bossshot.velocity.y;
+
+            let destroyed = false;
+
+            // check for collisions with players
+            for (let id in this.room.players.playing) {
+                let player = this.room.players.playing[id];
+
+                if (Physics.isColliding(
+                        player, gameSettings.playerTypes[player.type].radius, 
+                        bossshot, 0 //enemy shots have no radius
+                    )) {
+
+                        destroyed = true;
+
+                        Physics.collideShotPlayer(bossshot, player);
+
+                        //do damage to player if not cheating
+                        if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
+                            this.room.players.damagePlayer(player, gameSettings.boss.shots.damage);
+                        }
+                }
+            }
+
+            //remove range based on velocity
+            bossshot.range -= gameSettings.boss.shots.velocity;
+            
+            //destroy if out of range
+            destroyed = destroyed || bossshot.range <= 1;
+            
+            //delete if destroyed
+            if (destroyed) {
+                delete this.bossshots[id];
                 delete this.objects[id];
             }
         }
