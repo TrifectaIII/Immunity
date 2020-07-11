@@ -263,7 +263,7 @@ Room.prototype.get_AllObj = function(){
         ...Object.values(this.enemies.objects), 
         ...Object.values(this.players.objects),
         //BUG IF YOU INCLUDE ENEMY SHOTS
-        ...Object.values(this.shots.playershots),
+        ...Object.values(this.shots.playerShots),
         ...Object.values(this.zones.objects),
     ]; 
 }

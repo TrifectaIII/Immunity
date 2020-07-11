@@ -48,13 +48,13 @@ function Shots (room) {
     this.objects = {};
 
     //hold player shot objects
-    this.playershots = {};
+    this.playerShots = {};
 
     //hold player shot objects
-    this.enemyshots = {};
+    this.enemyShots = {};
 
     //hold boss shot objects
-    this.bossshots = {};
+    this.bossShots = {};
 
     //counter for object id's
     this.idCounter = 0;
@@ -69,8 +69,8 @@ Shots.prototype.update = function () {
     if (!this.room.gameOver) {
 
         //loop through all player shots
-        for (let id in this.playershots) {
-            let shot = this.playershots[id];
+        for (let id in this.playerShots) {
+            let shot = this.playerShots[id];
 
             //move based on velocity
             shot.x += shot.velocity.x;
@@ -115,18 +115,18 @@ Shots.prototype.update = function () {
             
             //delete if destroyed
             if (destroyed) {
-                delete this.playershots[id];
+                delete this.playerShots[id];
                 delete this.objects[id];
             }
         }
 
         //loop through all enemy shots
-        for (let id in this.enemyshots) {
-            let enemyshot = this.enemyshots[id];
+        for (let id in this.enemyShots) {
+            let enemyShot = this.enemyShots[id];
 
             //move based on velocity
-            enemyshot.x += enemyshot.velocity.x;
-            enemyshot.y += enemyshot.velocity.y;
+            enemyShot.x += enemyShot.velocity.x;
+            enemyShot.y += enemyShot.velocity.y;
 
             let destroyed = false;
 
@@ -136,40 +136,40 @@ Shots.prototype.update = function () {
 
                 if (Physics.isColliding(
                         player, gameSettings.playerTypes[player.type].radius, 
-                        enemyshot, 0 //enemy shots have no radius
+                        enemyShot, 0 //enemy shots have no radius
                     )) {
 
                         destroyed = true;
 
-                        Physics.collideShotPlayer(enemyshot, player);
+                        Physics.collideShotPlayer(enemyShot, player);
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
-                            this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemyshot.type].shots.damage);
+                            this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemyShot.type].shots.damage);
                         }
                 }
             }
 
             //remove range based on velocity
-            enemyshot.range -= gameSettings.enemyTypes[enemyshot.type].shots.velocity;
+            enemyShot.range -= gameSettings.enemyTypes[enemyShot.type].shots.velocity;
             
             //destroy if out of range
-            destroyed = destroyed || enemyshot.range <= 1;
+            destroyed = destroyed || enemyShot.range <= 1;
             
             //delete if destroyed
             if (destroyed) {
-                delete this.enemyshots[id];
+                delete this.enemyShots[id];
                 delete this.objects[id];
             }
         }
 
         //loop through all boss shots
-        for (let id in this.bossshots) {
-            let bossshot = this.bossshots[id];
+        for (let id in this.bossShots) {
+            let bossShot = this.bossShots[id];
 
             //move based on velocity
-            bossshot.x += bossshot.velocity.x;
-            bossshot.y += bossshot.velocity.y;
+            bossShot.x += bossShot.velocity.x;
+            bossShot.y += bossShot.velocity.y;
 
             let destroyed = false;
 
@@ -179,12 +179,12 @@ Shots.prototype.update = function () {
 
                 if (Physics.isColliding(
                         player, gameSettings.playerTypes[player.type].radius, 
-                        bossshot, 0 //enemy shots have no radius
+                        bossShot, 0 //enemy shots have no radius
                     )) {
 
                         destroyed = true;
 
-                        Physics.collideShotPlayer(bossshot, player);
+                        Physics.collideShotPlayer(bossShot, player);
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
@@ -194,14 +194,14 @@ Shots.prototype.update = function () {
             }
 
             //remove range based on velocity
-            bossshot.range -= gameSettings.boss.shots.velocity;
+            bossShot.range -= gameSettings.boss.shots.velocity;
             
             //destroy if out of range
-            destroyed = destroyed || bossshot.range <= 1;
+            destroyed = destroyed || bossShot.range <= 1;
             
             //delete if destroyed
             if (destroyed) {
-                delete this.bossshots[id];
+                delete this.bossShots[id];
                 delete this.objects[id];
             }
         }
@@ -212,7 +212,7 @@ Shots.prototype.update = function () {
 //create a new shot
 Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
 
-    //each class shoots differently
+    //each player has different settings
     let classShots = gameSettings.playerTypes[player.type].shots;
 
     //single-shot classes
@@ -225,11 +225,11 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
         );
 
         //use id counter as id, then increase
-        let id = 'playershot' + (this.idCounter++).toString();
+        let id = 'playerShot' + (this.idCounter++).toString();
 
         //create new object
         this.objects[id] = new PlayerShot(id, player, velocity);
-        this.playershots[id] = this.objects[id];
+        this.playerShots[id] = this.objects[id];
     }
 
     //multi-shot (shotgun) classes
@@ -245,11 +245,11 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
             );
 
             //use id counter as id, then increase
-            let id = 'playershot' + (this.idCounter++).toString();
+            let id = 'playerShot' + (this.idCounter++).toString();
 
             //create new object
             this.objects[id] = new PlayerShot(id, player, velocity);
-            this.playershots[id] = this.objects[id];
+            this.playerShots[id] = this.objects[id];
         }
     }
 }  
@@ -257,7 +257,7 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
 //create a new enemy shot
 Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
 
-    //each class shoots differently
+    //each enemy class has different settings
     let classShots = gameSettings.enemyTypes[enemy.type].shots;
 
     //single-shot classes
@@ -270,11 +270,11 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
         );
 
         //use id counter as id, then increase
-        let id = 'enemyshot' + (this.idCounter++).toString();
+        let id = 'enemyShot' + (this.idCounter++).toString();
 
         //create new object
         this.objects[id] = new EnemyShot(id, enemy, velocity);
-        this.enemyshots[id] = this.objects[id];
+        this.enemyShots[id] = this.objects[id];
     }
 
     //multi-shot (shotgun) classes
@@ -290,11 +290,56 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
             );
 
             //use id counter as id, then increase
-            let id = 'enemyshot' + (this.idCounter++).toString();
+            let id = 'enemyShot' + (this.idCounter++).toString();
 
             //create new object
             this.objects[id] = new EnemyShot(id, enemy, velocity);
-            this.enemyshots[id] = this.objects[id];
+            this.enemyShots[id] = this.objects[id];
+        }
+    }
+}  
+
+//create a new boss shot
+Shots.prototype.spawnBossShot = function (boss, destX, destY) {
+
+    //boss shot settings
+    let bossShots = gameSettings.boss.shots;
+
+    //single-shot classes
+    if (bossShots.count <= 1) {
+        
+        //calculate velocity based on destination and shot speed
+        let velocity = Physics.componentVector(
+            Physics.angleBetween(boss.x, boss.y, destX, destY), 
+            bossShots.velocity
+        );
+
+        //use id counter as id, then increase
+        let id = 'bossShot' + (this.idCounter++).toString();
+
+        //create new object
+        this.objects[id] = new BossShot(id, boss, velocity);
+        this.bossShots[id] = this.objects[id];
+    }
+
+    //multi-shot (shotgun) classes
+    else {
+        for (let i = 0; i < bossShots.count; i++) {
+
+            //calculate velocity based on destination, shot speed and spread
+            let velocity = Physics.componentVector(
+                Physics.angleBetween(boss.x, boss.y, destX, destY) 
+                + (i - bossShots.count/2 + 0.5) 
+                * (bossShots.angle/(bossShots.count-1)),
+                bossShots.velocity
+            );
+
+            //use id counter as id, then increase
+            let id = 'bossShot' + (this.idCounter++).toString();
+
+            //create new object
+            this.objects[id] = new BossShot(id, boss, velocity);
+            this.bossShots[id] = this.objects[id];
         }
     }
 }  
@@ -302,31 +347,43 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
 // collect info on shot objects
 Shots.prototype.collect = function () {
 
-    var playershot_info = {};
+    var playerShot_info = {};
 
-    for (let id in this.playershots) {
-        let playershot = this.playershots[id];
-        playershot_info[id] = {
-            x: playershot.x,
-            y: playershot.y,
-            type: playershot.type,
+    for (let id in this.playerShots) {
+        let playerShot = this.playerShots[id];
+        playerShot_info[id] = {
+            x: playerShot.x,
+            y: playerShot.y,
+            type: playerShot.type,
         };
     }
 
-    var enemyshot_info = {};
+    var enemyShot_info = {};
 
-    for (let id in this.enemyshots) {
-        let enemyshot = this.enemyshots[id];
-        enemyshot_info[id] = {
-            x: enemyshot.x,
-            y: enemyshot.y,
-            type: enemyshot.type,
+    for (let id in this.enemyShots) {
+        let enemyShot = this.enemyShots[id];
+        enemyShot_info[id] = {
+            x: enemyShot.x,
+            y: enemyShot.y,
+            type: enemyShot.type,
+        };
+    }
+
+    var bossShot_info = {};
+
+    for (let id in this.bossShots) {
+        let bossShot = this.bossShots[id];
+        bossShot_info[id] = {
+            x: bossShot.x,
+            y: bossShot.y,
+            type: bossShot.type,
         };
     }
 
     return {
-        playershots: playershot_info,
-        enemyshots: enemyshot_info,
+        playerShots: playerShot_info,
+        enemyShots: enemyShot_info,
+        bossShots: bossShot_info,
     };
 }
 

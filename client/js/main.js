@@ -93,8 +93,8 @@ function joinGame(menuChoices) {
             gameData = serverData.roomData;
             playingData = serverData.playerData.playing;
             waitingData = serverData.playerData.waiting;
-            shotData = serverData.shotData.playershots;
-            enemyShotData = serverData.shotData.enemyshots;
+            shotData = serverData.shotData.playerShots;
+            enemyShotData = serverData.shotData.enemyShots;
             pickupData = serverData.pickupData;
             enemyData = serverData.enemyData;
             bossData = serverData.bossData;
