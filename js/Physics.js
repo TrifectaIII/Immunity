@@ -95,7 +95,14 @@ var Physics = {
 
         //get masses
         let playerMass = gameSettings.playerTypes[player.type].mass;
-        let shotMass = gameSettings.enemyTypes[shot.type].shots.mass;
+
+        let shotMass = 0;
+        if (shot.constructor.name == "BossShot") {
+            shotMass = gameSettings.boss.shots.mass;
+        }
+        else {
+            shotMass = gameSettings.enemyTypes[shot.type].shots.mass;
+        }
 
         //ratio of shot mass to player mass
         let massRatio = shotMass/playerMass;

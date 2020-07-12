@@ -91,6 +91,22 @@ Bosses.prototype.update = function () {
                 //move based on velocity
                 boss.x += boss.velocity.x
                 boss.y += boss.velocity.y
+
+                //attacking
+
+                //check for off cooldown
+                if (boss.cooldown <= 0) {
+
+                    //shoot if in range 
+                    if (gameSettings.boss.shots.range >= Physics.distance(boss, player) - gameSettings.playerTypes[player.type].radius) {
+
+                            //reset boss cooldown
+                            boss.cooldown = gameSettings.boss.attack.cooldown;
+
+                            //shoot at player
+                            this.room.shots.spawnBossShot(boss, player.x, player.y);
+                    }
+                }
             }
 
             //boundaries

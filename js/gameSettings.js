@@ -259,10 +259,10 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //toggle for enabling boss waves
-    bossEnabled: false,
+    bossEnabled: true,
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 2,
+    bossFrequency: 1,
 
     //info about bosses
     boss: {
@@ -283,8 +283,8 @@ var gameSettings = {
         shots: {
             count: 5,
             velocity: 10,
-            angle:Math.PI*2,
-            range: 400,
+            angle:Math.PI,
+            range: 1000,
             damage: 1,
             mass: 5,
         },

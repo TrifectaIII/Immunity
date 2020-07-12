@@ -8,6 +8,7 @@ var waitingData = {};
 //info for other game objects
 var shotData = {};
 var enemyShotData = {};
+var bossShotData = {};
 var pickupData = {};
 var enemyData = {};
 var bossData = {};
@@ -332,6 +333,23 @@ function drawShots() {
             shot.y-screenOffset.y < windowHeight) {
                 fill(gameSettings.enemyTypes[shot.type].colors.dark);
                 stroke(gameSettings.enemyTypes[shot.type].colors.light);
+                circle(
+                    shot.x-screenOffset.x, 
+                    shot.y-screenOffset.y, 
+                    10,
+                );
+        }
+    }
+
+    //draw boss shots
+    for (let id in bossShotData) {
+        let shot = bossShotData[id];
+        if (shot.x-screenOffset.x > 0 &&
+            shot.x-screenOffset.x < windowWidth &&
+            shot.y-screenOffset.y > 0 &&
+            shot.y-screenOffset.y < windowHeight) {
+                fill(gameSettings.boss.colors.light);
+                stroke(gameSettings.boss.colors.dark);
                 circle(
                     shot.x-screenOffset.x, 
                     shot.y-screenOffset.y, 
