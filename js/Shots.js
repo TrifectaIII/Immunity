@@ -109,16 +109,22 @@ Shots.prototype.update = function () {
                                 gameSettings.playerTypes[shot.type].shots.damage, 
                                 shot.playerId
                             );
-                }
 
-                //if entity is boss, and then check collision
-                if (entity.constructor.name == "Boss" &&
-                    Physics.isColliding(
-                        entity, gameSettings.boss.radius, 
+                            break;
+                }
+            }
+
+            //check for collision with bosses 
+
+            //loop through bosses
+            for (let bid in this.room.bosses.objects) {
+
+                let boss = this.room.bosses.objects[bid];
+
+                if (Physics.isColliding(
+                        boss, gameSettings.boss.radius, 
                         shot, 0 //shots have no radius
                     )) {
-
-                            let boss = entity;
 
                             destroyed = true;
 
@@ -131,6 +137,8 @@ Shots.prototype.update = function () {
                                 gameSettings.playerTypes[shot.type].shots.damage, 
                                 shot.playerId
                             );
+
+                            break;
                 }
             }
 
@@ -174,6 +182,8 @@ Shots.prototype.update = function () {
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
                             this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemyShot.type].shots.damage);
                         }
+
+                        break;
                 }
             }
 
@@ -217,6 +227,8 @@ Shots.prototype.update = function () {
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
                             this.room.players.damagePlayer(player, gameSettings.boss.shots.damage);
                         }
+
+                        break;
                 }
             }
 
@@ -414,14 +426,14 @@ Shots.prototype.collect = function () {
     };
 }
 
-Shots.prototype.findIndexOfEnemy = function (enemy) {
+// Shots.prototype.findIndexOfEnemy = function (enemy) {
 
-    for( i in this.room.enemies.objects){
-        let e = this.room.enemies.objects[i];
-        if (e.x == enemy.x && e.y == enemy.y){
-            return i;
-        }
-    }
-}
+//     for( i in this.room.enemies.objects){
+//         let e = this.room.enemies.objects[i];
+//         if (e.x == enemy.x && e.y == enemy.y){
+//             return i;
+//         }
+//     }
+// }
 
 module.exports = Shots;

@@ -259,10 +259,10 @@ var gameSettings = {
     /////////////////////////////////////////////////
 
     //toggle for enabling boss waves
-    bossEnabled: false,
+    bossEnabled: true,
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 1,
+    bossFrequency: 5,
 
     //info about bosses
     boss: {

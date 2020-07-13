@@ -12,7 +12,7 @@ const QT = require(__dirname +'/Qtree.js');
 
 
 //object constructor for individual boss
-function Boss (id, x, y, playerCount) {
+function Boss (id, x, y, playerCount, waveCount) {
     this.id = id;
     this.x = x;
     this.y = y;
@@ -20,7 +20,9 @@ function Boss (id, x, y, playerCount) {
         x: 0,
         y: 0,
     }
-    this.maxHealth = gameSettings.boss.maxHealth * playerCount;
+
+    let bossWaveCount = Math.floor(waveCount/gameSettings.bossFrequency);
+    this.maxHealth = gameSettings.boss.maxHealth * (playerCount + bossWaveCount - 1);
     this.health = this.maxHealth;
     this.cooldown = 0;
 
@@ -151,7 +153,11 @@ Bosses.prototype.spawnBoss = function () {
     let y = gameSettings.height/2;
 
     //create object
-    this.objects[id] = new Boss(id, x, y, this.room.playerCount());
+    this.objects[id] = new Boss(
+        id, x, y, 
+        this.room.playerCount(), 
+        this.room.waveCount
+    );
 }
 
 //damages an individual boss
