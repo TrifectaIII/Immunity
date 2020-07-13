@@ -154,15 +154,28 @@ Bosses.prototype.spawnBoss = function () {
     this.objects[id] = new Boss(id, x, y, this.room.playerCount());
 }
 
-//kills boss based on it's id
-Bosses.prototype.killBoss = function (id) {
-    let boss = this.objects[id];
+//damages an individual boss
+Bosses.prototype.damageBoss = function (boss, amount, playerId) {
 
-    if (Math.random() < gameSettings.enemyDropChance) {
-        this.room.pickups.spawnPickup(boss.x, boss.y);
+    //subtract health
+    boss.health -= amount;
+
+    // if boss died
+    if (boss.health <= 0) {
+
+        //increase player killStreak
+        if (playerId in this.room.players.objects) {
+            this.room.players.objects[playerId].killStreak++;
+        }
+        
+        //drop pickup based on chance
+        if (Math.random() < gameSettings.bossDropChance) {
+            this.room.pickups.spawnPickup(boss.x, boss.y);
+        }
+    
+        //delete boss
+        delete this.objects[boss.id];
     }
-
-    delete this.objects[id];
 }
 
 //collects info on enemies to send to clients

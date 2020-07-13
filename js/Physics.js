@@ -90,6 +90,21 @@ var Physics = {
         enemy.velocity.y += shot.velocity.y * massRatio;
     },
 
+    //impart shot momentum to boss (currently unused)
+    collideShotBoss: function (shot, boss) {
+
+        //get masses
+        let bossMass = gameSettings.boss.mass;
+        let shotMass = gameSettings.playerTypes[shot.type].shots.mass;
+
+        //ratio of shot mass to boss mass
+        let massRatio = shotMass/bossMass;
+
+        //accelerate boss based on shot velocity and mass ratio
+        boss.velocity.x += shot.velocity.x * massRatio;
+        boss.velocity.y += shot.velocity.y * massRatio;
+    },
+
     //impart shot momentum to player
     collideShotPlayer: function (shot, player) {
 

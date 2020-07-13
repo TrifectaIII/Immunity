@@ -260,10 +260,11 @@ Room.prototype.isEmpty = function () {
 
 Room.prototype.get_AllObj = function(){
     return [
-        ...Object.values(this.enemies.objects), 
         ...Object.values(this.players.objects),
-        //BUG IF YOU INCLUDE ENEMY SHOTS
-        ...Object.values(this.shots.playerShots),
+        ...Object.values(this.enemies.objects), 
+        ...Object.values(this.bosses.objects), 
+        //MAX CALL STACK BUG IF YOU INCLUDE SHOTS
+        // ...Object.values(this.shots.objects),
         ...Object.values(this.zones.objects),
     ]; 
 }

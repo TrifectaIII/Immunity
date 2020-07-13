@@ -231,7 +231,7 @@ Enemies.prototype.spawnEnemy = function () {
     this.objects[id] = new Enemy(id, type, x, y);
 }
 
-//kills enemy based on it's id
+//damages an individual enemy
 Enemies.prototype.damageEnemy = function (enemy, amount, playerId) {
 
     //subtract health

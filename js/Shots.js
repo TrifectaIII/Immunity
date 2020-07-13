@@ -85,14 +85,19 @@ Shots.prototype.update = function () {
 
             //loop through nearby objects
             for (let id in nearby_objs) {
-                let enemy = nearby_objs[id];
 
-                //make sure object is enemy, and then check collision
-                if (enemy.constructor.name == "Enemy" &&
+                //access near entity
+                let entity = nearby_objs[id];
+
+                //if entity is enemy, and then check collision
+                if (entity.constructor.name == "Enemy" &&
                     Physics.isColliding(
-                        enemy, gameSettings.enemyTypes[enemy.type].radius, 
+                        entity, gameSettings.enemyTypes[entity.type].radius, 
                         shot, 0 //shots have no radius
                     )) {
+
+                            let enemy = entity;
+
                             destroyed = true;
 
                             //calculate physics collision
@@ -101,6 +106,28 @@ Shots.prototype.update = function () {
                             //damage enemy
                             this.room.enemies.damageEnemy(
                                 enemy, 
+                                gameSettings.playerTypes[shot.type].shots.damage, 
+                                shot.playerId
+                            );
+                }
+
+                //if entity is boss, and then check collision
+                if (entity.constructor.name == "Boss" &&
+                    Physics.isColliding(
+                        entity, gameSettings.boss.radius, 
+                        shot, 0 //shots have no radius
+                    )) {
+
+                            let boss = entity;
+
+                            destroyed = true;
+
+                            //boss unaffected by bullet momentum
+                            // Physics.collideShotBoss(shot, boss);
+
+                            //damage enemy
+                            this.room.bosses.damageBoss(
+                                boss, 
                                 gameSettings.playerTypes[shot.type].shots.damage, 
                                 shot.playerId
                             );
