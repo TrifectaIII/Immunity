@@ -22,6 +22,16 @@ function PlayerShot (id, player, velocity) {
     this.range = gameSettings.playerTypes[player.type].shots.range;
 }
 
+//returns damage of player shot
+PlayerShot.prototype.getDamage = function () {
+    return gameSettings.playerTypes[this.type].shots.damage;
+}
+
+//returns speed of player shot
+PlayerShot.prototype.getSpeed = function () {
+    return gameSettings.playerTypes[this.type].shots.velocity;
+}
+
 //object constructor for individual enemy shots
 function EnemyShot (id, enemy, velocity) {
     this.id = id;
@@ -32,6 +42,16 @@ function EnemyShot (id, enemy, velocity) {
     this.range = gameSettings.enemyTypes[enemy.type].shots.range;
 }
 
+//returns damage of enemy shot
+EnemyShot.prototype.getDamage = function () {
+    return gameSettings.enemyTypes[this.type].shots.damage;
+}
+
+//returns speed of player shot
+EnemyShot.prototype.getSpeed = function () {
+    return gameSettings.enemyTypes[this.type].shots.velocity;
+}
+
 //object constructor for individual enemy shots
 function BossShot (id, boss, velocity) {
     this.id = id;
@@ -39,6 +59,16 @@ function BossShot (id, boss, velocity) {
     this.y = boss.y;
     this.velocity = velocity;
     this.range = gameSettings.boss.shots.range;
+}
+
+//returns damage of eboss shot
+BossShot.prototype.getDamage = function () {
+    return gameSettings.boss.shots.damage;
+}
+
+//returns speed of player shot
+BossShot.prototype.getSpeed = function () {
+    return gameSettings.boss.shots.velocity;
 }
 
 // object constructor for shots container
@@ -106,7 +136,7 @@ Shots.prototype.update = function () {
                             //damage enemy
                             this.room.enemies.damageEnemy(
                                 enemy, 
-                                gameSettings.playerTypes[shot.type].shots.damage, 
+                                shot.getDamage(), 
                                 shot.playerId
                             );
 
@@ -134,7 +164,7 @@ Shots.prototype.update = function () {
                             //damage enemy
                             this.room.bosses.damageBoss(
                                 boss, 
-                                gameSettings.playerTypes[shot.type].shots.damage, 
+                                shot.getDamage(), 
                                 shot.playerId
                             );
 
@@ -142,8 +172,8 @@ Shots.prototype.update = function () {
                 }
             }
 
-            //remove range based on velocity
-            shot.range -= gameSettings.playerTypes[shot.type].shots.velocity;
+            //remove range based on speed
+            shot.range -= shot.getSpeed();
             
             //destroy if out of range
             destroyed = destroyed || shot.range <= 1;
@@ -180,15 +210,18 @@ Shots.prototype.update = function () {
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
-                            this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemyShot.type].shots.damage);
+                            this.room.players.damagePlayer(
+                                player, 
+                                enemyShot.getDamage()
+                            );
                         }
 
                         break;
                 }
             }
 
-            //remove range based on velocity
-            enemyShot.range -= gameSettings.enemyTypes[enemyShot.type].shots.velocity;
+            //remove range based on speed
+            enemyShot.range -= enemyShot.getSpeed();
             
             //destroy if out of range
             destroyed = destroyed || enemyShot.range <= 1;
@@ -225,15 +258,18 @@ Shots.prototype.update = function () {
 
                         //do damage to player if not cheating
                         if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()){
-                            this.room.players.damagePlayer(player, gameSettings.boss.shots.damage);
+                            this.room.players.damagePlayer(
+                                player, 
+                                bossShot.getDamage()
+                            );
                         }
 
                         break;
                 }
             }
 
-            //remove range based on velocity
-            bossShot.range -= gameSettings.boss.shots.velocity;
+            //remove range based on speed
+            bossShot.range -= bossShot.getSpeed();
             
             //destroy if out of range
             destroyed = destroyed || bossShot.range <= 1;

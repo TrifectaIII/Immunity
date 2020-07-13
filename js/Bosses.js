@@ -20,7 +20,7 @@ function Boss (id, x, y, playerCount, waveCount) {
         x: 0,
         y: 0,
     }
-
+    // health is max health * (number of players + number of times boss has been killed already)
     let bossWaveCount = Math.floor(waveCount/gameSettings.bossFrequency);
     this.maxHealth = gameSettings.boss.maxHealth * (playerCount + bossWaveCount - 1);
     this.health = this.maxHealth;
