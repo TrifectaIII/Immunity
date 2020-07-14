@@ -29,67 +29,68 @@ const QT = require(__dirname +'/Qtree.js');
 const { PerformanceObserver, performance } = require('perf_hooks');
 
 
-// ROOM CONSTRUCTOR
+// ROOM CLASS
 ///////////////////////////////////////////////////////////////////////////
 
-//constructor for room objects
-function Room (roomId, io) {
+//class for room objects
+class Room {
 
-    this.roomId = roomId;
+    constructor(roomId, io) {
 
-    this.io = io;
+        this.roomId = roomId;
 
-    //objects to hold each type of game object
-    this.players = new Players(this);
-    this.shots = new Shots(this);
-    this.enemies = new Enemies(this);
-    this.bosses = new Bosses(this);
-    this.pickups = new Pickups(this);
-    this.zones = new Zones(this);
+        this.io = io;
 
-    //create a Quad tree covering the game world with capacity of each node at 4
-    this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height, 4));
+        //objects to hold each type of game object
+        this.players = new Players(this);
+        this.shots = new Shots(this);
+        this.enemies = new Enemies(this);
+        this.bosses = new Bosses(this);
+        this.pickups = new Pickups(this);
+        this.zones = new Zones(this);
 
-    //counts each enemy wave
-    this.waveCount = 0;
+        //create a Quad tree covering the game world with capacity of each node at 4
+        this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width / 2, gameSettings.height / 2, gameSettings.width, gameSettings.height, 4));
 
-    //type of current wave
-    this.waveType = 'random';
+        //counts each enemy wave
+        this.waveCount = 0;
 
-    //timer until next wave
-    this.waveTimer = gameSettings.waveTime;
+        //type of current wave
+        this.waveType = 'random';
 
-    //how many lives the players have
-    this.livesCount = gameSettings.livesStart;
+        //timer until next wave
+        this.waveTimer = gameSettings.waveTime;
 
-    //how many players have joined at any time, up to 4
-    this.playersSeen = 0;
+        //how many lives the players have
+        this.livesCount = gameSettings.livesStart;
 
-    //switch for if the game is over
-    this.gameOver = false;
+        //how many players have joined at any time, up to 4
+        this.playersSeen = 0;
 
-    //interval for updating game
-    this.updateInterval = setInterval(function () {
+        //switch for if the game is over
+        this.gameOver = false;
 
-        //update game
-        let serverData = this.update();
+        //interval for updating game
+        this.updateInterval = setInterval(function () {
 
-        //send game info to clients
-        this.io.to(this.roomId).emit('game_update', serverData);
-    //tickrate from settings
-    }.bind(this), gameSettings.tickRate);
-}
+            //update game
+            let serverData = this.update();
 
+            //send game info to clients
+            this.io.to(this.roomId).emit('game_update', serverData);
+            //tickrate from settings
+        }.bind(this), gameSettings.tickRate);
+    }
 
-// ROOM UPDATE
-///////////////////////////////////////////////////////////////////////////
+    // ROOM UPDATE
+    ///////////////////////////////////////////////////////////////////////
 
-//called every gameSettings.tickRate ms in index.js
-Room.prototype.update = function () {
+    //called every gameSettings.tickRate (ms)
+    update() {
 
-    //only update game if active
-    if (!this.gameOver && 
-        this.players.playingCount() > 0) {
+        //only update game if active
+        if (!this.gameOver &&
+            this.players.playingCount() > 0) {
 
             //spawn new wave if needed
             this.spawnWave();
@@ -101,186 +102,185 @@ Room.prototype.update = function () {
             this.pickups.update();
             this.zones.update();
             this.update_Quadtree();
+        }
+
+        //update players always
+        this.players.update();
+
+        //if no lives and all players dead, game is over
+        this.gameOver = this.players.allDead() && this.livesCount <= 0;
+
+        //collect return game info for emit to clients in room
+        return {
+            playerData: this.players.collect(),
+            shotData: this.shots.collect(),
+            enemyData: this.enemies.collect(),
+            bossData: this.bosses.collect(),
+            pickupData: this.pickups.collect(),
+            zoneData: this.zones.collect(),
+
+            roomData: {
+                waveCount: this.waveCount,
+                livesCount: this.livesCount,
+                gameOver: this.gameOver,
+                waveTimer: this.waveTimer,
+            },
+        };
     }
 
-    //update players always
-    this.players.update();
+    // OTHER METHODS
+    ///////////////////////////////////////////////////////////////////////
 
-    //if no lives and all players dead, game is over
-    this.gameOver = this.players.allDead() && this.livesCount <= 0;
+    //creates a wave of enemies
+    spawnWave() {
 
-    //collect return game info for emit to clients in room
-    return {
-        playerData: this.players.collect(),
-        shotData: this.shots.collect(),
-        enemyData: this.enemies.collect(),
-        bossData: this.bosses.collect(),
-        pickupData: this.pickups.collect(),
-        zoneData: this.zones.collect(),
+        //countdown wave timer when no zones or bosses
+        if (this.zones.count() <= 0 &&
+            this.bosses.count() <= 0) {
+            this.waveTimer = Math.max(
+                0,
+                this.waveTimer - gameSettings.tickRate);
+        }
 
-        roomData: {
-            waveCount: this.waveCount,
-            livesCount: this.livesCount,
-            gameOver: this.gameOver,
-            waveTimer: this.waveTimer,
-        },
-    }
-}
+        //check the old wave is gone and that timer is off
+        if (this.waveTimer <= 0) {
 
+            //increase wavecount
+            this.waveCount++;
 
-// OTHER METHODS
-///////////////////////////////////////////////////////////////////////////
+            //restart timer for next time
+            this.waveTimer = gameSettings.waveTime;
 
-//creates a wave of enemies
-Room.prototype.spawnWave = function () {
+            //usually spawn enemy/zone wave
+            if (!gameSettings.bossEnabled ||
+                this.waveCount % gameSettings.bossFrequency != 0) {
+                //roll for mono wave chance
+                if (Math.random() > gameSettings.enemyMonoChance) {
+                    this.waveType = 'random';
+                }
+                else {
+                    let typeList = Object.keys(gameSettings.enemyTypes);
+                    this.waveType = typeList[Math.floor(Math.random() * typeList.length)];
+                }
 
-    //countdown wave timer when no zones or bosses
-    if (this.zones.count() <= 0 &&
-        this.bosses.count() <= 0) {
-        this.waveTimer = Math.max(
-            0,
-            this.waveTimer - gameSettings.tickRate,
-        );
-    }
+                //spawn number of enemies based on number of players and wave count
+                let enemyNum = this.playerCount() * (
+                    gameSettings.enemyCountStart +
+                    (this.waveCount - 1) *
+                    gameSettings.enemyCountScale
+                );
+                for (let i = 0; i < enemyNum; i++) {
+                    this.enemies.spawnEnemy();
+                }
 
-    //check the old wave is gone and that timer is off
-    if (this.waveTimer <= 0) {
-
-        //increase wavecount
-        this.waveCount++;
-        
-        //restart timer for next time
-        this.waveTimer = gameSettings.waveTime;
-
-        //usually spawn enemy/zone wave
-        if (!gameSettings.bossEnabled ||
-            this.waveCount%gameSettings.bossFrequency != 0) {
-            //roll for mono wave chance
-            if (Math.random() > gameSettings.enemyMonoChance) {
-                this.waveType = 'random';
+                //spawn zones based on player count
+                let zoneNum = this.playerCount() * gameSettings.zoneCount;
+                for (let i = 0; i < zoneNum; i++) {
+                    this.zones.spawnZone();
+                }
             }
+            //otherwise spawn boss wave
             else {
-                let typeList = Object.keys(gameSettings.enemyTypes);
-                this.waveType = typeList[Math.floor(Math.random()*typeList.length)];
+                this.bosses.spawnBoss();
             }
-
-            //spawn number of enemies based on number of players and wave count
-            let enemyNum = this.playerCount() * (
-                gameSettings.enemyCountStart + 
-                (this.waveCount - 1) * 
-                gameSettings.enemyCountScale
-            );
-            for (let i = 0; i < enemyNum; i++) {
-                this.enemies.spawnEnemy();
-            }
-
-            //spawn zones based on player count
-            let zoneNum = this.playerCount() * gameSettings.zoneCount;
-            for (let i = 0; i < zoneNum; i++) {
-                this.zones.spawnZone();
-            }
-        }
-        //otherwise spawn boss wave
-        else {
-            this.bosses.spawnBoss();
         }
     }
-}
 
-//adds player to room
-Room.prototype.addPlayer = function (player) {
-    
-    //join socketio room
-    player.join(this.roomId);
+    //adds player to room
+    addPlayer(player) {
 
-    //set roomId to socket
-    player.roomId = this.roomId;
+        //join socketio room
+        player.join(this.roomId);
 
-    //if haven't seen enough players to meet cap yet, give a life
-    if (!this.gameOver &&
-        this.playersSeen < gameSettings.roomCap) {
+        //set roomId to socket
+        player.roomId = this.roomId;
+
+        //if haven't seen enough players to meet cap yet, give a life
+        if (!this.gameOver &&
+            this.playersSeen < gameSettings.roomCap) {
             this.livesCount++;
             this.playersSeen++;
+        }
+
+        //add to players
+        this.players.add(player);
+
+        //confirm join with server after player totally set up
+        player.emit('joined', this.roomId);
     }
 
-    //add to players
-    this.players.add(player);
+    //remove socket if socket exists in room
+    removePlayer(player) {
+        this.players.remove(player);
+    }
 
-    //confirm join with server after player totally set up
-    player.emit('joined',this.roomId);
-}
+    reset() {
+        //make sure game is actually over
+        if (this.gameOver) {
 
-//remove socket if socket exists in room
-Room.prototype.removePlayer = function (player) {
-    this.players.remove(player);
-}
+            //reset all players
+            this.players.reset();
 
-Room.prototype.reset = function () {
-    //make sure game is actually over
-    if (this.gameOver) {
+            //recreate other game objects
+            this.shots = new Shots(this);
+            this.enemies = new Enemies(this);
+            this.pickups = new Pickups(this);
+            this.zones = new Zones(this);
+            this.bosses = new Bosses(this);
 
-        //reset all players
-        this.players.reset();
+            //reset attributes
+            this.waveCount = 0;
+            this.waveTimer = gameSettings.waveTime;
+            this.playersSeen = this.players.count();
+            this.livesCount = gameSettings.livesStart + this.players.count();
+            this.gameOver = false;
+        }
+    }
 
-        //recreate other game objects
-        this.shots = new Shots(this);
-        this.enemies = new Enemies(this);
-        this.pickups = new Pickups(this);
-        this.zones = new Zones(this);
-        this.bosses = new Bosses(this);
+    //shut down room in preparation for deletion
+    shutDown() {
+        clearInterval(this.updateInterval);
+    }
 
-        //reset attributes
-        this.waveCount = 0;
-        this.waveTimer = gameSettings.waveTime;
-        this.playersSeen = this.players.count();
-        this.livesCount = gameSettings.livesStart + this.players.count();
-        this.gameOver = false;
+    //get current population of room
+    playerCount() {
+        return this.players.count();
+    }
+
+    //checks if room is full of players
+    isFull() {
+        return this.players.count() >= gameSettings.roomCap;
+    }
+
+    //checks if room is empty
+    isEmpty() {
+        return this.players.count() == 0;
+    }
+
+    //collate all objects for qtree
+    get_AllObj() {
+        return [
+            ...Object.values(this.players.objects),
+            ...Object.values(this.enemies.objects),
+            ...Object.values(this.bosses.objects),
+            //MAX CALL STACK BUG IF YOU INCLUDE SHOTS
+            // ...Object.values(this.shots.objects),
+            ...Object.values(this.zones.objects),
+        ];
+    }
+
+    //update qtree
+    update_Quadtree() {
+        this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width / 2, gameSettings.height / 2, gameSettings.width, gameSettings.height), 4);
+
+        //reinsert objects into the new Quadtree
+        let objs = this.get_AllObj();
+        for (let i in objs) {
+            this.Quadtree.insert(objs[i]);
+        }
     }
 }
 
-//shut down room in preparation for deletion
-Room.prototype.shutDown = function () {
-    clearInterval(this.updateInterval);
-}
-
-//get current population of room
-Room.prototype.playerCount = function () {
-    return this.players.count();
-}
-
-//checks if room is full of players
-Room.prototype.isFull = function () {
-    return this.players.count() >= gameSettings.roomCap;
-}
-
-//checks if room is empty
-Room.prototype.isEmpty = function () {
-    return this.players.count() == 0;
-}
-
-Room.prototype.get_AllObj = function(){
-    return [
-        ...Object.values(this.players.objects),
-        ...Object.values(this.enemies.objects), 
-        ...Object.values(this.bosses.objects), 
-        //MAX CALL STACK BUG IF YOU INCLUDE SHOTS
-        // ...Object.values(this.shots.objects),
-        ...Object.values(this.zones.objects),
-    ]; 
-}
-
-Room.prototype.update_Quadtree = function (){
-    this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width/2, gameSettings.height/2, gameSettings.width, gameSettings.height),4);
-
-    //reinsert objects into the new Quadtree
-    let objs = this.get_AllObj();
-    for (let i in objs){
-        this.Quadtree.insert(objs[i]);
-    }
-}
-
-
-
-// EXPORTS CONSTRCTOR TO index.js
+// EXPORTS CLASS TO index.js
 ///////////////////////////////////////////////////////////////////////////
 module.exports = Room;

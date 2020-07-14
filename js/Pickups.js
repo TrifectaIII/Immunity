@@ -10,135 +10,140 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
-//object constructor for individual pickup
-function Pickup (id, type, x, y) {
-    this.id = id;
-    this.type = type;
-    this.x = x;
-    this.y = y;
+//class for individual pickup
+class Pickup {
+
+    constructor(id, type, x, y) {
+        this.id = id;
+        this.type = type;
+        this.x = x;
+        this.y = y;
+    }
 }
 
-// object constructor for pickups container
-function Pickups (room) {
+// class for pickups container
+class Pickups {
 
-    //hold individual pickup objects
-    this.objects = {};
+    constructor(room) {
 
-    //counter for object id's
-    this.idCounter = 0;
+        //hold individual pickup objects
+        this.objects = {};
 
-    //save room that object exists in
-    this.room = room;
-}
+        //counter for object id's
+        this.idCounter = 0;
 
-//updates all pickups
-Pickups.prototype.update = function () {
+        //save room that object exists in
+        this.room = room;
+    }
 
-    if (!this.room.gameOver) {
-    
-        let players = this.room.players.playing;
+    //updates all pickups
+    update() {
 
-        //loop through all pickups
-        for (let id in this.objects) {
-            let pickup = this.objects[id];
+        if (!this.room.gameOver) {
 
-            //find closest alive player
-            let closestDistance = Infinity;
-            let closestId = 0;
+            let players = this.room.players.playing;
 
-            for (let pid in players) {
-                if (players[pid].health > 0) {
-                    let thisDistance = Physics.distance(players[pid], pickup);
-                    if (thisDistance < closestDistance) {
-                        closestDistance = thisDistance;
-                        closestId = pid;
+            //loop through all pickups
+            for (let id in this.objects) {
+                let pickup = this.objects[id];
+
+                //find closest alive player
+                let closestDistance = Infinity;
+                let closestId = 0;
+
+                for (let pid in players) {
+                    if (players[pid].health > 0) {
+                        let thisDistance = Physics.distance(players[pid], pickup);
+                        if (thisDistance < closestDistance) {
+                            closestDistance = thisDistance;
+                            closestId = pid;
+                        }
+                    }
+                }
+                let player = players[closestId];
+
+                //if player is close enough
+                if (closestDistance < Infinity &&
+                    Physics.isColliding(
+                        player,
+                        player.getRadius(),
+                        pickup,
+                        gameSettings.pickupRadius
+                    )) {
+
+                    //effect determined by type
+                    switch (pickup.type) {
+                        case "health":
+                            //if player not at max health
+                            if (player.health < player.getMaxHealth()) {
+                                //give health and delete pickup
+                                this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
+                                delete this.objects[id];
+                            }
+                            break;
+
+                        case "life":
+                            //give another life to room
+                            this.room.livesCount++;
+                            delete this.objects[id];
                     }
                 }
             }
-            let player = players[closestId];
+        }
+    }
 
-            //if player is close enough
-            if (closestDistance < Infinity &&
-                Physics.isColliding(
-                    player, 
-                    player.getRadius(),
-                    pickup, 
-                    gameSettings.pickupRadius
-                )
-            ) {
+    //spawn a new pickup (called when enemy dies)
+    spawnPickup(x, y) {
 
-                //effect determined by type
-                switch (pickup.type) {
-                    case "health":
-                        //if player not at max health
-                        if (player.health < player.getMaxHealth()) {
-                            //give health and delete pickup
-                            this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
-                            delete this.objects[id];
-                        }
-                        break;
+        //make sure we are under cap
+        //cap is pickupMax * number of players
+        if (this.count() < this.room.playerCount() * gameSettings.pickupMax) {
 
-                    case "life":
-                        //give another life to room
-                        this.room.livesCount++;
-                        delete this.objects[id];
+            //calculate type based on chances
+            let typeMax = 0;
+            for (let type in gameSettings.pickupTypes) {
+                typeMax += gameSettings.pickupTypes[type].chance;
+            }
+            let typeNum = Math.floor(Math.random() * (typeMax + 1));
+            let chosenType = '';
+            for (let type in gameSettings.pickupTypes) {
+                if (typeNum <= gameSettings.pickupTypes[type].chance) {
+                    chosenType = type;
+                    break;
+                }
+                else {
+                    typeNum -= gameSettings.pickupTypes[type].chance;
                 }
             }
-        }
-    } 
-}
 
-//spawn a new pickup (called when enemy dies)
-Pickups.prototype.spawnPickup = function (x, y) {
+            //use id counter as id, then increase
+            let id = 'pickup' + (this.idCounter++).toString();
 
-    //make sure we are under cap
-    //cap is pickupMax * number of players
-    if (this.count() < this.room.playerCount() * gameSettings.pickupMax) {
-
-        //calculate type based on chances
-        let typeMax = 0
-        for (let type in gameSettings.pickupTypes) {
-            typeMax += gameSettings.pickupTypes[type].chance;
-        }
-        let typeNum = Math.floor(Math.random() * (typeMax + 1));
-        let chosenType = '';
-        for (let type in gameSettings.pickupTypes) {
-            if (typeNum <= gameSettings.pickupTypes[type].chance) {
-                chosenType = type;
-                break;
-            }
-            else {
-                typeNum -= gameSettings.pickupTypes[type].chance;
-            }
-        }
-
-        //use id counter as id, then increase
-        let id = 'pickup' + (this.idCounter++).toString();
-
-        //create pickup object
-        this.objects[id] = new Pickup(id, chosenType, x, y);
-    }
-}
-
-//collect info to send to clients
-Pickups.prototype.collect = function () {
-    let pickup_info = {};
-
-    for (let id in this.objects) {
-        let pickup = this.objects[id];
-        pickup_info[id] = {
-            x: pickup.x,
-            y: pickup.y,
-            type: pickup.type,
+            //create pickup object
+            this.objects[id] = new Pickup(id, chosenType, x, y);
         }
     }
 
-    return pickup_info;
-}
+    //collect info to send to clients
+    collect() {
+        let pickup_info = {};
 
-//get count of pickups
-Pickups.prototype.count = function () {
-    return Object.keys(this.objects).length;
+        for (let id in this.objects) {
+            let pickup = this.objects[id];
+            pickup_info[id] = {
+                x: pickup.x,
+                y: pickup.y,
+                type: pickup.type,
+            };
+        }
+
+        return pickup_info;
+    }
+
+    //get count of pickups
+    count() {
+        return Object.keys(this.objects).length;
+    }
 }
 
 module.exports = Pickups;

@@ -10,39 +10,44 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
-//object constructor for individual pickup
-function Zone (id, x, y, startRadius) {
-    this.id = id;
-    this.x = x;
-    this.y = y;
+//class for individual pickup
+class Zone {
 
-    //current and maximum radius
-    this.radius = startRadius;
-    this.maxRadius = startRadius;
+    constructor(id, x, y, startRadius) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
 
-    this.closing = 0;
-    this.cooldown = gameSettings.zoneCooldown;
+        //current and maximum radius
+        this.radius = startRadius;
+        this.maxRadius = startRadius;
+
+        this.closing = 0;
+        this.cooldown = gameSettings.zoneCooldown;
+    }
 }
 
-// object constructor for pickups container
-function Zones (room) {
+// class for pickups container
+class Zones {
 
-    //hold individual pickup objects
-    this.objects = {};
+    constructor(room) {
 
-    //counter for object id's
-    this.idCounter = 0;
+        //hold individual pickup objects
+        this.objects = {};
 
-    //save room that object exists in
-    this.room = room;
-}
+        //counter for object id's
+        this.idCounter = 0;
 
-//updates all enemies
-Zones.prototype.update = function () {
+        //save room that object exists in
+        this.room = room;
+    }
 
-    //make sure game is running and at least 1 player is playing
-    if (!this.room.gameOver &&
-        this.room.players.playingCount() > 0) {
+    //updates all enemies
+    update() {
+
+        //make sure game is running and at least 1 player is playing
+        if (!this.room.gameOver &&
+            this.room.players.playingCount() > 0) {
 
             //loop through all zones
             for (let id in this.objects) {
@@ -67,26 +72,24 @@ Zones.prototype.update = function () {
 
                     //check to see if player is colliding with zone
                     if (Physics.isColliding(
-                            zone,
-                            zone.radius,
-                            player,
-                            player.getRadius(),
-                        )) {
-                                //add one to closing count
-                                zone.closing++;
+                        zone,
+                        zone.radius,
+                        player,
+                        player.getRadius())) {
+                        //add one to closing count
+                        zone.closing++;
                     }
                 }
 
                 //close zone if players inside it
                 if (zone.closing > 0) {
-                    zone.radius -= zone.closing*gameSettings.zoneCloseRate;
+                    zone.radius -= zone.closing * gameSettings.zoneCloseRate;
                 }
                 //other wise grow, up to maximum
                 else {
                     zone.radius = Math.min(
-                        zone.maxRadius, 
-                        zone.radius + gameSettings.zoneGrowRate,
-                    );
+                        zone.maxRadius,
+                        zone.radius + gameSettings.zoneGrowRate);
                 }
 
                 //delete zone if it gets small
@@ -94,50 +97,50 @@ Zones.prototype.update = function () {
                     delete this.objects[id];
                 }
             }
-    }
-}
-
-//create a zone
-Zones.prototype.spawnZone = function () {
-
-    //get radius from settings, plus 10 for each wave
-    let startRadius = Math.min(
-        gameSettings.zoneRadiusStart + (this.room.waveCount-1) * gameSettings.zoneRadiusScale,
-        //capped at settings max
-        gameSettings.zoneRadiusMax,
-    );
-
-    //place at random position still fully within game world
-    let x = Math.floor(Math.random()*((gameSettings.width - 2*startRadius)+1))+startRadius;
-    let y = Math.floor(Math.random()*((gameSettings.height - 2*startRadius)+1))+startRadius;
-
-    //increment id counter and generate id for new object
-    let id = 'zone' + (this.idCounter++).toString();
-
-    //create new object
-    this.objects[id] = new Zone (id, x, y, startRadius);
-}
-
-//collect info to send to clients
-Zones.prototype.collect = function () {
-    let zone_info = {};
-
-    for (let id in this.objects) {
-        let zone = this.objects[id];
-        zone_info[id] = {
-            x: zone.x,
-            y: zone.y,
-            radius: zone.radius,
-            closing: zone.closing,
         }
     }
 
-    return zone_info;
-}
+    //create a zone
+    spawnZone() {
 
-//get count of zones
-Zones.prototype.count = function () {
-    return Object.keys(this.objects).length;
+        //get radius from settings, plus 10 for each wave
+        let startRadius = Math.min(
+            gameSettings.zoneRadiusStart + (this.room.waveCount - 1) * gameSettings.zoneRadiusScale,
+            //capped at settings max
+            gameSettings.zoneRadiusMax);
+
+        //place at random position still fully within game world
+        let x = Math.floor(Math.random() * ((gameSettings.width - 2 * startRadius) + 1)) + startRadius;
+        let y = Math.floor(Math.random() * ((gameSettings.height - 2 * startRadius) + 1)) + startRadius;
+
+        //increment id counter and generate id for new object
+        let id = 'zone' + (this.idCounter++).toString();
+
+        //create new object
+        this.objects[id] = new Zone(id, x, y, startRadius);
+    }
+
+    //collect info to send to clients
+    collect() {
+        let zone_info = {};
+
+        for (let id in this.objects) {
+            let zone = this.objects[id];
+            zone_info[id] = {
+                x: zone.x,
+                y: zone.y,
+                radius: zone.radius,
+                closing: zone.closing,
+            };
+        }
+
+        return zone_info;
+    }
+
+    //get count of zones
+    count() {
+        return Object.keys(this.objects).length;
+    }
 }
 
 module.exports = Zones;
