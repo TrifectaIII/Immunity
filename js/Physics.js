@@ -3,23 +3,23 @@
 
 const gameSettings = require(__dirname + '/gameSettings.js');
 
-var Physics = {
+class Physics {
 
     //calculates angle of vector between 2 points
-    angleBetween: function (x1, y1, x2, y2) {
+    static angleBetween (x1, y1, x2, y2) {
         return Math.atan2(y2 - y1, x2 - x1);
-    },
+    }
 
     //calculates x/y component vectors based on angle and magnitude of vector
-    componentVector: function (angle, magnitude) {
+    static componentVector (angle, magnitude) {
         return {
             x: Math.cos(angle) * magnitude,
             y: Math.sin(angle) * magnitude,
         };
-    },
+    }
 
     //cap magnitude of object's velocity at maxVelocity
-    capVelocity: function (obj, maxVelocity) {
+    static capVelocity (obj, maxVelocity) {
 
         //get current magnitude of velocities
         let currentMagnitude = Math.sqrt(
@@ -37,23 +37,23 @@ var Physics = {
             obj.velocity.x *= ratio;
             obj.velocity.y *= ratio;
         }
-    },
+    }
 
     //calulates distance between centerpoints of 2 objects w/ x/y attributes
-    distance: function (obj1, obj2) {
+    static distance (obj1, obj2) {
         return Math.sqrt(
             Math.pow(obj1.x-obj2.x, 2) + 
             Math.pow(obj1.y-obj2.y, 2)
         );
-    },
+    }
 
     //checks if 2 objects are colliding given their x/y attributes and their radii
-    isColliding: function (obj1, rad1, obj2, rad2) {
+    static isColliding (obj1, rad1, obj2, rad2) {
         return (Physics.distance(obj1, obj2) < rad1 + rad2);
-    },
+    }
 
     //checks for collision, then displace both away from each other
-    collideAndDisplace: function (obj1, rad1, obj2, rad2) {
+    static collideAndDisplace (obj1, rad1, obj2, rad2) {
         let dist = Physics.distance(obj1, obj2);
         
         //check for collision, then do displacement
@@ -73,10 +73,10 @@ var Physics = {
             obj2.x += displaceDist*(obj1.x - obj2.x);
             obj2.y += displaceDist*(obj1.y - obj2.y);
         }
-    },
+    }
 
     //impart shot momentum to enemy
-    collideShotEnemy: function (shot, enemy) {
+    static collideShotEnemy (shot, enemy) {
 
         //get masses
         let enemyMass = gameSettings.enemyTypes[enemy.type].mass;
@@ -88,10 +88,10 @@ var Physics = {
         //accelerate enemy based on shot velocity and mass ratio
         enemy.velocity.x += shot.velocity.x * massRatio;
         enemy.velocity.y += shot.velocity.y * massRatio;
-    },
+    }
 
     //impart shot momentum to boss (currently unused)
-    collideShotBoss: function (shot, boss) {
+    static collideShotBoss (shot, boss) {
 
         //get masses
         let bossMass = gameSettings.boss.mass;
@@ -103,10 +103,10 @@ var Physics = {
         //accelerate boss based on shot velocity and mass ratio
         boss.velocity.x += shot.velocity.x * massRatio;
         boss.velocity.y += shot.velocity.y * massRatio;
-    },
+    }
 
     //impart shot momentum to player
-    collideShotPlayer: function (shot, player) {
+    static collideShotPlayer (shot, player) {
 
         //get masses
         let playerMass = gameSettings.playerTypes[player.type].mass;
@@ -125,9 +125,9 @@ var Physics = {
         //accelerate player based on shot velocity and mass ratio
         player.velocity.x += shot.velocity.x * massRatio;
         player.velocity.y += shot.velocity.y * massRatio;
-    },
+    }
 
-    calCollisionVect: function (bullet, enemy) {
+    static calCollisionVect (bullet, enemy) {
 
         let dist = Physics.distance(bullet, enemy);
     
