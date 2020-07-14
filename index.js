@@ -54,25 +54,25 @@ const gameSettings = require(__dirname + '/js/gameSettings.js');
 const Room = require(__dirname + '/js/Room.js');
 
 //object to hold individual game rooms
-var Rooms = {};
+var rooms = {};
 
 //generates new, currently-unused roomId
-function generateRoomId(Rooms) {
+function generateRoomId(rooms) {
     let roomIdCounter = 101;
-    while (roomIdCounter.toString() in Rooms) {
+    while (roomIdCounter.toString() in rooms) {
         roomIdCounter += 1;
     }
     return roomIdCounter.toString();
 }
 
 //logs current rooms and their populations
-function showRooms (Rooms) {
+function showRooms (rooms) {
     console.log('\n');
-    if (Object.keys(Rooms).length > 0) {
+    if (Object.keys(rooms).length > 0) {
         console.log("ROOM STATUS ######################");
-        for (let roomId in Rooms) {
+        for (let roomId in rooms) {
             console.log(
-                `Game Room ${roomId}: ${Rooms[roomId].playerCount()} Players`
+                `Game Room ${roomId}: ${rooms[roomId].playerCount()} Players`
             );
         }
         console.log("##################################");
@@ -96,19 +96,19 @@ io.sockets.on('connection', function (socket) {
         //remove from room if in one
         if ('roomId' in socket) {
 
-            Rooms[socket.roomId].removePlayer(socket);
+            rooms[socket.roomId].removePlayer(socket);
 
             //delete room if empty
-            if (Rooms[socket.roomId].isEmpty()) {
+            if (rooms[socket.roomId].isEmpty()) {
 
                 //properly shut down room
-                Rooms[socket.roomId].shutDown();
+                rooms[socket.roomId].shutDown();
 
-                delete Rooms[socket.roomId];
+                delete rooms[socket.roomId];
             }
 
             //show current room status
-            showRooms(Rooms);
+            showRooms(rooms);
         }     
     });
 
@@ -128,37 +128,37 @@ io.sockets.on('connection', function (socket) {
         socket.name = name.trim().substring(0, gameSettings.nameMax);
 
         //reject socket if room does not exist
-        if (!(roomId in Rooms) && roomId != 'new_game') {
+        if (!(roomId in rooms) && roomId != 'new_game') {
             socket.emit('rejection', 'Game Does Not Exist');
         }
 
         //reject socket if room full
-        else if (roomId in Rooms && Rooms[roomId].isFull()) {
+        else if (roomId in rooms && rooms[roomId].isFull()) {
             socket.emit('rejection', 'Game Full');
         }
 
         //create new room on request
         else if (roomId == 'new_game') {
             //generate new room id
-            let newRoomId = generateRoomId(Rooms);
+            let newRoomId = generateRoomId(rooms);
             
             //create room object
-            Rooms[newRoomId] = new Room(newRoomId, io);
+            rooms[newRoomId] = new Room(newRoomId, io);
 
             //place socket into room
-            Rooms[newRoomId].addPlayer(socket);
+            rooms[newRoomId].addPlayer(socket);
 
             //show current room status
-            showRooms(Rooms);
+            showRooms(rooms);
         }
 
         //add to room if room exists and has space
-        else if (roomId in Rooms) {
+        else if (roomId in rooms) {
 
-            Rooms[roomId].addPlayer(socket);
+            rooms[roomId].addPlayer(socket);
 
             //show current room status
-            showRooms(Rooms);
+            showRooms(rooms);
         }
 
         //reject if any other situation
