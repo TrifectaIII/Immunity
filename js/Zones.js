@@ -70,7 +70,7 @@ Zones.prototype.update = function () {
                             zone,
                             zone.radius,
                             player,
-                            gameSettings.playerTypes[player.type].radius,
+                            player.getRadius(),
                         )) {
                                 //add one to closing count
                                 zone.closing++;

@@ -25,6 +25,36 @@ function Enemy (id, type, x, y) {
     this.cooldown = 0;
 } 
 
+//return enemy radius
+Enemy.prototype.getRadius = function () {
+    return gameSettings.enemyTypes[this.type].radius;
+}
+
+//return enemy max speed
+Enemy.prototype.getMaxSpeed = function () {
+    return gameSettings.enemyTypes[this.type].maxVelocity;
+}
+
+//return enemy acceleration magnitude
+Enemy.prototype.getAcceleration = function () {
+    return gameSettings.enemyTypes[this.type].acceleration;
+}
+
+//return enemy mass
+Enemy.prototype.getMass = function () {
+    return gameSettings.enemyTypes[this.type].mass;
+}
+
+//return info about enemy attacks
+Enemy.prototype.getAttackInfo = function () {
+    return gameSettings.enemyTypes[this.type].attack;
+}
+
+//return info about enemy shots
+Enemy.prototype.getShotInfo = function () {
+    return gameSettings.enemyTypes[this.type].shots;
+}
+
 // object constructor for enemies container
 function Enemies (room) {
 
@@ -79,13 +109,13 @@ Enemies.prototype.update = function () {
                 //accelerate in direction of closest player
                 let acceleration = Physics.componentVector(
                     Physics.angleBetween(enemy.x, enemy.y, player.x, player.y), 
-                    gameSettings.enemyTypes[enemy.type].acceleration
+                    enemy.getAcceleration()
                 );
                 enemy.velocity.x += acceleration.x;
                 enemy.velocity.y += acceleration.y;
 
                 //reduce velocity to max, if needed
-                Physics.capVelocity(enemy, gameSettings.enemyTypes[enemy.type].maxVelocity);
+                Physics.capVelocity(enemy, enemy.getMaxSpeed());
 
                 //move based on velocity
                 enemy.x += enemy.velocity.x
@@ -97,26 +127,26 @@ Enemies.prototype.update = function () {
                 if (enemy.cooldown <= 0) {
 
                     //shoot if enemy type has shots are are in range
-                    if ('shots' in gameSettings.enemyTypes[enemy.type] &&
-                        gameSettings.enemyTypes[enemy.type].shots.range >= Physics.distance(enemy, player) - gameSettings.playerTypes[player.type].radius) {
+                    if (enemy.getShotInfo() &&
+                        enemy.getShotInfo().range >= Physics.distance(enemy, player) - player.getRadius()) {
 
                             //reset enemy cooldown
-                            enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
+                            enemy.cooldown = enemy.getAttackInfo().cooldown;
 
                             //shoot at player
                             this.room.shots.spawnEnemyShot(enemy, player.x, player.y);
                     }
 
                     else if (Physics.isColliding(
-                            enemy, gameSettings.enemyTypes[enemy.type].radius,
-                            player, gameSettings.playerTypes[player.type].radius
+                            enemy, enemy.getRadius(),
+                            player, player.getRadius()
                             )) {
 
                                 //reset enemy cooldown
-                                enemy.cooldown = gameSettings.enemyTypes[enemy.type].attack.cooldown;
+                                enemy.cooldown = enemy.getAttackInfo().cooldown;
                                 
                                 //do damage to player
-                                this.room.players.damagePlayer(player, gameSettings.enemyTypes[enemy.type].attack.damage);
+                                this.room.players.damagePlayer(player, enemy.getAttackInfo().damage);
                     }
                 }
             }
@@ -150,12 +180,12 @@ Enemies.prototype.update = function () {
                 //recall that near_by_objects is a list of lists: [[object_id, object_data]...]
                 let obj = near_by_objects[i];
                 if (obj.constructor.name == "Enemy"){
-                    if (enemy.id != Object.values(this.objects).indexOf(obj)){
+                    if (enemy.id != obj.id){
                         Physics.collideAndDisplace(
                             enemy, 
-                            gameSettings.enemyTypes[enemy.type].radius,
+                            enemy.getRadius(),
                             obj, 
-                            gameSettings.enemyTypes[obj.type].radius
+                            obj.getRadius()
                         );
                     }
                 }
@@ -165,13 +195,11 @@ Enemies.prototype.update = function () {
                         obj.health > 0) {
                         Physics.collideAndDisplace(
                             enemy, 
-                            gameSettings.enemyTypes[enemy.type].radius,
+                            enemy.getRadius(),
                             obj, 
-                            gameSettings.playerTypes[obj.type].radius
+                            obj.getRadius()
                         );
                     }
-
-
                 }
             }
 

@@ -61,7 +61,7 @@ function BossShot (id, boss, velocity) {
     this.range = gameSettings.boss.shots.range;
 }
 
-//returns damage of eboss shot
+//returns damage of boss shot
 BossShot.prototype.getDamage = function () {
     return gameSettings.boss.shots.damage;
 }
@@ -122,7 +122,7 @@ Shots.prototype.update = function () {
                 //if entity is enemy, and then check collision
                 if (entity.constructor.name == "Enemy" &&
                     Physics.isColliding(
-                        entity, gameSettings.enemyTypes[entity.type].radius, 
+                        entity, entity.getRadius(), 
                         shot, 0 //shots have no radius
                     )) {
 
@@ -152,7 +152,7 @@ Shots.prototype.update = function () {
                 let boss = this.room.bosses.objects[bid];
 
                 if (Physics.isColliding(
-                        boss, gameSettings.boss.radius, 
+                        boss, boss.getRadius(), 
                         shot, 0 //shots have no radius
                     )) {
 
@@ -200,7 +200,7 @@ Shots.prototype.update = function () {
                 let player = this.room.players.playing[id];
 
                 if (Physics.isColliding(
-                        player, gameSettings.playerTypes[player.type].radius, 
+                        player, player.getRadius(), 
                         enemyShot, 0 //enemy shots have no radius
                     )) {
 
@@ -248,7 +248,7 @@ Shots.prototype.update = function () {
                 let player = this.room.players.playing[id];
 
                 if (Physics.isColliding(
-                        player, gameSettings.playerTypes[player.type].radius, 
+                        player, player.getRadius(), 
                         bossShot, 0 //enemy shots have no radius
                     )) {
 
@@ -288,7 +288,7 @@ Shots.prototype.update = function () {
 Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
 
     //each player has different settings
-    let classShots = gameSettings.playerTypes[player.type].shots;
+    let classShots = player.getShotInfo();
 
     //single-shot classes
     if (classShots.count <= 1) {
@@ -333,7 +333,7 @@ Shots.prototype.spawnPlayerShot = function (player, destX, destY) {
 Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
 
     //each enemy class has different settings
-    let classShots = gameSettings.enemyTypes[enemy.type].shots;
+    let classShots = enemy.getShotInfo();
 
     //single-shot classes
     if (classShots.count <= 1) {
@@ -378,7 +378,7 @@ Shots.prototype.spawnEnemyShot = function (enemy, destX, destY) {
 Shots.prototype.spawnBossShot = function (boss, destX, destY) {
 
     //boss shot settings
-    let bossShots = gameSettings.boss.shots;
+    let bossShots = boss.getShotInfo();
 
     //single-shot classes
     if (bossShots.count <= 1) {

@@ -30,6 +30,41 @@ function Boss (id, x, y, playerCount, waveCount) {
     this.focus = 'none';
 } 
 
+//return boss radius
+Boss.prototype.getRadius = function () {
+    return gameSettings.boss.radius;
+}
+
+//return boss max speed
+Boss.prototype.getMaxSpeed = function () {
+    return gameSettings.boss.maxVelocity;
+}
+
+//return boss acceleration magnitude
+Boss.prototype.getAcceleration = function () {
+    return gameSettings.boss.acceleration;
+}
+
+//return boss mass
+Boss.prototype.getMass = function () {
+    return gameSettings.boss.mass;
+}
+
+//return time in ms between boss focus changes
+Boss.prototype.getFocusTime = function () {
+    return gameSettings.boss.focusTime;
+}
+
+//return time between boss focus changes
+Boss.prototype.getAttackInfo = function () {
+    return gameSettings.boss.attack;
+}
+
+//return info about boss shots
+Boss.prototype.getShotInfo = function () {
+    return gameSettings.boss.shots;
+}
+
 // object constructor for bosses container
 function Bosses (room) {
 
@@ -67,7 +102,7 @@ Bosses.prototype.update = function () {
                     let playingIds = Object.keys(this.room.players.playing);
                     boss.focus = playingIds[Math.floor(Math.random()*playingIds.length)];
                     //reset cooldown
-                    boss.focusCooldown = gameSettings.boss.focusTime;
+                    boss.focusCooldown = boss.getFocusTime();
             }
 
             //countdown attack cooldown
@@ -82,13 +117,13 @@ Bosses.prototype.update = function () {
                 //accelerate in direction of focus
                 let acceleration = Physics.componentVector(
                     Physics.angleBetween(boss.x, boss.y, player.x, player.y), 
-                    gameSettings.boss.acceleration
+                    boss.getAcceleration()
                 );
                 boss.velocity.x += acceleration.x;
                 boss.velocity.y += acceleration.y;
 
                 //reduce velocity to max, if needed
-                Physics.capVelocity(boss, gameSettings.boss.maxVelocity);
+                Physics.capVelocity(boss, boss.getMaxSpeed());
 
                 //move based on velocity
                 boss.x += boss.velocity.x
@@ -100,10 +135,10 @@ Bosses.prototype.update = function () {
                 if (boss.cooldown <= 0) {
 
                     //shoot if in range 
-                    if (gameSettings.boss.shots.range >= Physics.distance(boss, player) - gameSettings.playerTypes[player.type].radius) {
+                    if (boss.getShotInfo().range >= Physics.distance(boss, player) - player.getRadius()) {
 
                             //reset boss cooldown
-                            boss.cooldown = gameSettings.boss.attack.cooldown;
+                            boss.cooldown = boss.getAttackInfo().cooldown;
 
                             //shoot at player
                             this.room.shots.spawnBossShot(boss, player.x, player.y);
@@ -121,9 +156,9 @@ Bosses.prototype.update = function () {
 
                 Physics.collideAndDisplace(
                     boss, 
-                    gameSettings.boss.radius,
+                    boss.getRadius(),
                     enemy, 
-                    gameSettings.enemyTypes[enemy.type].radius
+                    enemy.getRadius()
                 );
             }
 
@@ -133,9 +168,9 @@ Bosses.prototype.update = function () {
 
                 Physics.collideAndDisplace(
                     boss, 
-                    gameSettings.boss.radius,
+                    boss.getRadius(),
                     player, 
-                    gameSettings.playerTypes[player.type].radius
+                    player.getRadius()
                 );
             }
         }

@@ -10,6 +10,40 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
+//functions to be added to all player objects
+const playerFunctions = {
+
+    //return player radius
+    getRadius: function () {
+        return gameSettings.playerTypes[this.type].radius;
+    },
+
+    //return player max speed
+    getMaxSpeed: function () {
+        return gameSettings.playerTypes[this.type].maxVelocity;
+    },
+
+    //return player acceleration magnitude
+    getAcceleration: function () {
+        return gameSettings.playerTypes[this.type].acceleration;
+    },
+
+    //return player mass
+    getMass: function () {
+        return gameSettings.playerTypes[this.type].mass;
+    },
+
+    //return max health of player
+    getMaxHealth() {
+        return gameSettings.playerTypes[this.type].maxHealth;
+    },
+
+    //return info about player shots
+    getShotInfo: function () {
+        return gameSettings.playerTypes[this.type].shots;
+    }
+}
+
 
 // object constructor for enemies
 function Players (room) {
@@ -79,7 +113,7 @@ Players.prototype.update = function () {
                 else {
                     let acceleration = Physics.componentVector(
                         player.angle,
-                        gameSettings.playerTypes[player.type].acceleration,
+                        player.getAcceleration(),
                     )
                     //x with cos
                     if (Math.abs(Math.cos(player.angle)) < 0.1) {
@@ -104,7 +138,7 @@ Players.prototype.update = function () {
                 }
 
                 //cap velocity
-                Physics.capVelocity(player, gameSettings.playerTypes[player.type].maxVelocity);
+                Physics.capVelocity(player, player.getMaxSpeed());
 
                 //move based on velocity
                 player.x += player.velocity.x;
@@ -117,9 +151,9 @@ Players.prototype.update = function () {
                             let otherPlayer = this.playing[pid];
                             Physics.collideAndDisplace(
                                 player, 
-                                gameSettings.playerTypes[player.type].radius,
+                                player.getRadius(),
                                 otherPlayer, 
-                                gameSettings.playerTypes[otherPlayer.type].radius
+                                otherPlayer.getRadius()
                             );
                     }
                 }
@@ -198,7 +232,7 @@ Players.prototype.healPlayer = function (player, amount) {
     if (player.id in this.playing) {
         //heal up to maximum for class
         player.health = Math.min(
-            gameSettings.playerTypes[player.type].maxHealth,
+            player.getMaxHealth(),
             player.health + amount
         );
     }
@@ -220,7 +254,7 @@ Players.prototype.shootRequest = function (player) {
             player.emit('shoot_request');
 
             //start cooldown
-            player.cooldown = gameSettings.playerTypes[player.type].shots.cooldown;
+            player.cooldown = player.getShotInfo().cooldown;
     }
 }
 
@@ -267,6 +301,14 @@ Players.prototype.add = function (player) {
     //start with no ready shots
     player.readyShots = 0;
 
+    //ADD UTLITY FUNCTIONS
+    /////////////////////////////////
+
+    //loop through each function and assign to player
+    for (let funcName in playerFunctions) {
+        player[funcName] = playerFunctions[funcName];
+    }
+
     //SET UP LISTENERS
     /////////////////////////////////
 
@@ -299,8 +341,8 @@ Players.prototype.add = function (player) {
                 player.x = Math.floor(Math.random() * (gameSettings.width-200+1)) + 100;
                 player.y = Math.floor(Math.random() * (gameSettings.height-200+1)) + 100;
 
-                //give max health based on 
-                player.health = gameSettings.playerTypes[player.type].maxHealth;
+                //give max health based on class
+                player.health = player.getMaxHealth();
 
                 //reset killstreak
                 player.killStreak = 0;

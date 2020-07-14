@@ -61,7 +61,7 @@ Pickups.prototype.update = function () {
             if (closestDistance < Infinity &&
                 Physics.isColliding(
                     player, 
-                    gameSettings.playerTypes[player.type].radius,
+                    player.getRadius(),
                     pickup, 
                     gameSettings.pickupRadius
                 )
@@ -71,7 +71,7 @@ Pickups.prototype.update = function () {
                 switch (pickup.type) {
                     case "health":
                         //if player not at max health
-                        if (player.health < gameSettings.playerTypes[player.type].maxHealth) {
+                        if (player.health < player.getMaxHealth()) {
                             //give health and delete pickup
                             this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
                             delete this.objects[id];
