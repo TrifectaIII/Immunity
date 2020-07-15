@@ -41,7 +41,7 @@ class PlayerShot {
 }
 
 
-//oclass for individual enemy shots
+//class for individual enemy shots
 class EnemyShot {
 
     constructor(id, enemy, velocity) {
@@ -96,8 +96,6 @@ class BossShot {
         return gameSettings.boss.shots.mass;
     }
 }
-
-
 
 
 // class for shots container
@@ -486,5 +484,6 @@ class Shots {
         };
     }
 }
+
 
 module.exports = Shots;

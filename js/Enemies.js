@@ -58,6 +58,7 @@ class Enemy {
     }
 }
 
+
 // class for enemies container
 class Enemies {
 
@@ -308,5 +309,6 @@ class Enemies {
         return Object.keys(this.objects).length;
     }
 }
+
 
 module.exports = Enemies;

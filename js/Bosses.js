@@ -68,6 +68,7 @@ class Boss {
     }
 }
 
+
 // class for bosses container
 class Bosses {
 
@@ -244,5 +245,6 @@ class Bosses {
         return Object.keys(this.objects).length;
     }
 }
+
 
 module.exports = Bosses;

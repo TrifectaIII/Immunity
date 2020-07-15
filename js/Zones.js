@@ -27,6 +27,7 @@ class Zone {
     }
 }
 
+
 // class for pickups container
 class Zones {
 
@@ -142,5 +143,6 @@ class Zones {
         return Object.keys(this.objects).length;
     }
 }
+
 
 module.exports = Zones;

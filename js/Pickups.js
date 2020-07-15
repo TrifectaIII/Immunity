@@ -21,6 +21,7 @@ class Pickup {
     }
 }
 
+
 // class for pickups container
 class Pickups {
 
@@ -145,5 +146,6 @@ class Pickups {
         return Object.keys(this.objects).length;
     }
 }
+
 
 module.exports = Pickups;
