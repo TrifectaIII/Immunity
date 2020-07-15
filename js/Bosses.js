@@ -100,7 +100,7 @@ class Bosses {
                 }
 
                 //change focus if needed
-                if ((!(boss.focus in this.room.players.playing) || this.focusCooldown <= 0) &&
+                if ((!(boss.focus in this.room.players.playing) || boss.focusCooldown <= 0) &&
                     this.room.players.playingCount() > 0) {
                     //choose new focus randomly from playing 
                     let playingIds = Object.keys(this.room.players.playing);

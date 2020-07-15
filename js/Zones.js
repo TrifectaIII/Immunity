@@ -10,7 +10,7 @@ const gameSettings = require(__dirname + '/gameSettings.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
-//class for individual pickup
+//class for individual zones
 class Zone {
 
     constructor(id, x, y, startRadius) {
@@ -28,12 +28,12 @@ class Zone {
 }
 
 
-// class for pickups container
+// class for zones container
 class Zones {
 
     constructor(room) {
 
-        //hold individual pickup objects
+        //hold individual zone objects
         this.objects = {};
 
         //counter for object id's
