@@ -13,11 +13,11 @@ const Physics = require(__dirname + '/Physics.js');
 //functions to be added to all player objects
 class Player {
 
-    constructor (socket) {
+    constructor (socket, name) {
 
         this.socket = socket;
         this.id = socket.id;
-        this.name = socket.name;
+        this.name = name;
 
         //give default class
         this.type = 'none';
@@ -299,10 +299,10 @@ class Players {
     }
 
     //add new player
-    add(socket) {
+    add(socket, name) {
 
         //create player object
-        let player = new Player(socket);
+        let player = new Player(socket, name);
 
         //add to players object
         this.objects[player.id] = player;

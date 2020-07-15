@@ -125,7 +125,7 @@ io.sockets.on('connection', function (socket) {
     socket.once ('join_game', function (roomId, name) {
 
         //set name of socket
-        socket.name = name.trim().substring(0, gameSettings.nameMax);
+        let nameTrimmed = name.trim().substring(0, gameSettings.nameMax);
 
         //reject socket if room does not exist
         if (!(roomId in rooms) && roomId != 'new_game') {
@@ -146,7 +146,7 @@ io.sockets.on('connection', function (socket) {
             rooms[newRoomId] = new Room(newRoomId, io);
 
             //place socket into room
-            rooms[newRoomId].addPlayer(socket);
+            rooms[newRoomId].addPlayer(socket, nameTrimmed);
 
             //show current room status
             showRooms(rooms);
@@ -155,7 +155,7 @@ io.sockets.on('connection', function (socket) {
         //add to room if room exists and has space
         else if (roomId in rooms) {
 
-            rooms[roomId].addPlayer(socket);
+            rooms[roomId].addPlayer(socket, nameTrimmed);
 
             //show current room status
             showRooms(rooms);

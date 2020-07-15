@@ -187,7 +187,7 @@ class Room {
     }
 
     //adds player to room
-    addPlayer(socket) {
+    addPlayer(socket, name) {
 
         //join socketio room
         socket.join(this.roomId);
@@ -203,7 +203,7 @@ class Room {
         }
 
         //add to players
-        this.players.add(socket);
+        this.players.add(socket, name);
 
         //confirm join with server after player totally set up
         socket.emit('joined', this.roomId);
