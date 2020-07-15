@@ -1,7 +1,7 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const gameSettings = require(__dirname + '/gameSettings.js');
+const gameSettings = require(__dirname + '/../gameSettings.js');
 
 class Physics {
 

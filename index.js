@@ -36,8 +36,8 @@ app.get('/', function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 //Serve gameSettings.js file
-app.get('/js/gameSettings.js', function (req, res) {
-    res.sendFile(__dirname + '/js/gameSettings.js');
+app.get('/gameSettings.js', function (req, res) {
+    res.sendFile(__dirname + '/gameSettings.js');
 });
 
 console.log("SERVER BOOTED SUCCESSFULLY");
@@ -48,7 +48,7 @@ console.log("SERVER BOOTED SUCCESSFULLY");
 ///////////////////////////////////////////////////
 
 //include gameSettings.js
-const gameSettings = require(__dirname + '/js/gameSettings.js');
+const gameSettings = require(__dirname + '/gameSettings.js');
 
 //include Room constructor from Room.js
 const Room = require(__dirname + '/js/Room.js');
