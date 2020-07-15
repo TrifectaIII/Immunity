@@ -192,7 +192,7 @@ class Enemies {
                             );
                         }
                     }
-                    else if (obj.constructor.name == "Socket") {
+                    else if (obj.constructor.name == "Player") {
 
                         if (obj.id in this.room.players.playing &&
                             obj.health > 0) {

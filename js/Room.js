@@ -187,13 +187,13 @@ class Room {
     }
 
     //adds player to room
-    addPlayer(player) {
+    addPlayer(socket) {
 
         //join socketio room
-        player.join(this.roomId);
+        socket.join(this.roomId);
 
         //set roomId to socket
-        player.roomId = this.roomId;
+        socket.roomId = this.roomId;
 
         //if haven't seen enough players to meet cap yet, give a life
         if (!this.gameOver &&
@@ -203,15 +203,15 @@ class Room {
         }
 
         //add to players
-        this.players.add(player);
+        this.players.add(socket);
 
         //confirm join with server after player totally set up
-        player.emit('joined', this.roomId);
+        socket.emit('joined', this.roomId);
     }
 
     //remove socket if socket exists in room
-    removePlayer(player) {
-        this.players.remove(player);
+    removePlayer(socket) {
+        this.players.remove(socket);
     }
 
     reset() {

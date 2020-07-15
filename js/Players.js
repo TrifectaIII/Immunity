@@ -11,35 +11,76 @@ const Physics = require(__dirname + '/Physics.js');
 
 
 //functions to be added to all player objects
-const playerFunctions = {
+class Player {
+
+    constructor (socket) {
+
+        this.socket = socket;
+        this.id = socket.id;
+        this.name = socket.name;
+
+        //give default class
+        this.type = 'none';
+
+        //mark as not respawning
+        this.respawnTimer = 0;
+
+        //give no health
+        this.health = 0;
+
+        //start killStreak at 0
+        this.killStreak = 0;
+
+        //give default angle
+        this.angle = 'none';
+
+        //give default location
+        this.x = 0;
+        this.y = 0;
+
+        //give default velocities
+        this.velocity = {
+            x: 0,
+            y: 0,
+        };
+
+        //give default click value
+        this.clicking = false;
+
+        //start with no shooting cooldown
+        this.cooldown = 0;
+
+        //start with no ready shots
+        this.readyShots = 0;
+    }
 
     //return player radius
-    getRadius: function () {
+    getRadius () {
         return gameSettings.playerTypes[this.type].radius;
-    },
+    }
 
     //return player max speed
-    getMaxSpeed: function () {
+    getMaxSpeed () {
         return gameSettings.playerTypes[this.type].maxVelocity;
-    },
+    }
 
     //return player acceleration magnitude
-    getAcceleration: function () {
+    getAcceleration () {
         return gameSettings.playerTypes[this.type].acceleration;
-    },
+    }
 
     //return player mass
-    getMass: function () {
+    getMass () {
         return gameSettings.playerTypes[this.type].mass;
-    },
+    }
 
     //return max health of player
-    getMaxHealth() {
+    getMaxHealth () {
         return gameSettings.playerTypes[this.type].maxHealth;
-    },
+    }
 
     //return info about player shots
-    getShotInfo: function () {
+    getShotInfo () {
         return gameSettings.playerTypes[this.type].shots;
     }
 }
@@ -250,7 +291,7 @@ class Players {
             player.readyShots++;
 
             //ask for coordinates
-            player.emit('shoot_request');
+            player.socket.emit('shoot_request');
 
             //start cooldown
             player.cooldown = player.getShotInfo().cooldown;
@@ -258,7 +299,10 @@ class Players {
     }
 
     //add new player
-    add(player) {
+    add(socket) {
+
+        //create player object
+        let player = new Player(socket);
 
         //add to players object
         this.objects[player.id] = player;
@@ -266,51 +310,11 @@ class Players {
         //add to waiting object
         this.waitPlayer(player);
 
-        //give default class
-        player.type = 'none';
-
-        //mark as not respawning
-        player.respawnTimer = 0;
-
-        //give no health
-        player.health = 0;
-
-        //start killStreak at 0
-        player.killStreak = 0;
-
-        //give default angle
-        player.angle = 'none';
-
-        //give default location
-        player.x = 0;
-        player.y = 0;
-
-        //give default velocities
-        player.velocity = {
-            x: 0,
-            y: 0,
-        };
-
-        //give default click value
-        player.clicking = false;
-
-        //start with no shooting cooldown
-        player.cooldown = 0;
-
-        //start with no ready shots
-        player.readyShots = 0;
-
-        //ADD UTLITY FUNCTIONS
-        /////////////////////////////////
-        //loop through each function and assign to player
-        for (let funcName in playerFunctions) {
-            player[funcName] = playerFunctions[funcName];
-        }
-
         //SET UP LISTENERS
         /////////////////////////////////
+
         //set class based on player choice
-        player.on('class_choice', function (type) {
+        player.socket.on('class_choice', function (type) {
             //only change if valid choice and a life exists
             if (this.room.livesCount > 0 &&
                 player.id in this.waiting &&
@@ -351,12 +355,12 @@ class Players {
 
 
         //switch player movement angle
-        player.on('angle', function (angle) {
+        player.socket.on('angle', function (angle) {
             player.angle = angle;
         });
 
         //switch clicking state
-        player.on('click', function (clicking) {
+        player.socket.on('click', function (clicking) {
             player.clicking = clicking;
             //request shoot right away to avoid a click getting clipped by tickRate
             this.shootRequest(player);
@@ -364,7 +368,7 @@ class Players {
 
 
         //handle shooting
-        player.on('shoot', function (destX, destY) {
+        player.socket.on('shoot', function (destX, destY) {
             //only shoot if alive and have ready shots
             if (player.id in this.playing &&
                 player.health > 0 &&
@@ -380,7 +384,7 @@ class Players {
 
 
         //restart game if client requests
-        player.on('restart_game', function () {
+        player.socket.on('restart_game', function () {
             this.room.reset();
         }.bind(this)); //bind to scope
     }
@@ -402,11 +406,11 @@ class Players {
     }
 
     //removes player from object
-    remove(player) {
-        if (player.id in this.objects) {
-            delete this.objects[player.id];
-            delete this.playing[player.id];
-            delete this.waiting[player.id];
+    remove(socket) {
+        if (socket.id in this.objects) {
+            delete this.objects[socket.id];
+            delete this.playing[socket.id];
+            delete this.waiting[socket.id];
         }
     }
 
