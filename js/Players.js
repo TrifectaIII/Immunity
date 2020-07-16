@@ -4,6 +4,12 @@
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
+//Container Class for Extending from Container.js
+///////////////////////////////////////////////////////////////////////////
+
+const Container = require(__dirname + '/Container.js');
+
+
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
@@ -87,21 +93,18 @@ class Player {
 
 
 // class for players container
-class Players {
+class Players extends Container {
 
     constructor(room) {
 
-        //hold individual enemy objects
-        this.objects = {};
+        //call Container constructor
+        super(room);
 
         //hold players who have yet to choose a class
         this.waiting = {};
 
         //hold playing players
         this.playing = {};
-
-        //save room that object exists in
-        this.room = room;
     }
 
     //updates all player objects
@@ -186,15 +189,18 @@ class Players {
 
                     //check for collisions with other players
                     for (let pid in this.playing) {
+
                         if (player.id != pid &&
                             this.playing[pid].health > 0) {
-                            let otherPlayer = this.playing[pid];
-                            Physics.collideAndDisplace(
-                                player,
-                                player.getRadius(),
-                                otherPlayer,
-                                otherPlayer.getRadius()
-                            );
+
+                                let otherPlayer = this.playing[pid];
+                                
+                                Physics.collideAndDisplace(
+                                    player,
+                                    player.getRadius(),
+                                    otherPlayer,
+                                    otherPlayer.getRadius()
+                                );
                         }
                     }
 
@@ -436,11 +442,6 @@ class Players {
         return true;
     }
 
-    //counts players currently in room
-    count() {
-        return Object.keys(this.objects).length;
-    }
-
     //counts players currently in room & playing
     playingCount() {
         return Object.keys(this.playing).length;
@@ -452,5 +453,5 @@ class Players {
     }
 }
 
-
+//export to room
 module.exports = Players;

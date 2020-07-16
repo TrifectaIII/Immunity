@@ -4,6 +4,12 @@
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
+//Container Class for Extending from Container.js
+///////////////////////////////////////////////////////////////////////////
+
+const Container = require(__dirname + '/Container.js');
+
+
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
@@ -99,12 +105,12 @@ class BossShot {
 
 
 // class for shots container
-class Shots {
+class Shots extends Container {
 
     constructor(room) {
 
-        //hold all objects
-        this.objects = {};
+       //call Container constructor
+       super(room);
 
         //hold player shot objects
         this.playerShots = {};
@@ -117,9 +123,6 @@ class Shots {
 
         //counter for object id's
         this.idCounter = 0;
-
-        //save room that object exists in
-        this.room = room;
     }
 
     //updates all shots
@@ -485,5 +488,5 @@ class Shots {
     }
 }
 
-
+//export to room
 module.exports = Shots;

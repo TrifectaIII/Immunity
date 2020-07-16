@@ -4,6 +4,12 @@
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
+//Container Class for Extending from Container.js
+///////////////////////////////////////////////////////////////////////////
+
+const Container = require(__dirname + '/Container.js');
+
+
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
@@ -70,18 +76,15 @@ class Boss {
 
 
 // class for bosses container
-class Bosses {
+class Bosses extends Container {
 
     constructor(room) {
 
-        //hold individual enemy objects
-        this.objects = {};
+        //call Container constructor
+        super(room);
 
         //counter for object id's
         this.idCounter = 0;
-
-        //save room that object exists in
-        this.room = room;
     }
 
     //updates all bosses
@@ -239,12 +242,7 @@ class Bosses {
 
         return boss_info;
     }
-
-    //get count of bosses
-    count() {
-        return Object.keys(this.objects).length;
-    }
 }
 
-
+//export to room
 module.exports = Bosses;

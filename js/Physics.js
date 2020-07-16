@@ -162,5 +162,5 @@ class Physics {
     }
 }
 
-//what to export
+//export to anywhere that needs it
 module.exports = Physics;

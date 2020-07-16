@@ -4,6 +4,12 @@
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
+//Container Class for Extending from Container.js
+///////////////////////////////////////////////////////////////////////////
+
+const Container = require(__dirname + '/Container.js');
+
+
 //Collision/Physics Functions from Physics.js
 ///////////////////////////////////////////////////////////////////////////
 
@@ -29,18 +35,15 @@ class Zone {
 
 
 // class for zones container
-class Zones {
+class Zones extends Container {
 
     constructor(room) {
 
-        //hold individual zone objects
-        this.objects = {};
+        //call Container constructor
+        super(room);
 
         //counter for object id's
         this.idCounter = 0;
-
-        //save room that object exists in
-        this.room = room;
     }
 
     //updates all enemies
@@ -137,12 +140,7 @@ class Zones {
 
         return zone_info;
     }
-
-    //get count of zones
-    count() {
-        return Object.keys(this.objects).length;
-    }
 }
 
-
+//export to room
 module.exports = Zones;
