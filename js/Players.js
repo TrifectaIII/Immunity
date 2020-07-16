@@ -395,6 +395,15 @@ class Players extends Container {
         }.bind(this)); //bind to scope
     }
 
+    //removes player from object
+    remove(socket) {
+        if (socket.id in this.objects) {
+            delete this.objects[socket.id];
+            delete this.playing[socket.id];
+            delete this.waiting[socket.id];
+        }
+    }
+
     //moves player to waiting object
     waitPlayer(player) {
         if (player.id in this.objects) {
@@ -408,15 +417,6 @@ class Players extends Container {
         if (player.id in this.objects) {
             this.playing[player.id] = player;
             delete this.waiting[player.id];
-        }
-    }
-
-    //removes player from object
-    remove(socket) {
-        if (socket.id in this.objects) {
-            delete this.objects[socket.id];
-            delete this.playing[socket.id];
-            delete this.waiting[socket.id];
         }
     }
 

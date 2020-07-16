@@ -4,13 +4,14 @@
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
-//Collision/Physics Functions from Physics.js
+//Collision/Physics Functions from Physics.js and QuadTree from QTree.js
 ///////////////////////////////////////////////////////////////////////////
 
 const Physics = require(__dirname + '/Physics.js');
+const QT = require(__dirname +'/Qtree.js');
 
 
-//Objects to control different game entities
+//Containers to control different game entities
 ///////////////////////////////////////////////////////////////////////////
 
 const Players = require(__dirname + '/Players.js');
@@ -21,11 +22,8 @@ const Zones = require(__dirname + '/Zones.js');
 const Bosses = require(__dirname + '/Bosses.js');
 
 
-//Quadtree class
-const QT = require(__dirname +'/Qtree.js');
-
-
 //Performance.js for benchmarking 
+///////////////////////////////////////////////////////////////////////////
 const { PerformanceObserver, performance } = require('perf_hooks');
 
 
@@ -214,6 +212,7 @@ class Room {
         this.players.remove(socket);
     }
 
+    //reset room when new game starts
     reset() {
         //make sure game is actually over
         if (this.gameOver) {
