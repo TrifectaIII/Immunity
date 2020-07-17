@@ -101,8 +101,10 @@ function drawRespawnMenu (player) {
     textSize(60);
     text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
     drawMainbar(
+        windowHeight - 37,
         gameSettings.colors.red, 
-        1-player.respawnTimer/gameSettings.respawnTime
+        1-player.respawnTimer/gameSettings.respawnTime,
+        '', '',
     );
 
     pop();

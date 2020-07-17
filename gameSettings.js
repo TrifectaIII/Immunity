@@ -37,6 +37,9 @@ const gameSettings = {
     // time in MS to respawn players
     respawnTime: 3000,
 
+    //kills needed to use ability
+    abilityCap: 10,
+
     //info specific to each class
     playerTypes: {
 

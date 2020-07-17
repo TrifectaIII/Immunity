@@ -37,6 +37,9 @@ class Player {
         //start killStreak at 0
         this.killStreak = 0;
 
+        //start ability buildup at 0
+        this.abilityProgress = 0;
+
         //give default angle
         this.angle = 'none';
 
@@ -58,6 +61,15 @@ class Player {
 
         //start with no ready shots
         this.readyShots = 0;
+    }
+
+    //increase killstreak and ability prog when kill enemy
+    giveKillCredit() {
+        this.killStreak++;
+        this.abilityProgress = Math.min(
+            this.abilityProgress+1, 
+            gameSettings.abilityCap
+        );
     }
 
     //return player radius
@@ -226,6 +238,7 @@ class Players extends Container {
                 health: Math.max(0, player.health),
                 name: player.name,
                 killStreak: player.killStreak,
+                abilityProgress: player.abilityProgress,
             };
         }
 
@@ -336,7 +349,6 @@ class Players extends Container {
                 //mark as not respawning
                 player.respawnTimer = 0;
 
-
                 //give default angle & velocities
                 player.angle = 'none';
                 player.velocity = {
@@ -353,6 +365,9 @@ class Players extends Container {
 
                 //reset killstreak
                 player.killStreak = 0;
+
+                //reset ability progress
+                player.abilityProgress = 0;
 
                 //move to playing object
                 this.playPlayer(player);

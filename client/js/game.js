@@ -42,13 +42,11 @@ function drawGame () {
         //draw game area borders
         drawBorders();
 
+        //draw zones
+        drawZones();
+
         //draw dead players
         drawDead();
-
-        //draw client player if dead
-        if (player.health <= 0) {
-            drawPlayer(player);
-        }
 
         //draw pickups
         drawPickups();
@@ -62,22 +60,20 @@ function drawGame () {
         //draw bosses
         drawBosses();
 
-        //draw zones
-        drawZones();
-
         //draw living players
         drawLiving();
 
-        //draw boss healthbar
-        drawBossbar();
-
         // then draw client player on top if living
-        if (player.health > 0) {
-            drawPlayer(player);
-            drawHealthbar(player);
-        }
+        drawPlayer(player);
 
         //draw UI
+
+        //draw player alive. draw health and ability bar
+        drawHealthbar(player);
+        drawAbilitybar(player);
+
+        //draw boss healthbar
+        drawBossbar();
 
         //draw minimap
         drawMinimap(player);
@@ -114,6 +110,9 @@ function drawGame () {
         //draw game area borders
         drawBorders();
 
+        //draw zones
+        drawZones();
+
         //draw dead players
         drawDead();
 
@@ -129,16 +128,13 @@ function drawGame () {
         //draw bosses
         drawBosses();
 
-        //draw zones
-        drawZones();
-
         //draw living players
         drawLiving();
 
+        //draw UI
+
         //draw boss healthbar
         drawBossbar();
-
-        //draw UI
 
         //draw minimap
         drawMinimap();
@@ -504,8 +500,9 @@ function drawZones () {
 
     //set up look
     stroke('black');
-    strokeWeight(3);
-    fill(color(50,50,50,50));
+    strokeWeight(10);
+    // fill(color(0,0,0,50));
+    fill('black');
 
     //loop through every zone
     for (let id in zoneData) {
@@ -708,42 +705,71 @@ function drawPlayer (player) {
 }
 
 //draws the main bar at bottom of the screen
-function drawMainbar (color, prog) {
+function drawMainbar (y, color, prog, text1, text2) {
+
     //prog is ratio from 0 to 1
     prog = Math.min(1,Math.max(0,prog));
+
     push();
-    strokeWeight(0);
+    
+    //draw bar
     fill('black');
+    strokeWeight(0);
     rect(
-        windowWidth/4-2, windowHeight - 27,
-        windowWidth/2+4, 24,
+        windowWidth/4-2, y,
+        windowWidth/2+4, 35,
     );
     fill(color);
     rect(
-        windowWidth/4, windowHeight - 25,
-        windowWidth/2*(prog), 20
+        windowWidth/4, y + 2,
+        windowWidth/2*(prog), 31
     );
+
+    //draw texts
+    stroke('black');
+    strokeWeight(4);
+    textSize(25);
+    fill(gameSettings.colors.white);
+
+    //first text (left side)
+    textAlign(LEFT, CENTER);
+    text(
+        text1,
+        windowWidth/4 + 8,
+        y + 15.5
+    );
+
+    //second text(right side)
+    textAlign(RIGHT, CENTER);
+    text(
+        text2,
+        windowWidth*3/4 - 8,
+        y + 15.5
+    );
+
     pop();
 }
 
 //draw client player healthbar
 function drawHealthbar (player) {
-    push();
-    textAlign(CENTER, CENTER);
     drawMainbar(
+        windowHeight - 37,
         gameSettings.playerTypes[player.type].colors.light, 
-        player.health/gameSettings.playerTypes[player.type].maxHealth
-    );
-    stroke('black');
-    strokeWeight(4);
-    textSize(20);
-    fill(gameSettings.colors.white);
-    text(
+        player.health/gameSettings.playerTypes[player.type].maxHealth,
+        'Health',
         player.health.toString()+' / '+ gameSettings.playerTypes[player.type].maxHealth.toString(),
-        windowWidth/2,
-        windowHeight-17
     );
-    pop();
+}
+
+//draw client player ability progress bar
+function drawAbilitybar (player) {
+    drawMainbar(
+        windowHeight - 74,
+        gameSettings.playerTypes[player.type].colors.light, 
+        player.abilityProgress/gameSettings.abilityCap,
+        'Ability',
+        player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
+    )
 }
 
 //draw boss's healthbar

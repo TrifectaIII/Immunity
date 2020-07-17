@@ -274,9 +274,9 @@ class Enemies extends Container {
         // if enemy died
         if (enemy.health <= 0) {
 
-            //increase player killStreak
+            //give player credit for the kill
             if (playerId in this.room.players.objects) {
-                this.room.players.objects[playerId].killStreak++;
+                this.room.players.objects[playerId].giveKillCredit();
             }
 
             //drop pickup based on chance
