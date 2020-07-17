@@ -774,44 +774,16 @@ function drawAbilitybar (player) {
 
 //draw boss's healthbar
 function drawBossbar () {
-
     //only draw in boss exists
     if (Object.keys(bossData).length > 0) {
-
-        push();
-
         let boss = bossData[Object.keys(bossData)[0]];
-
-        //draw bar
-        let prog = boss.health/boss.maxHealth;
-        prog = Math.min(1,Math.max(0,prog));
-        push();
-        strokeWeight(0);
-        fill('black');
-        rect(
-            windowWidth/4-2, 3,
-            windowWidth/2+4, 24
-        );
-        fill(gameSettings.boss.colors.light);
-        rect(
-            windowWidth/4, 5,
-            windowWidth/2*(prog), 20
-        );
-        pop();
-
-        //draw text
-        textAlign(CENTER, CENTER);
-        stroke('black');
-        strokeWeight(4);
-        textSize(20);
-        fill(gameSettings.colors.white);
-        text(
+        drawMainbar(
+            2,
+            gameSettings.boss.colors.light,
+            boss.health/boss.maxHealth,
+            "Boss",
             boss.health.toString()+' / '+ boss.maxHealth.toString(),
-            windowWidth/2,
-            13
-        );
-
-        pop();
+        )
     }
 }
 
