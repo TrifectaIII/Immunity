@@ -763,9 +763,13 @@ function drawHealthbar (player) {
 
 //draw client player ability progress bar
 function drawAbilitybar (player) {
+    let color = gameSettings.colors.red;
+    if (player.abilityProgress == gameSettings.abilityCap){
+        color = gameSettings.colors.mango;
+    }
     drawMainbar(
         windowHeight - 74,
-        gameSettings.playerTypes[player.type].colors.light, 
+        color, 
         player.abilityProgress/gameSettings.abilityCap,
         'Ability',
         player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
