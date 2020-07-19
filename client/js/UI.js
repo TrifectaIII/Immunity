@@ -1,7 +1,76 @@
 //code for drawing game ui
 var UI = {
 
-    // drawUI: function ()
+    //conglomerate draw function for game UI
+    drawUI: function (socket, gameState) {
+
+        push();
+
+        //if player is actively playing
+        if (socket.id in gameState.players.playing) {
+
+            //get player object
+            let player = gameState.players.playing[socket.id];
+
+            //draw player health and ability bar
+            UI.drawHealthBar(player);
+            UI.drawAbilityBar(player);
+
+            //draw boss healthbar
+            UI.drawBossBar(gameState);
+
+            //draw minimap
+            UI.drawMiniMap(gameState, player);
+
+            //draw info about the current Room
+            UI.drawRoomInfo(gameState, gameSettings.playerTypes[player.type].colors.dark);
+
+            //draw names of players
+            UI.drawPlayerInfo(gameState);
+
+            //draw countdown to next wave
+            UI.drawWaveCountdown(gameState);
+
+            //draw fps counter
+            UI.drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
+
+            // draw crosshair
+            UI.drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
+
+        }
+
+        //if player not in game
+        else {
+
+            //draw boss healthbar
+            UI.drawBossBar(gameState);
+
+            //draw minimap
+            UI.drawMiniMap(gameState);
+
+            //draw info about the current Room
+            UI.drawRoomInfo(gameState, gameSettings.colors.darkgrey);
+
+            //draw names of players
+            UI.drawPlayerInfo(gameState);
+
+            //draw countdown to next wave
+            UI.drawWaveCountdown(gameState);
+
+            //draw fps counter
+            UI.drawFPSandPing(gameSettings.colors.darkgrey);
+
+            //draw death menus
+            if (socket.id in gameState.players.waiting) {
+                UI.drawDeathMenus(gameState);
+            }
+
+            // draw crosshair
+            UI.drawCrosshair(gameSettings.colors.darkgrey);
+        }
+
+        pop();
+    },
 
     //draw a progress bar
     drawBar: function (options) {
@@ -104,7 +173,7 @@ var UI = {
     },
 
     //draw boss's healthbar
-    drawBossBar: function () {
+    drawBossBar: function (gameState) {
         //only draw in boss exists
         if (Object.keys(gameState.bosses).length > 0) {
             let boss = gameState.bosses[Object.keys(gameState.bosses)[0]];
@@ -122,7 +191,7 @@ var UI = {
     },
 
     //draws minimap, player argument optional
-    drawMiniMap: function (player) {
+    drawMiniMap: function (gameState, player) {
 
         //settings for the minimap
         let minimapWidth = Math.min(250, Math.max(windowWidth/6, windowHeight/6));
@@ -203,7 +272,7 @@ var UI = {
         }
 
         //draw client player pip with outline indicator + larger
-        if (player != null) {
+        if (player !== undefined) {
             strokeWeight(2);
             stroke(gameSettings.colors.white);
             fill(gameSettings.playerTypes[player.type].colors.light);
@@ -218,7 +287,7 @@ var UI = {
     },
 
     //display room code + info so others can join
-    drawRoomInfo: function (color) {
+    drawRoomInfo: function (gameState, color) {
         push();
         textAlign(LEFT, CENTER);
         stroke('black');
@@ -242,7 +311,7 @@ var UI = {
     },
 
     //draw name, killstreak, and healthbar for each player
-    drawPlayerInfo: function () {
+    drawPlayerInfo: function (gameState) {
         push();
         rectMode(CORNERS);
         textAlign(RIGHT, CENTER);
@@ -321,7 +390,7 @@ var UI = {
     },
 
     //draw countdown to next wave
-    drawWaveCountdown: function () {
+    drawWaveCountdown: function (gameState) {
 
         push();
 
@@ -395,8 +464,210 @@ var UI = {
         line(mouseX, mouseY+20, mouseX, mouseY-20);
         pop();
     },
+
+    // DEATH MENUS
+    ////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////
+
+    //Exit Game Button
+    exitGameButton: new Button(
+        "EXIT\nGAME",
+        gameSettings.colors.darkpink,
+        gameSettings.colors.pink
+    ),
+    drawExitGameButton: function() {
+        UI.exitGameButton.update(
+            windowWidth - 100, 
+            windowHeight - 100, 
+            windowHeight/8, 
+            windowHeight/8
+        );
+        UI.exitGameButton.draw();
+    },
+
+    //CLASS MENU
+    ////////////////////////////////////////////////////////////
+
+    //create button for each player class
+    classButtons: function () {
+        let classButtons = {};
+
+        for (let className in gameSettings.playerTypes) {
+            classButtons[className] = new Button(
+                className.toUpperCase(),
+                gameSettings.playerTypes[className].colors.dark,
+                gameSettings.playerTypes[className].colors.light
+            );
+        }
+
+        return classButtons;
+    }(),
+
+    drawClassMenu: function () {
+        push();
+        textAlign(CENTER, CENTER);
+
+        let classCount = Object.keys(UI.classButtons).length;
+        
+        //update and draw buttons
+        let counter = 1;
+        for (let className in UI.classButtons) {
+            let button = UI.classButtons[className];
+            button.update(
+                windowWidth/2, 
+                windowHeight*counter/(1+classCount), 
+                windowWidth/3,
+                windowHeight/(4+classCount)
+            );
+            button.draw();
+            counter++;
+        }
+    
+        //draw text
+        stroke('black');
+        strokeWeight(3);
+        fill(gameSettings.colors.white);
+        textSize(40);
+        text("Choose a Class:", windowWidth/2, windowHeight/12);
+        pop();
+    },
+
+    clickClassMenu: function () {
+        for (let className in UI.classButtons) {
+            if (UI.classButtons[className].mouseOver()) {
+                return className;
+            }
+        }
+        return false;
+    },
+
+    // NO LIVES MENU
+    ////////////////////////////////////////////////////////////
+
+    drawNoLivesMenu: function () {
+        push();
+        textAlign(CENTER, CENTER);
+
+        //draw text
+        stroke('black');
+        strokeWeight(3);
+        fill(gameSettings.colors.red);
+        textSize(60);
+        text("No Lives Remaining", windowWidth/2, windowHeight/2);
+        pop();
+    },
+
+    // RESPAWNING MENU
+    ////////////////////////////////////////////////////////////
+
+    drawRespawnMenu: function (player) {
+
+        push();
+    
+        textAlign(CENTER, CENTER);
+        fill(gameSettings.colors.red);
+        stroke('black');
+        strokeWeight(3);
+        textSize(60);
+        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
+        UI.drawBar({
+            x: windowWidth/2,
+            y: windowHeight - 40,
+            width: windowWidth/2,
+            height: 40,
+            color: gameSettings.colors.red,
+            prog: 1-player.respawnTimer/gameSettings.respawnTime,
+        })
+    
+        pop();
+    },
+
+    // GAME OVER MENU
+    ////////////////////////////////////////////////////////////
+
+    restartButton: new Button (
+        "NEW GAME",
+        gameSettings.colors.darkgreen,
+        gameSettings.colors.green
+    ),
+
+    drawGameOverMenu: function (gameState) {
+        push();
+        textAlign(CENTER, CENTER);
+    
+        //update and draw restart button
+        UI.restartButton.update(
+            windowWidth/2,
+            windowHeight*2/3,
+            windowWidth/3,
+            windowHeight/8,
+        )
+    
+        UI.restartButton.draw();
+    
+        //draw text
+        stroke('black');
+        strokeWeight(3);
+        fill(gameSettings.colors.red);
+        textSize(60);
+        text("GAME OVER", windowWidth/2, windowHeight/3);
+    
+        fill(gameSettings.colors.white);
+        text(`WAVE: ${gameState.roomInfo.waveCount}`, windowWidth/2, windowHeight/2);
+        pop();
+    },
+
+    clickGameOverMenu: function () {
+        return UI.restartButton.mouseOver();
+    },
+
+    // Death Menu Functions
+    ////////////////////////////////////////////////////////////
+
+    //draw death menus
+    drawDeathMenus: function (gameState) {
+
+        let player = gameState.players.waiting[socket.id];
+
+        //darken game screen
+        background(0, 200);
+
+        //if game is over
+        if (gameState.roomInfo.gameOver) {
+            UI.drawGameOverMenu(gameState);
+        }
+        //if player is respawning
+        else if (player.respawnTimer > 0) {
+            UI.drawRespawnMenu(player);
+        }
+        //if lives left, select new class
+        else if (gameState.roomInfo.livesCount > 0) {
+            UI.drawClassMenu();
+        }
+        //if no lives left
+        else {
+            UI.drawNoLivesMenu();
+        }
+
+        UI.drawExitGameButton();
+    },
+
+    deathMenuMouseClicked: function (socket, gameState) {
+        if(UI.exitGameButton.mouseOver()) {
+            Errors.displayError('Left Game', 5000);
+            endGame();
+            return;
+        }
+        if (gameState.roomInfo.gameOver &&
+            UI.clickGameOverMenu()) {
+                socket.emit('restart_game');
+                return;
+        }
+        if (gameState.roomInfo.livesCount > 0 &&
+            UI.clickClassMenu()) {
+                socket.emit('class_choice', UI.clickClassMenu());
+                return;
+        }
+    },
 }
-
-
-
 

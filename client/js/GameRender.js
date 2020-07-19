@@ -8,11 +8,9 @@ var GameRender = {
     },
 
     //conglomerate draw function for game objects
-    drawGame: function () {
-        push();
+    drawGame: function (socket, gameState) {
 
-        //refresh screen
-        clear();
+        push();
 
         //if player is actively playing
         if (socket.id in gameState.players.playing) {
@@ -30,66 +28,35 @@ var GameRender = {
             GameRender.drawBorders();
 
             //draw zones
-            GameRender.drawZones();
+            GameRender.drawZones(gameState);
 
             //draw dead players
-            GameRender.drawDead();
+            // GameRender.drawDead();
 
             //draw pickups
-            GameRender.drawPickups();
+            GameRender.drawPickups(gameState);
 
             //draw shots
-            GameRender.drawShots();
+            GameRender.drawShots(gameState);
 
             //draw enemies
-            GameRender.drawEnemies();
+            GameRender.drawEnemies(gameState);
 
             //draw bosses
-            GameRender.drawBosses();
+            GameRender.drawBosses(gameState);
 
             //draw living players
-            GameRender.drawLiving();
+            GameRender.drawLiving(gameState);
 
             // then draw client player on top if living
             GameRender.drawPlayer(player);
-
-            //draw UI
-
-            //draw player alive. draw health and ability bar
-            UI.drawHealthBar(player);
-            UI.drawAbilityBar(player);
-
-            //draw boss healthbar
-            UI.drawBossBar();
-
-            //draw minimap
-            UI.drawMiniMap(player);
-
-            //draw info about the current Room
-            UI.drawRoomInfo(gameSettings.playerTypes[player.type].colors.dark);
-
-            //draw names of players
-            UI.drawPlayerInfo();
-
-            //draw countdown to next wave
-            UI.drawWaveCountdown();
-
-            //draw fps counter
-            UI.drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
-
-            // draw crosshair
-            UI.drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
-
         }
 
         //draw game if player not in game
         else {
 
             //calculate screen offset based on center of screen
-            GameRender.calcOffset({
-                x: gameSettings.width/2,
-                y: gameSettings.height/2
-            });
+            GameRender.calcOffset();
 
             //draw grid background
             GameRender.drawGrid();
@@ -98,48 +65,25 @@ var GameRender = {
             GameRender.drawBorders();
 
             //draw zones
-            GameRender.drawZones();
+            GameRender.drawZones(gameState);
 
             //draw dead players
-            GameRender.drawDead();
+            // GameRender.drawDead();
 
             //draw pickups
-            GameRender.drawPickups();
+            GameRender.drawPickups(gameState);
 
             //draw shots
-            GameRender.drawShots();
+            GameRender.drawShots(gameState);
 
             //draw enemies
-            GameRender.drawEnemies();
+            GameRender.drawEnemies(gameState);
 
             //draw bosses
-            GameRender.drawBosses();
+            GameRender.drawBosses(gameState);
 
             //draw living players
-            GameRender.drawLiving();
-
-            //draw UI
-
-            //draw boss healthbar
-            UI.drawBossBar();
-
-            //draw minimap
-            UI.drawMiniMap();
-
-            //draw info about the current Room
-            UI.drawRoomInfo(gameSettings.colors.darkgrey);
-
-            //draw names of players
-            UI.drawPlayerInfo();
-
-            //draw countdown to next wave
-            UI.drawWaveCountdown();
-
-            //draw fps counter
-            UI.drawFPSandPing(gameSettings.colors.darkgrey);
-
-            // draw crosshair
-            UI.drawCrosshair(gameSettings.colors.darkgrey);
+            GameRender.drawLiving(gameState);
         }
 
         pop();
@@ -147,6 +91,14 @@ var GameRender = {
 
     //calculate screen offset based on player position
     calcOffset: function (player) {
+
+        //if no player, target center of game area
+        if (player === undefined) {
+            player = {
+                x: gameSettings.width/2,
+                y: gameSettings.height/2,
+            }
+        }
 
         let margin = 100;
         
@@ -240,7 +192,7 @@ var GameRender = {
     ],
 
     //draws pickup-able objects
-    drawPickups: function () {
+    drawPickups: function (gameState) {
         push();
 
         GameRender.pickupProg -= 0.5;
@@ -302,7 +254,7 @@ var GameRender = {
     },
 
     //draw all shots
-    drawShots: function () {
+    drawShots: function (gameState) {
 
         push();
         strokeWeight(2);
@@ -362,7 +314,7 @@ var GameRender = {
     },
 
     //draw all enemies
-    drawEnemies: function () {
+    drawEnemies: function (gameState) {
 
         push();
 
@@ -438,7 +390,7 @@ var GameRender = {
     },
 
     //draw bosses
-    drawBosses: function () {
+    drawBosses: function (gameState) {
 
         push();
 
@@ -481,7 +433,7 @@ var GameRender = {
     },
 
     //draw zones
-    drawZones: function () {
+    drawZones: function (gameState) {
         
         push();
 
@@ -514,41 +466,41 @@ var GameRender = {
         pop();
     },
 
-    //draw dead players
-    drawDead: function () {
+    // //draw dead players
+    // drawDead: function () {
 
-        push();
+    //     push();
 
-        for (let id in gameState.players.playing) {
-            if (id != socket.id) {
-                let player = gameState.players.playing[id];
-                if (player.health <= 0 &&
-                    player.x-GameRender.screenOffset.x > -50 &&
-                    player.x-GameRender.screenOffset.x < windowWidth + 50 &&
-                    player.y-GameRender.screenOffset.y > -50 &&
-                    player.y-GameRender.screenOffset.y < windowHeight + 50) {
-                        //draw player as transparent
-                        let fillcolor = color(gameSettings.playerTypes[player.type].colors.light);
-                        fillcolor.setAlpha(100);
-                        let strokecolor = color(gameSettings.playerTypes[player.type].colors.dark);
-                        strokecolor.setAlpha(100)
-                        fill(fillcolor);
-                        stroke(strokecolor);
-                        strokeWeight(4);
-                        circle(
-                            player.x-GameRender.screenOffset.x, 
-                            player.y-GameRender.screenOffset.y, 
-                            gameSettings.playerTypes[player.type].radius*2 - 1, 
-                        );
-                }
-            }
-        }
+    //     for (let id in gameState.players.playing) {
+    //         if (id != socket.id) {
+    //             let player = gameState.players.playing[id];
+    //             if (player.health <= 0 &&
+    //                 player.x-GameRender.screenOffset.x > -50 &&
+    //                 player.x-GameRender.screenOffset.x < windowWidth + 50 &&
+    //                 player.y-GameRender.screenOffset.y > -50 &&
+    //                 player.y-GameRender.screenOffset.y < windowHeight + 50) {
+    //                     //draw player as transparent
+    //                     let fillcolor = color(gameSettings.playerTypes[player.type].colors.light);
+    //                     fillcolor.setAlpha(100);
+    //                     let strokecolor = color(gameSettings.playerTypes[player.type].colors.dark);
+    //                     strokecolor.setAlpha(100)
+    //                     fill(fillcolor);
+    //                     stroke(strokecolor);
+    //                     strokeWeight(4);
+    //                     circle(
+    //                         player.x-GameRender.screenOffset.x, 
+    //                         player.y-GameRender.screenOffset.y, 
+    //                         gameSettings.playerTypes[player.type].radius*2 - 1, 
+    //                     );
+    //             }
+    //         }
+    //     }
 
-        pop();
-    },
+    //     pop();
+    // },
 
     //draw living players
-    drawLiving: function () {
+    drawLiving: function (gameState) {
 
         push();
 

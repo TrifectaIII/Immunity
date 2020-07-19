@@ -148,6 +148,8 @@ function windowResized() {
 // p5 drawing
 function draw () {
 
+    clear();
+
     //draw based on current state
     switch (state) {
 
@@ -163,11 +165,8 @@ function draw () {
         
         //draw game (game.js)
         case 'game':
-            GameRender.drawGame();
-            //draw death menu when dead
-            if (socket.id in gameState.players.waiting) {
-                drawDeathMenus();
-            }
+            GameRender.drawGame(socket, gameState);
+            UI.drawUI(socket, gameState);
             break;
     }
 
@@ -187,7 +186,7 @@ function mouseClicked () {
         case 'game':
             //listen for clicks when player is dead
             if (socket.id in gameState.players.waiting) {
-                deathMenuMouseClicked(socket);
+                UI.deathMenuMouseClicked(socket, gameState);
             }
     }
 

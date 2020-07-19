@@ -362,9 +362,6 @@ function drawLoading () {
     push();
     textAlign(CENTER, CENTER);
 
-    //refresh screen
-    clear()
-
     //draw background
     drawMenuGrid();
 
@@ -412,9 +409,6 @@ var menuIndex = 0;
 
 //draws each menu
 function drawMenus (canvas) {
-
-    //refresh screen
-    clear();
 
     //draw background
     drawMenuGrid();
