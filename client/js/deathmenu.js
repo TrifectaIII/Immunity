@@ -100,7 +100,7 @@ function drawRespawnMenu (player) {
     strokeWeight(3);
     textSize(60);
     text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
-    drawBar({
+    UI.drawBar({
         x: windowWidth/2,
         y: windowHeight - 40,
         width: windowWidth/2,

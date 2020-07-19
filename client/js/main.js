@@ -163,7 +163,7 @@ function draw () {
         
         //draw game (game.js)
         case 'game':
-            drawGame();
+            GameRender.drawGame();
             //draw death menu when dead
             if (socket.id in gameState.players.waiting) {
                 drawDeathMenus();

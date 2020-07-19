@@ -44,8 +44,8 @@ var Controls = {
         socket.on('shoot_request', function () {
             socket.emit(
                 'shoot',
-                mouseX+screenOffset.x,
-                mouseY+screenOffset.y
+                mouseX+GameRender.screenOffset.x,
+                mouseY+GameRender.screenOffset.y
             );
         });
     },

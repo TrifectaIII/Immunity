@@ -30,13 +30,13 @@ window.addEventListener('keypress', function (event) {
 });
 
 //event listener for close button
-document.querySelector('.InfoMenu .InfoMenu-close').addEventListener(
+InfoMenu.div.querySelector('.InfoMenu-close').addEventListener(
     'click', 
     InfoMenu.toggle.bind(InfoMenu)
 );
 
 //event listener for exit game button
-document.querySelector('.InfoMenu .InfoMenu-exit').addEventListener(
+InfoMenu.div.querySelector('.InfoMenu-exit').addEventListener(
     'click', 
     function () {
         Errors.displayError('Left Game', 5000);
