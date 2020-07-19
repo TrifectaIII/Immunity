@@ -1,9 +1,9 @@
 //info panel
 
-var infomenu = {
+var InfoMenu = {
 
     //get div element
-    div: document.querySelector('.infomenu'),
+    div: document.querySelector('.InfoMenu'),
 
     //function to toggle display of settings
     toggle: function () {
@@ -20,23 +20,23 @@ var infomenu = {
 }
 
 //default is hidden
-infomenu.div.style.display = 'none';
+InfoMenu.div.style.display = 'none';
 
-//toggle display of infomenu when button pressed
+//toggle display of InfoMenu when button pressed
 window.addEventListener('keypress', function (event) {
     if (event.keyCode == gameSettings.menuToggleButton.charCodeAt(0)) {
-        infomenu.toggle();
+        InfoMenu.toggle();
     }
 });
 
 //event listener for close button
-document.querySelector('.infomenu .infomenu-close').addEventListener(
+document.querySelector('.InfoMenu .InfoMenu-close').addEventListener(
     'click', 
-    infomenu.toggle.bind(infomenu)
+    InfoMenu.toggle.bind(InfoMenu)
 );
 
 //event listener for exit game button
-document.querySelector('.infomenu .infomenu-exit').addEventListener(
+document.querySelector('.InfoMenu .InfoMenu-exit').addEventListener(
     'click', 
     function () {
         Errors.displayError('Left Game', 5000);

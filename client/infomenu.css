@@ -1,6 +1,6 @@
 /* info menu */
 
-.infomenu {
+.InfoMenu {
 
     z-index: 1;
     position:fixed;
@@ -18,19 +18,19 @@
     font-family: 'Aldrich', sans-serif;
 }
 
-.infomenu .infomenu-inner {
+.InfoMenu .InfoMenu-inner {
     overflow-y: auto;
     height: 100%;
 }
 
-.infomenu hr {
+.InfoMenu hr {
     border-style: solid;
     border-color: black;
     width: 80%;
 }
 
 /* close button */
-.infomenu .infomenu-close {
+.InfoMenu .InfoMenu-close {
     border-right: 4px solid black;
     border-bottom: 4px solid black;
     border-top: 0px solid black;
@@ -47,12 +47,12 @@
     font-family: 'Aldrich', sans-serif;
 }
 
-.infomenu .infomenu-close:hover {
+.InfoMenu .InfoMenu-close:hover {
     background-color: var(--p8-pink);
 }
 
 /* exit game button */
-.infomenu .infomenu-exit {
+.InfoMenu .InfoMenu-exit {
     border: 4px solid black;
     margin-top: 25px;
     margin-bottom: 25px;
@@ -62,6 +62,6 @@
     font-family: 'Aldrich', sans-serif;
 }
 
-.infomenu .infomenu-exit:hover {
+.InfoMenu .InfoMenu-exit:hover {
     background-color: var(--p8-pink);
 }
