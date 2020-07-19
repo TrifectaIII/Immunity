@@ -143,7 +143,7 @@ function drawGameOverMenu () {
     text("GAME OVER", windowWidth/2, windowHeight/3);
 
     fill(gameSettings.colors.white);
-    text(`WAVE: ${gameData.waveCount}`, windowWidth/2, windowHeight/2);
+    text(`WAVE: ${gameState.roomInfo.waveCount}`, windowWidth/2, windowHeight/2);
     pop();
 }
 
@@ -157,13 +157,13 @@ function clickGameOverMenu() {
 //draw death menus
 function drawDeathMenus () {
 
-    let player = waitingData[socket.id];
+    let player = gameState.players.waiting[socket.id];
 
     //darken game screen
     background(0, 200);
 
     //if game is over
-    if (gameData.gameOver) {
+    if (gameState.roomInfo.gameOver) {
         drawGameOverMenu();
     }
     //if player is respawning
@@ -171,7 +171,7 @@ function drawDeathMenus () {
         drawRespawnMenu(player);
     }
     //if lives left, select new class
-    else if (gameData.livesCount > 0) {
+    else if (gameState.roomInfo.livesCount > 0) {
         drawClassMenu();
     }
     //if no lives left
@@ -191,13 +191,13 @@ function deathMenuMouseClicked (socket) {
         socket.close();
         return;
     }
-    if (gameData.gameOver) {
+    if (gameState.roomInfo.gameOver) {
         if (clickGameOverMenu()) {
             socket.emit('restart_game');
         }
     }
     else if (
-        gameData.livesCount > 0 &&
+        gameState.roomInfo.livesCount > 0 &&
         clickClassMenu()) {
             socket.emit('class_choice', clickClassMenu());
     }

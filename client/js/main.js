@@ -4,8 +4,23 @@
 // global game state
 var state = 'menu';
 
-//info on game state from server
-var gameState = {};
+//info on game state from server (starts empty)
+var gameState = {
+    roomInfo:{},
+    players:{
+        playing:{},
+        waiting:{},
+    },
+    enemies:{},
+    bosses:{},
+    shots:{
+        playerShots:{},
+        enemyShots:{},
+        bossShots:{},
+    },
+    zones:{},
+    pickups:{},
+};
 
 // current roomId
 var roomId;
@@ -92,18 +107,8 @@ function joinGame(menuChoices) {
 
         //recieve player info from server
         socket.on ('game_update', function (serverState) {
+            //save to local object
             gameState = serverState;
-            //save to objects (game.js)
-            gameData = serverState.roomInfo;
-            playingData = serverState.players.playing;
-            waitingData = serverState.players.waiting;
-            shotData = serverState.shots.playerShots;
-            enemyShotData = serverState.shots.enemyShots;
-            bossShotData = serverState.shots.bossShots;
-            pickupData = serverState.pickups;
-            enemyData = serverState.enemies;
-            bossData = serverState.bosses;
-            zoneData = serverState.zones;
         });
     });
 }
@@ -160,7 +165,7 @@ function draw () {
         case 'game':
             drawGame();
             //draw death menu when dead
-            if (socket.id in waitingData) {
+            if (socket.id in gameState.players.waiting) {
                 drawDeathMenus();
             }
             break;
@@ -181,7 +186,7 @@ function mouseClicked () {
 
         case 'game':
             //listen for clicks when player is dead
-            if (socket.id in waitingData) {
+            if (socket.id in gameState.players.waiting) {
                 deathMenuMouseClicked(socket);
             }
     }

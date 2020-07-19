@@ -1,19 +1,3 @@
-//game info from server
-var gameData = {};
-
-//holds info of playing and waiting players
-var playingData = {};
-var waitingData = {};
-
-//info for other game objects
-var shotData = {};
-var enemyShotData = {};
-var bossShotData = {};
-var pickupData = {};
-var enemyData = {};
-var bossData = {};
-var zoneData = {};
-
 //object to hold info re: screen offset based on player position
 var screenOffset = {
     x:0,
@@ -28,10 +12,10 @@ function drawGame () {
     clear();
 
     //if player is actively playing
-    if (socket.id in playingData) {
+    if (socket.id in gameState.players.playing) {
         
         //get player object
-        let player = playingData[socket.id];
+        let player = gameState.players.playing[socket.id];
 
         //calculate screen offset based on player position
         calcOffset(player);
@@ -261,8 +245,8 @@ function drawPickups() {
     stroke(progColor);
     fill(gameSettings.colors.white);
     strokeWeight(4);
-    for (let id in pickupData) {
-        let pickup = pickupData[id];
+    for (let id in gameState.pickups) {
+        let pickup = gameState.pickups[id];
         if (pickup.x-screenOffset.x > -50 &&
             pickup.x-screenOffset.x < windowWidth + 50 &&
             pickup.y-screenOffset.y > -50 &&
@@ -321,8 +305,8 @@ function drawShots() {
     strokeWeight(2);
 
     //draw enemy shots
-    for (let id in enemyShotData) {
-        let shot = enemyShotData[id];
+    for (let id in gameState.shots.enemyShots) {
+        let shot = gameState.shots.enemyShots[id];
         if (shot.x-screenOffset.x > 0 &&
             shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
@@ -338,8 +322,8 @@ function drawShots() {
     }
 
     //draw boss shots
-    for (let id in bossShotData) {
-        let shot = bossShotData[id];
+    for (let id in gameState.shots.bossShots) {
+        let shot = gameState.shots.bossShots[id];
         if (shot.x-screenOffset.x > 0 &&
             shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
@@ -355,8 +339,8 @@ function drawShots() {
     }
     
     //draw player shots
-    for (let id in shotData) {
-        let shot = shotData[id];
+    for (let id in gameState.shots.playerShots) {
+        let shot = gameState.shots.playerShots[id];
         if (shot.x-screenOffset.x > 0 &&
             shot.x-screenOffset.x < windowWidth &&
             shot.y-screenOffset.y > 0 &&
@@ -380,8 +364,8 @@ function drawEnemies() {
     push();
 
     //draw enemies
-    for (let id in enemyData) {
-        let enemy = enemyData[id];
+    for (let id in gameState.enemies) {
+        let enemy = gameState.enemies[id];
         if (enemy.x-screenOffset.x > -50 &&
             enemy.x-screenOffset.x < windowWidth + 50 &&
             enemy.y-screenOffset.y > -50 &&
@@ -415,8 +399,8 @@ function drawEnemies() {
     }
 
     //draw healthbars
-    for (let id in enemyData) {
-        let enemy = enemyData[id];
+    for (let id in gameState.enemies) {
+        let enemy = gameState.enemies[id];
         if (enemy.x-screenOffset.x > -50 &&
             enemy.x-screenOffset.x < windowWidth + 50 &&
             enemy.y-screenOffset.y > -50 &&
@@ -456,8 +440,8 @@ function drawBosses () {
     push();
 
     //draw enemies
-    for (let id in bossData) {
-        let boss = bossData[id];
+    for (let id in gameState.bosses) {
+        let boss = gameState.bosses[id];
         if (boss.x-screenOffset.x > -200 &&
             boss.x-screenOffset.x < windowWidth + 200 &&
             boss.y-screenOffset.y > -200 &&
@@ -505,8 +489,8 @@ function drawZones () {
     fill('black');
 
     //loop through every zone
-    for (let id in zoneData) {
-        let zone = zoneData[id];
+    for (let id in gameState.zones) {
+        let zone = gameState.zones[id];
 
         //check if zone is closing
         if (zone.closing > 0) {
@@ -532,9 +516,9 @@ function drawDead () {
 
     push();
 
-    for (let id in playingData) {
+    for (let id in gameState.players.playing) {
         if (id != socket.id) {
-            let player = playingData[id];
+            let player = gameState.players.playing[id];
             if (player.health <= 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -566,9 +550,9 @@ function drawLiving () {
     push();
 
     //draw players
-    for (let id in playingData) {
+    for (let id in gameState.players.playing) {
         if (id != socket.id) {
-            let player = playingData[id];
+            let player = gameState.players.playing[id];
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -588,9 +572,9 @@ function drawLiving () {
     }
 
     //draw healthbar
-    for (let id in playingData) {
+    for (let id in gameState.players.playing) {
         if (id != socket.id) {
-            let player = playingData[id];
+            let player = gameState.players.playing[id];
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -627,9 +611,9 @@ function drawLiving () {
     strokeWeight(4);
     textAlign(CENTER, BOTTOM);
     textSize(22);
-    for (let id in playingData) {
+    for (let id in gameState.players.playing) {
         if (id != socket.id) {
-            let player = playingData[id];
+            let player = gameState.players.playing[id];
             if (player.health > 0 &&
                 player.x-screenOffset.x > -50 &&
                 player.x-screenOffset.x < windowWidth + 50 &&
@@ -807,8 +791,8 @@ function drawAbilitybar (player) {
 //draw boss's healthbar
 function drawBossbar () {
     //only draw in boss exists
-    if (Object.keys(bossData).length > 0) {
-        let boss = bossData[Object.keys(bossData)[0]];
+    if (Object.keys(gameState.bosses).length > 0) {
+        let boss = gameState.bosses[Object.keys(gameState.bosses)[0]];
         drawBar({
             x: windowWidth/2,
             y: 40,
@@ -850,8 +834,8 @@ function drawMinimap (player) {
     //draw zones
     strokeWeight(1);
     fill(color(50,50,50,50));
-    for (let id in zoneData) {
-        let zone = zoneData[id];
+    for (let id in gameState.zones) {
+        let zone = gameState.zones[id];
         if (zone.closing > 0) {
             stroke(gameSettings.colors.green);
         }
@@ -870,8 +854,8 @@ function drawMinimap (player) {
 
     //draw enemy pips
     fill(gameSettings.colors.red);
-    for (let id in enemyData) {
-        let enemy = enemyData[id];
+    for (let id in gameState.enemies) {
+        let enemy = gameState.enemies[id];
         circle(
             (enemy.x/gameSettings.width)*minimapWidth + minimapOffset.x,
             (enemy.y/gameSettings.height)*minimapHeight + minimapOffset.y,
@@ -881,8 +865,8 @@ function drawMinimap (player) {
 
     //draw boss pips
     fill(gameSettings.colors.red);
-    for (let id in bossData) {
-        let boss = bossData[id];
+    for (let id in gameState.bosses) {
+        let boss = gameState.bosses[id];
         circle(
             (boss.x/gameSettings.width)*minimapWidth + minimapOffset.x,
             (boss.y/gameSettings.height)*minimapHeight + minimapOffset.y,
@@ -891,9 +875,9 @@ function drawMinimap (player) {
     }
 
     //draw other player pips
-    for (let id in playingData) {
-        if (id != socket.id && playingData[id].health > 0) {
-            let player = playingData[id];
+    for (let id in gameState.players.playing) {
+        if (id != socket.id && gameState.players.playing[id].health > 0) {
+            let player = gameState.players.playing[id];
             fill(gameSettings.playerTypes[player.type].colors.light);
             circle(
                 (player.x/gameSettings.width)*minimapWidth + minimapOffset.x,
@@ -928,17 +912,17 @@ function drawRoomInfo (color) {
     fill(color);
     text(`Game Code: ${roomId}`, 15, 20);
 
-    let playerCount = Object.keys(playingData).length + Object.keys(waitingData).length;
+    let playerCount = Object.keys(gameState.players.playing).length + Object.keys(gameState.players.waiting).length;
 
     text(`Players: ${playerCount}/${gameSettings.roomCap}`, 15, 60);
 
-    text(`Wave: ${gameData.waveCount}`, 15 ,100);
+    text(`Wave: ${gameState.roomInfo.waveCount}`, 15 ,100);
 
     //draw lives as red if none left
-    if (gameData.livesCount <= 0) {
+    if (gameState.roomInfo.livesCount <= 0) {
         fill(gameSettings.colors.red);
     }
-    text(`Lives: ${gameData.livesCount}`, 15, 140);
+    text(`Lives: ${gameState.roomInfo.livesCount}`, 15, 140);
     pop();
 }
 
@@ -953,10 +937,10 @@ function drawPlayerInfo () {
     let counter = 0;
 
     //draw living players first
-    let sortedPlaying = Object.keys(playingData).sort();
+    let sortedPlaying = Object.keys(gameState.players.playing).sort();
     for (let id of sortedPlaying) {
         
-        let player = playingData[id];
+        let player = gameState.players.playing[id];
 
         //draw name and killstreak
         fill(gameSettings.playerTypes[player.type].colors.dark);
@@ -983,10 +967,10 @@ function drawPlayerInfo () {
         counter++;
     }
 
-    let sortedWaiting = Object.keys(waitingData).sort();
+    let sortedWaiting = Object.keys(gameState.players.waiting).sort();
     for (let id of sortedWaiting) {
         
-        let player = waitingData[id];
+        let player = gameState.players.waiting[id];
 
         //draw name and killstreak
         fill(gameSettings.colors.darkgrey);
@@ -1027,11 +1011,11 @@ function drawWaveCountdown () {
     push();
 
     //make sure countdown is going
-    if (gameData.waveTimer > 0 &&
-        Object.keys(zoneData).length == 0 &&
-        Object.keys(bossData).length == 0) {
+    if (gameState.roomInfo.waveTimer > 0 &&
+        Object.keys(gameState.zones).length == 0 &&
+        Object.keys(gameState.bosses).length == 0) {
 
-            let countdownNum = Math.ceil(gameData.waveTimer/1000);
+            let countdownNum = Math.ceil(gameState.roomInfo.waveTimer/1000);
 
             textAlign(CENTER, CENTER);
             textSize(75);

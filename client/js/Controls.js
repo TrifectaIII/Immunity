@@ -7,16 +7,18 @@ var Controls = {
 
     directionHandler: function (socket) {
         if (state == "game" &&
-            socket.id in playingData && 
-            playingData[socket.id].health > 0) {
+            gameState.players.playing &&
+            socket.id in gameState.players.playing && 
+            gameState.players.playing[socket.id].health > 0) {
                 Movement.sendAngle(socket);
         }
     },
 
     clickHandler: function (socket) {
         if (state == "game" &&
-            socket.id in playingData && 
-            playingData[socket.id].health > 0) {
+            gameState.players.playing &&
+            socket.id in gameState.players.playing && 
+            gameState.players.playing[socket.id].health > 0) {
                 Shoot.sendClicking(socket);
         }
     },
