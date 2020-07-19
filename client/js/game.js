@@ -705,10 +705,31 @@ function drawPlayer (player) {
 }
 
 //draws the main bar at bottom of the screen
-function drawMainbar (y, color, prog, text1, text2) {
+function drawBar (options) {
+
+    //set defaults for options
+    let defaults = {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 10,
+        color: 'white',
+        prog: 0.5,
+        leftText: '',
+        rightText: '',
+        fontSize: 25,
+    }
+
+    if(!options) {options = {}};
+
+    for (let option in defaults) {
+        if (options[option] === undefined) {
+            options[option] = defaults[option];
+        }
+    }
 
     //prog is ratio from 0 to 1
-    prog = Math.min(1,Math.max(0,prog));
+    options.prog = Math.min(1,Math.max(0, options.prog));
 
     push();
     
@@ -716,35 +737,35 @@ function drawMainbar (y, color, prog, text1, text2) {
     fill('black');
     strokeWeight(0);
     rect(
-        windowWidth/4-2, y,
-        windowWidth/2+4, 35,
+        options.x-options.width/2, options.y-options.height/2,
+        options.width, options.height,
     );
-    fill(color);
+    fill(options.color);
     rect(
-        windowWidth/4, y + 2,
-        windowWidth/2*(prog), 31
+        options.x-options.width/2+2, options.y - options.height/2 + 2,
+        (options.width-4)*(options.prog), options.height-4
     );
 
     //draw texts
     stroke('black');
     strokeWeight(4);
-    textSize(25);
+    textSize(options.fontSize);
     fill(gameSettings.colors.white);
 
     //first text (left side)
     textAlign(LEFT, CENTER);
     text(
-        text1,
-        windowWidth/4 + 8,
-        y + 15.5
+        options.leftText,
+        options.x - options.width/2 + 8,
+        options.y - options.height/2 + (options.height-4)/2
     );
 
     //second text(right side)
     textAlign(RIGHT, CENTER);
     text(
-        text2,
-        windowWidth*3/4 - 8,
-        y + 15.5
+        options.rightText,
+        options.x + options.width/2 - 8,
+        options.y - options.height/2 + (options.height-4)/2
     );
 
     pop();
@@ -752,13 +773,17 @@ function drawMainbar (y, color, prog, text1, text2) {
 
 //draw client player healthbar
 function drawHealthbar (player) {
-    drawMainbar(
-        windowHeight - 37,
-        gameSettings.playerTypes[player.type].colors.light, 
-        player.health/gameSettings.playerTypes[player.type].maxHealth,
-        'Health',
-        player.health.toString()+' / '+ gameSettings.playerTypes[player.type].maxHealth.toString(),
-    );
+
+    drawBar({
+        x: windowWidth*3/8 - 10,
+        y: windowHeight - 40,
+        width: windowWidth/4,
+        height: 40,
+        color: gameSettings.playerTypes[player.type].colors.light,
+        prog: player.health/gameSettings.playerTypes[player.type].maxHealth,
+        leftText: 'Health',
+        rightText: player.health.toString()+' / '+ gameSettings.playerTypes[player.type].maxHealth.toString(),
+    })
 }
 
 //draw client player ability progress bar
@@ -767,13 +792,16 @@ function drawAbilitybar (player) {
     if (player.abilityProgress == gameSettings.abilityCap){
         color = gameSettings.colors.mango;
     }
-    drawMainbar(
-        windowHeight - 74,
-        color, 
-        player.abilityProgress/gameSettings.abilityCap,
-        'Ability',
-        player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
-    )
+    drawBar({
+        x: windowWidth*5/8 + 10,
+        y: windowHeight - 40,
+        width: windowWidth/4,
+        height: 40,
+        color: color,
+        prog: player.abilityProgress/gameSettings.abilityCap,
+        leftText: 'Ability',
+        rightText: player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
+    })
 }
 
 //draw boss's healthbar
@@ -781,13 +809,16 @@ function drawBossbar () {
     //only draw in boss exists
     if (Object.keys(bossData).length > 0) {
         let boss = bossData[Object.keys(bossData)[0]];
-        drawMainbar(
-            2,
-            gameSettings.boss.colors.light,
-            boss.health/boss.maxHealth,
-            "Boss",
-            boss.health.toString()+' / '+ boss.maxHealth.toString(),
-        )
+        drawBar({
+            x: windowWidth/2,
+            y: 40,
+            width: windowWidth/2,
+            height: 40,
+            color: gameSettings.boss.colors.light,
+            prog: boss.health/boss.maxHealth,
+            leftText: 'Boss',
+            rightText: boss.health.toString()+' / '+ boss.maxHealth.toString(),
+        })
     }
 }
 
