@@ -4,6 +4,9 @@
 // global game state
 var state = 'menu';
 
+//info on game state from server
+var gameState = {};
+
 // current roomId
 var roomId;
 
@@ -88,18 +91,19 @@ function joinGame(menuChoices) {
         state = 'game';
 
         //recieve player info from server
-        socket.on ('game_update', function (serverData) {
+        socket.on ('game_update', function (serverState) {
+            gameState = serverState;
             //save to objects (game.js)
-            gameData = serverData.roomData;
-            playingData = serverData.playerData.playing;
-            waitingData = serverData.playerData.waiting;
-            shotData = serverData.shotData.playerShots;
-            enemyShotData = serverData.shotData.enemyShots;
-            bossShotData = serverData.shotData.bossShots;
-            pickupData = serverData.pickupData;
-            enemyData = serverData.enemyData;
-            bossData = serverData.bossData;
-            zoneData = serverData.zoneData;
+            gameData = serverState.roomInfo;
+            playingData = serverState.players.playing;
+            waitingData = serverState.players.waiting;
+            shotData = serverState.shots.playerShots;
+            enemyShotData = serverState.shots.enemyShots;
+            bossShotData = serverState.shots.bossShots;
+            pickupData = serverState.pickups;
+            enemyData = serverState.enemies;
+            bossData = serverState.bosses;
+            zoneData = serverState.zones;
         });
     });
 }

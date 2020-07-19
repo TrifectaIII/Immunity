@@ -133,7 +133,8 @@ class Players extends Container {
             else {
                 player.respawnTimer = Math.max(
                     player.respawnTimer - gameSettings.tickRate,
-                    0);
+                    0
+                );
             }
         }
 

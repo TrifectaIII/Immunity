@@ -110,14 +110,14 @@ class Room {
 
         //collect return game info for emit to clients in room
         return {
-            playerData: this.players.collect(),
-            shotData: this.shots.collect(),
-            enemyData: this.enemies.collect(),
-            bossData: this.bosses.collect(),
-            pickupData: this.pickups.collect(),
-            zoneData: this.zones.collect(),
+            players: this.players.collect(),
+            shots: this.shots.collect(),
+            enemies: this.enemies.collect(),
+            bosses: this.bosses.collect(),
+            pickups: this.pickups.collect(),
+            zones: this.zones.collect(),
 
-            roomData: {
+            roomInfo: {
                 waveCount: this.waveCount,
                 livesCount: this.livesCount,
                 gameOver: this.gameOver,
