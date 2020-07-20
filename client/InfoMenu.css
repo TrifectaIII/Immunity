@@ -19,8 +19,12 @@
 }
 
 .InfoMenu .InfoMenu-inner {
+    font-size: 20px;
+    margin:auto;
     overflow-y: auto;
     height: 100%;
+    padding-right:20px;
+    padding-left: 20px;
 }
 
 .InfoMenu hr {
