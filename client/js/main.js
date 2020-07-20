@@ -165,7 +165,7 @@ function draw () {
         
         //draw game (game.js)
         case 'game':
-            GameRender.drawGame(socket, gameState);
+            Render.drawGame(socket, gameState);
             UI.drawUI(socket, gameState);
             break;
     }
