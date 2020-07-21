@@ -8,9 +8,9 @@ var Shoot = {
     previous: false,
 
     sendClicking: function (socket) {
-        if (Shoot.clicking != Shoot.previous) {
-            socket.emit('click', Shoot.clicking);
-            Shoot.previous = Shoot.clicking;
+        if (this.clicking != this.previous) {
+            socket.emit('click', this.clicking);
+            this.previous = this.clicking;
         }
     }
 }

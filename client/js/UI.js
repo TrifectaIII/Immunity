@@ -13,29 +13,29 @@ var UI = {
             let player = gameState.players.playing[socket.id];
 
             //draw player health and ability bar
-            UI.drawHealthBar(player);
-            UI.drawAbilityBar(player);
+            this.drawHealthBar(player);
+            this.drawAbilityBar(player);
 
             //draw boss healthbar
-            UI.drawBossBar(gameState);
+            this.drawBossBar(gameState);
 
             //draw minimap
-            UI.drawMiniMap(gameState, player);
+            this.drawMiniMap(gameState, player);
 
             //draw info about the current Room
-            UI.drawRoomInfo(gameState, gameSettings.playerTypes[player.type].colors.dark);
+            this.drawRoomInfo(gameState, gameSettings.playerTypes[player.type].colors.dark);
 
             //draw names of players
-            UI.drawPlayerInfo(gameState);
+            this.drawPlayerInfo(gameState);
 
             //draw countdown to next wave
-            UI.drawWaveCountdown(gameState);
+            this.drawWaveCountdown(gameState);
 
             //draw fps counter
-            UI.drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
+            this.drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
 
             // draw crosshair
-            UI.drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
+            this.drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
 
         }
 
@@ -43,30 +43,30 @@ var UI = {
         else {
 
             //draw boss healthbar
-            UI.drawBossBar(gameState);
+            this.drawBossBar(gameState);
 
             //draw minimap
-            UI.drawMiniMap(gameState);
+            this.drawMiniMap(gameState);
 
             //draw info about the current Room
-            UI.drawRoomInfo(gameState, gameSettings.colors.darkgrey);
+            this.drawRoomInfo(gameState, gameSettings.colors.darkgrey);
 
             //draw names of players
-            UI.drawPlayerInfo(gameState);
+            this.drawPlayerInfo(gameState);
 
             //draw countdown to next wave
-            UI.drawWaveCountdown(gameState);
+            this.drawWaveCountdown(gameState);
 
             //draw fps counter
-            UI.drawFPSandPing(gameSettings.colors.darkgrey);
+            this.drawFPSandPing(gameSettings.colors.darkgrey);
 
             //draw death menus
             if (socket.id in gameState.players.waiting) {
-                UI.drawDeathMenus(gameState);
+                this.drawDeathMenus(gameState);
             }
 
             // draw crosshair
-            UI.drawCrosshair(gameSettings.colors.darkgrey);
+            this.drawCrosshair(gameSettings.colors.darkgrey);
         }
 
         pop();
@@ -142,7 +142,7 @@ var UI = {
     //draw client player healthbar
     drawHealthBar: function (player) {
 
-        UI.drawBar({
+        this.drawBar({
             x: windowWidth*3/8 - 10,
             y: windowHeight - 40,
             width: windowWidth/4,
@@ -160,7 +160,7 @@ var UI = {
         if (player.abilityProgress == gameSettings.abilityCap){
             color = gameSettings.colors.mango;
         }
-        UI.drawBar({
+        this.drawBar({
             x: windowWidth*5/8 + 10,
             y: windowHeight - 40,
             width: windowWidth/4,
@@ -177,7 +177,7 @@ var UI = {
         //only draw in boss exists
         if (Object.keys(gameState.bosses).length > 0) {
             let boss = gameState.bosses[Object.keys(gameState.bosses)[0]];
-            UI.drawBar({
+            this.drawBar({
                 x: windowWidth/2,
                 y: 40,
                 width: windowWidth/2,
@@ -421,15 +421,15 @@ var UI = {
     //draw framerate
     drawFPSandPing: function (color) {
         //add fps to list
-        UI.fpsList.push(frameRate());
+        this.fpsList.push(frameRate());
         //remove oldest if above 0.5 seconds
-        if (UI.fpsList.length > 500/gameSettings.tickRate) {
-            UI.fpsList.shift();
+        if (this.fpsList.length > 500/gameSettings.tickRate) {
+            this.fpsList.shift();
         }
 
         //round and average the list
-        let fpsSum = UI.fpsList.reduce((a,b) => a+b);
-        let fpsMean = (fpsSum/UI.fpsList.length);
+        let fpsSum = this.fpsList.reduce((a,b) => a+b);
+        let fpsMean = (fpsSum/this.fpsList.length);
         let fps = fpsMean.toFixed(0);
 
         push();
@@ -476,13 +476,13 @@ var UI = {
         gameSettings.colors.pink
     ),
     drawExitGameButton: function() {
-        UI.exitGameButton.update(
+        this.exitGameButton.update(
             windowWidth - 100, 
             windowHeight - 100, 
             windowHeight/8, 
             windowHeight/8
         );
-        UI.exitGameButton.draw();
+        this.exitGameButton.draw();
     },
 
     //CLASS MENU
@@ -507,12 +507,12 @@ var UI = {
         push();
         textAlign(CENTER, CENTER);
 
-        let classCount = Object.keys(UI.classButtons).length;
+        let classCount = Object.keys(this.classButtons).length;
         
         //update and draw buttons
         let counter = 1;
-        for (let className in UI.classButtons) {
-            let button = UI.classButtons[className];
+        for (let className in this.classButtons) {
+            let button = this.classButtons[className];
             button.update(
                 windowWidth/2, 
                 windowHeight*counter/(1+classCount), 
@@ -533,8 +533,8 @@ var UI = {
     },
 
     clickClassMenu: function () {
-        for (let className in UI.classButtons) {
-            if (UI.classButtons[className].mouseOver()) {
+        for (let className in this.classButtons) {
+            if (this.classButtons[className].mouseOver()) {
                 return className;
             }
         }
@@ -570,7 +570,7 @@ var UI = {
         strokeWeight(3);
         textSize(60);
         text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
-        UI.drawBar({
+        this.drawBar({
             x: windowWidth/2,
             y: windowHeight - 40,
             width: windowWidth/2,
@@ -596,14 +596,14 @@ var UI = {
         textAlign(CENTER, CENTER);
     
         //update and draw restart button
-        UI.restartButton.update(
+        this.restartButton.update(
             windowWidth/2,
             windowHeight*2/3,
             windowWidth/3,
             windowHeight/8,
         )
     
-        UI.restartButton.draw();
+        this.restartButton.draw();
     
         //draw text
         stroke('black');
@@ -618,7 +618,7 @@ var UI = {
     },
 
     clickGameOverMenu: function () {
-        return UI.restartButton.mouseOver();
+        return this.restartButton.mouseOver();
     },
 
     // Death Menu Functions
@@ -634,38 +634,38 @@ var UI = {
 
         //if game is over
         if (gameState.roomInfo.gameOver) {
-            UI.drawGameOverMenu(gameState);
+            this.drawGameOverMenu(gameState);
         }
         //if player is respawning
         else if (player.respawnTimer > 0) {
-            UI.drawRespawnMenu(player);
+            this.drawRespawnMenu(player);
         }
         //if lives left, select new class
         else if (gameState.roomInfo.livesCount > 0) {
-            UI.drawClassMenu();
+            this.drawClassMenu();
         }
         //if no lives left
         else {
-            UI.drawNoLivesMenu();
+            this.drawNoLivesMenu();
         }
 
-        UI.drawExitGameButton();
+        this.drawExitGameButton();
     },
 
     deathMenuMouseClicked: function (socket, gameState) {
-        if(UI.exitGameButton.mouseOver()) {
+        if(this.exitGameButton.mouseOver()) {
             Errors.displayError('Left Game', 5000);
             endGame();
             return;
         }
         if (gameState.roomInfo.gameOver &&
-            UI.clickGameOverMenu()) {
+            this.clickGameOverMenu()) {
                 socket.emit('restart_game');
                 return;
         }
         if (gameState.roomInfo.livesCount > 0 &&
-            UI.clickClassMenu()) {
-                socket.emit('class_choice', UI.clickClassMenu());
+            this.clickClassMenu()) {
+                socket.emit('class_choice', this.clickClassMenu());
                 return;
         }
     },

@@ -19,71 +19,71 @@ var Render = {
             let player = gameState.players.playing[socket.id];
 
             //calculate screen offset based on player position
-            Render.calcOffset(player);
+            this.calcOffset(player);
 
             //draw grid background
-            Render.drawGrid();
+            this.drawGrid();
 
             //draw game area borders
-            Render.drawBorders();
+            this.drawBorders();
 
             //draw zones
-            Render.drawZones(gameState);
+            this.drawZones(gameState);
 
             //draw dead players
-            // Render.drawDead();
+            // this.drawDead();
 
             //draw pickups
-            Render.drawPickups(gameState);
+            this.drawPickups(gameState);
 
             //draw shots
-            Render.drawShots(gameState);
+            this.drawShots(gameState);
 
             //draw enemies
-            Render.drawEnemies(gameState);
+            this.drawEnemies(gameState);
 
             //draw bosses
-            Render.drawBosses(gameState);
+            this.drawBosses(gameState);
 
             //draw living players
-            Render.drawLiving(gameState);
+            this.drawLiving(gameState);
 
             // then draw client player on top if living
-            Render.drawPlayer(player);
+            this.drawPlayer(player);
         }
 
         //draw game if player not in game
         else {
 
             //calculate screen offset based on center of screen
-            Render.calcOffset();
+            this.calcOffset();
 
             //draw grid background
-            Render.drawGrid();
+            this.drawGrid();
 
             //draw game area borders
-            Render.drawBorders();
+            this.drawBorders();
 
             //draw zones
-            Render.drawZones(gameState);
+            this.drawZones(gameState);
 
             //draw dead players
-            // Render.drawDead();
+            // this.drawDead();
 
             //draw pickups
-            Render.drawPickups(gameState);
+            this.drawPickups(gameState);
 
             //draw shots
-            Render.drawShots(gameState);
+            this.drawShots(gameState);
 
             //draw enemies
-            Render.drawEnemies(gameState);
+            this.drawEnemies(gameState);
 
             //draw bosses
-            Render.drawBosses(gameState);
+            this.drawBosses(gameState);
 
             //draw living players
-            Render.drawLiving(gameState);
+            this.drawLiving(gameState);
         }
 
         pop();
@@ -104,16 +104,16 @@ var Render = {
         
         //account for screens too large for the game area
         if (windowWidth > gameSettings.width + 2*margin) {
-            Render.screenOffset.x = (gameSettings.width-windowWidth)/2;
+            this.screenOffset.x = (gameSettings.width-windowWidth)/2;
         }
         else {
-            Render.screenOffset.x = Math.min(Math.max(-margin, player.x - windowWidth/2), gameSettings.width-windowWidth + margin);
+            this.screenOffset.x = Math.min(Math.max(-margin, player.x - windowWidth/2), gameSettings.width-windowWidth + margin);
         }
         if (windowHeight > gameSettings.height + 2*margin) {
-            Render.screenOffset.y = (gameSettings.height-windowHeight)/2;
+            this.screenOffset.y = (gameSettings.height-windowHeight)/2;
         }
         else {
-            Render.screenOffset.y = Math.min(Math.max(-margin, player.y - windowHeight/2), gameSettings.height-windowHeight + margin);
+            this.screenOffset.y = Math.min(Math.max(-margin, player.y - windowHeight/2), gameSettings.height-windowHeight + margin);
         }
     },
 
@@ -124,20 +124,20 @@ var Render = {
         stroke(gameSettings.colors.grey);
         background(gameSettings.colors.white);
         for (let x = 100; x < gameSettings.width; x+=100) {
-            if (x-Render.screenOffset.x > 0 &&
-                x-Render.screenOffset.x < windowWidth) {
+            if (x-this.screenOffset.x > 0 &&
+                x-this.screenOffset.x < windowWidth) {
                     line(
-                        x-Render.screenOffset.x, 0,
-                        x-Render.screenOffset.x, windowHeight
+                        x-this.screenOffset.x, 0,
+                        x-this.screenOffset.x, windowHeight
                     );
             }
         }
         for (let y = 100; y < gameSettings.height; y+=100) {
-            if (y-Render.screenOffset.y > 0 &&
-                y-Render.screenOffset.y < windowHeight) {
+            if (y-this.screenOffset.y > 0 &&
+                y-this.screenOffset.y < windowHeight) {
                     line(
-                        0, y-Render.screenOffset.y,
-                        windowWidth, y-Render.screenOffset.y
+                        0, y-this.screenOffset.y,
+                        windowWidth, y-this.screenOffset.y
                     );
             }
         }
@@ -151,30 +151,30 @@ var Render = {
         fill(gameSettings.colors.grey);
         rectMode(CORNERS);
         //left
-        if (Render.screenOffset.x < 0) {
+        if (this.screenOffset.x < 0) {
             rect(
                 0, 0, 
-                -Render.screenOffset.x, windowHeight
+                -this.screenOffset.x, windowHeight
             )
         }
         //right
-        if (Render.screenOffset.x > gameSettings.width-windowWidth) {
+        if (this.screenOffset.x > gameSettings.width-windowWidth) {
             rect(
-                gameSettings.width - Render.screenOffset.x, 0, 
+                gameSettings.width - this.screenOffset.x, 0, 
                 windowWidth, windowHeight
             )
         }
         //top
-        if (Render.screenOffset.y < 0) {
+        if (this.screenOffset.y < 0) {
             rect(
                 0, 0, 
-                windowWidth, -Render.screenOffset.y
+                windowWidth, -this.screenOffset.y
             )
         }
         //bottom
-        if (Render.screenOffset.y > gameSettings.height-windowHeight) {
+        if (this.screenOffset.y > gameSettings.height-windowHeight) {
             rect(
-                0, gameSettings.height - Render.screenOffset.y, 
+                0, gameSettings.height - this.screenOffset.y, 
                 windowWidth, windowHeight
             )
         }
@@ -195,21 +195,21 @@ var Render = {
     drawPickups: function (gameState) {
         push();
 
-        Render.pickupProg -= 0.5;
-        let progColor = Render.pickupColors[Math.floor(-(Render.pickupProg/Render.pickupColors.length)%Render.pickupColors.length)];
+        this.pickupProg -= 0.5;
+        let progColor = this.pickupColors[Math.floor(-(this.pickupProg/this.pickupColors.length)%this.pickupColors.length)];
         stroke(progColor);
         fill(gameSettings.colors.white);
         strokeWeight(4);
         for (let id in gameState.pickups) {
             let pickup = gameState.pickups[id];
-            if (pickup.x-Render.screenOffset.x > -50 &&
-                pickup.x-Render.screenOffset.x < windowWidth + 50 &&
-                pickup.y-Render.screenOffset.y > -50 &&
-                pickup.y-Render.screenOffset.y < windowHeight + 50) {
+            if (pickup.x-this.screenOffset.x > -50 &&
+                pickup.x-this.screenOffset.x < windowWidth + 50 &&
+                pickup.y-this.screenOffset.y > -50 &&
+                pickup.y-this.screenOffset.y < windowHeight + 50) {
                     //draw circle
                     circle(
-                        pickup.x-Render.screenOffset.x,
-                        pickup.y-Render.screenOffset.y,
+                        pickup.x-this.screenOffset.x,
+                        pickup.y-this.screenOffset.y,
                         gameSettings.pickupRadius*2,
                     )
                     //health pickups
@@ -220,14 +220,14 @@ var Render = {
                         strokeWeight(0);
                         rectMode(CENTER);
                         rect(
-                            pickup.x-Render.screenOffset.x,
-                            pickup.y-Render.screenOffset.y,
+                            pickup.x-this.screenOffset.x,
+                            pickup.y-this.screenOffset.y,
                             gameSettings.pickupRadius,
                             6
                         )
                         rect(
-                            pickup.x-Render.screenOffset.x,
-                            pickup.y-Render.screenOffset.y,
+                            pickup.x-this.screenOffset.x,
+                            pickup.y-this.screenOffset.y,
                             6,
                             gameSettings.pickupRadius
                         )
@@ -243,8 +243,8 @@ var Render = {
                         textSize(30);
                         text(
                             '+1', 
-                            pickup.x-Render.screenOffset.x, 
-                            pickup.y-Render.screenOffset.y - 3
+                            pickup.x-this.screenOffset.x, 
+                            pickup.y-this.screenOffset.y - 3
                         );
                         pop();
                     }
@@ -262,15 +262,15 @@ var Render = {
         //draw enemy shots
         for (let id in gameState.shots.enemyShots) {
             let shot = gameState.shots.enemyShots[id];
-            if (shot.x-Render.screenOffset.x > 0 &&
-                shot.x-Render.screenOffset.x < windowWidth &&
-                shot.y-Render.screenOffset.y > 0 &&
-                shot.y-Render.screenOffset.y < windowHeight) {
+            if (shot.x-this.screenOffset.x > 0 &&
+                shot.x-this.screenOffset.x < windowWidth &&
+                shot.y-this.screenOffset.y > 0 &&
+                shot.y-this.screenOffset.y < windowHeight) {
                     fill(gameSettings.enemyTypes[shot.type].colors.dark);
                     stroke(gameSettings.enemyTypes[shot.type].colors.light);
                     circle(
-                        shot.x-Render.screenOffset.x, 
-                        shot.y-Render.screenOffset.y, 
+                        shot.x-this.screenOffset.x, 
+                        shot.y-this.screenOffset.y, 
                         10,
                     );
             }
@@ -279,15 +279,15 @@ var Render = {
         //draw boss shots
         for (let id in gameState.shots.bossShots) {
             let shot = gameState.shots.bossShots[id];
-            if (shot.x-Render.screenOffset.x > 0 &&
-                shot.x-Render.screenOffset.x < windowWidth &&
-                shot.y-Render.screenOffset.y > 0 &&
-                shot.y-Render.screenOffset.y < windowHeight) {
+            if (shot.x-this.screenOffset.x > 0 &&
+                shot.x-this.screenOffset.x < windowWidth &&
+                shot.y-this.screenOffset.y > 0 &&
+                shot.y-this.screenOffset.y < windowHeight) {
                     fill(gameSettings.boss.colors.light);
                     stroke(gameSettings.boss.colors.dark);
                     circle(
-                        shot.x-Render.screenOffset.x, 
-                        shot.y-Render.screenOffset.y, 
+                        shot.x-this.screenOffset.x, 
+                        shot.y-this.screenOffset.y, 
                         10,
                     );
             }
@@ -296,15 +296,15 @@ var Render = {
         //draw player shots
         for (let id in gameState.shots.playerShots) {
             let shot = gameState.shots.playerShots[id];
-            if (shot.x-Render.screenOffset.x > 0 &&
-                shot.x-Render.screenOffset.x < windowWidth &&
-                shot.y-Render.screenOffset.y > 0 &&
-                shot.y-Render.screenOffset.y < windowHeight) {
+            if (shot.x-this.screenOffset.x > 0 &&
+                shot.x-this.screenOffset.x < windowWidth &&
+                shot.y-this.screenOffset.y > 0 &&
+                shot.y-this.screenOffset.y < windowHeight) {
                     fill(gameSettings.playerTypes[shot.type].colors.light);
                     stroke(gameSettings.playerTypes[shot.type].colors.dark);
                     circle(
-                        shot.x-Render.screenOffset.x, 
-                        shot.y-Render.screenOffset.y, 
+                        shot.x-this.screenOffset.x, 
+                        shot.y-this.screenOffset.y, 
                         10,
                     );
             }
@@ -321,10 +321,10 @@ var Render = {
         //draw enemies
         for (let id in gameState.enemies) {
             let enemy = gameState.enemies[id];
-            if (enemy.x-Render.screenOffset.x > -50 &&
-                enemy.x-Render.screenOffset.x < windowWidth + 50 &&
-                enemy.y-Render.screenOffset.y > -50 &&
-                enemy.y-Render.screenOffset.y < windowHeight + 50) {
+            if (enemy.x-this.screenOffset.x > -50 &&
+                enemy.x-this.screenOffset.x < windowWidth + 50 &&
+                enemy.y-this.screenOffset.y > -50 &&
+                enemy.y-this.screenOffset.y < windowHeight + 50) {
 
                     //setup
                     fill(gameSettings.enemyTypes[enemy.type].colors.dark);
@@ -337,17 +337,17 @@ var Render = {
                         let spineX = Math.cos(angle) * (gameSettings.enemyTypes[enemy.type].radius + gameSettings.enemyTypes[enemy.type].spineLength);
                         let spineY = Math.sin(angle) * (gameSettings.enemyTypes[enemy.type].radius + gameSettings.enemyTypes[enemy.type].spineLength);
                         line(
-                            -spineX + enemy.x - Render.screenOffset.x, 
-                            -spineY + enemy.y - Render.screenOffset.y, 
-                            spineX + enemy.x - Render.screenOffset.x, 
-                            spineY + enemy.y - Render.screenOffset.y
+                            -spineX + enemy.x - this.screenOffset.x, 
+                            -spineY + enemy.y - this.screenOffset.y, 
+                            spineX + enemy.x - this.screenOffset.x, 
+                            spineY + enemy.y - this.screenOffset.y
                         );
                     }
 
                     //draw circle
                     circle(
-                        enemy.x-Render.screenOffset.x,
-                        enemy.y-Render.screenOffset.y,
+                        enemy.x-this.screenOffset.x,
+                        enemy.y-this.screenOffset.y,
                         gameSettings.enemyTypes[enemy.type].radius*2,
                     );
             }   
@@ -356,31 +356,31 @@ var Render = {
         //draw healthbars
         for (let id in gameState.enemies) {
             let enemy = gameState.enemies[id];
-            if (enemy.x-Render.screenOffset.x > -50 &&
-                enemy.x-Render.screenOffset.x < windowWidth + 50 &&
-                enemy.y-Render.screenOffset.y > -50 &&
-                enemy.y-Render.screenOffset.y < windowHeight + 50) {
+            if (enemy.x-this.screenOffset.x > -50 &&
+                enemy.x-this.screenOffset.x < windowWidth + 50 &&
+                enemy.y-this.screenOffset.y > -50 &&
+                enemy.y-this.screenOffset.y < windowHeight + 50) {
 
                     let x_offset = 15
                     let y_offset_abs = gameSettings.enemyTypes[enemy.type].radius + 10;
                     let y_offset = y_offset_abs;
-                    if (enemy.y-Render.screenOffset.y > windowHeight - 50) {
+                    if (enemy.y-this.screenOffset.y > windowHeight - 50) {
                         y_offset = -y_offset_abs;
                     }
                     stroke(gameSettings.enemyTypes[enemy.type].colors.dark);
                     strokeWeight(2);
                     fill('black');
                     rect(
-                        enemy.x - x_offset-Render.screenOffset.x, 
-                        enemy.y + y_offset-Render.screenOffset.y, 
+                        enemy.x - x_offset-this.screenOffset.x, 
+                        enemy.y + y_offset-this.screenOffset.y, 
                         x_offset*2, 
                         5*(y_offset/y_offset_abs),
                     );
                     strokeWeight(0);
                     fill(gameSettings.enemyTypes[enemy.type].colors.light);
                     rect(
-                        enemy.x - x_offset-Render.screenOffset.x, 
-                        enemy.y + y_offset-Render.screenOffset.y, 
+                        enemy.x - x_offset-this.screenOffset.x, 
+                        enemy.y + y_offset-this.screenOffset.y, 
                         x_offset*2*(enemy.health/gameSettings.enemyTypes[enemy.type].maxHealth), 
                         5*(y_offset/y_offset_abs),
                     );
@@ -397,10 +397,10 @@ var Render = {
         //draw enemies
         for (let id in gameState.bosses) {
             let boss = gameState.bosses[id];
-            if (boss.x-Render.screenOffset.x > -200 &&
-                boss.x-Render.screenOffset.x < windowWidth + 200 &&
-                boss.y-Render.screenOffset.y > -200 &&
-                boss.y-Render.screenOffset.y < windowHeight + 200) {
+            if (boss.x-this.screenOffset.x > -200 &&
+                boss.x-this.screenOffset.x < windowWidth + 200 &&
+                boss.y-this.screenOffset.y > -200 &&
+                boss.y-this.screenOffset.y < windowHeight + 200) {
 
                     //setup
                     fill(gameSettings.boss.colors.dark);
@@ -413,17 +413,17 @@ var Render = {
                         let spineX = Math.cos(angle) * (gameSettings.boss.radius + gameSettings.boss.spineLength);
                         let spineY = Math.sin(angle) * (gameSettings.boss.radius + gameSettings.boss.spineLength);
                         line(
-                            -spineX + boss.x - Render.screenOffset.x, 
-                            -spineY + boss.y - Render.screenOffset.y, 
-                            spineX + boss.x - Render.screenOffset.x, 
-                            spineY + boss.y - Render.screenOffset.y
+                            -spineX + boss.x - this.screenOffset.x, 
+                            -spineY + boss.y - this.screenOffset.y, 
+                            spineX + boss.x - this.screenOffset.x, 
+                            spineY + boss.y - this.screenOffset.y
                         );
                     }
 
                     //draw circle
                     circle(
-                        boss.x - Render.screenOffset.x,
-                        boss.y - Render.screenOffset.y,
+                        boss.x - this.screenOffset.x,
+                        boss.y - this.screenOffset.y,
                         gameSettings.boss.radius * 2,
                     );
             }   
@@ -457,8 +457,8 @@ var Render = {
 
             //draw zones
             circle(
-                zone.x - Render.screenOffset.x, 
-                zone.y - Render.screenOffset.y, 
+                zone.x - this.screenOffset.x, 
+                zone.y - this.screenOffset.y, 
                 zone.radius*2
             );
         }
@@ -475,10 +475,10 @@ var Render = {
     //         if (id != socket.id) {
     //             let player = gameState.players.playing[id];
     //             if (player.health <= 0 &&
-    //                 player.x-Render.screenOffset.x > -50 &&
-    //                 player.x-Render.screenOffset.x < windowWidth + 50 &&
-    //                 player.y-Render.screenOffset.y > -50 &&
-    //                 player.y-Render.screenOffset.y < windowHeight + 50) {
+    //                 player.x-this.screenOffset.x > -50 &&
+    //                 player.x-this.screenOffset.x < windowWidth + 50 &&
+    //                 player.y-this.screenOffset.y > -50 &&
+    //                 player.y-this.screenOffset.y < windowHeight + 50) {
     //                     //draw player as transparent
     //                     let fillcolor = color(gameSettings.playerTypes[player.type].colors.light);
     //                     fillcolor.setAlpha(100);
@@ -488,8 +488,8 @@ var Render = {
     //                     stroke(strokecolor);
     //                     strokeWeight(4);
     //                     circle(
-    //                         player.x-Render.screenOffset.x, 
-    //                         player.y-Render.screenOffset.y, 
+    //                         player.x-this.screenOffset.x, 
+    //                         player.y-this.screenOffset.y, 
     //                         gameSettings.playerTypes[player.type].radius*2 - 1, 
     //                     );
     //             }
@@ -509,17 +509,17 @@ var Render = {
             if (id != socket.id) {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
-                    player.x-Render.screenOffset.x > -50 &&
-                    player.x-Render.screenOffset.x < windowWidth + 50 &&
-                    player.y-Render.screenOffset.y > -50 &&
-                    player.y-Render.screenOffset.y < windowHeight + 50) {
+                    player.x-this.screenOffset.x > -50 &&
+                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.y-this.screenOffset.y > -50 &&
+                    player.y-this.screenOffset.y < windowHeight + 50) {
                         
                         fill(gameSettings.playerTypes[player.type].colors.light);
                         stroke(gameSettings.playerTypes[player.type].colors.dark);
                         strokeWeight(4);
                         circle(
-                            player.x-Render.screenOffset.x, 
-                            player.y-Render.screenOffset.y, 
+                            player.x-this.screenOffset.x, 
+                            player.y-this.screenOffset.y, 
                             gameSettings.playerTypes[player.type].radius*2 - 1, 
                         );
                 }
@@ -531,30 +531,30 @@ var Render = {
             if (id != socket.id) {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
-                    player.x-Render.screenOffset.x > -50 &&
-                    player.x-Render.screenOffset.x < windowWidth + 50 &&
-                    player.y-Render.screenOffset.y > -50 &&
-                    player.y-Render.screenOffset.y < windowHeight + 50) {
+                    player.x-this.screenOffset.x > -50 &&
+                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.y-this.screenOffset.y > -50 &&
+                    player.y-this.screenOffset.y < windowHeight + 50) {
                         let x_offset = 15
                         let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
                         let y_offset = y_offset_abs;
-                        // if (player.y-Render.screenOffset.y > windowHeight - 50) {
+                        // if (player.y-this.screenOffset.y > windowHeight - 50) {
                         //     y_offset = -y_offset_abs;
                         // }
                         stroke(gameSettings.playerTypes[player.type].colors.dark);
                         strokeWeight(2);
                         fill('black');
                         rect(
-                            player.x - x_offset-Render.screenOffset.x, 
-                            player.y + y_offset-Render.screenOffset.y, 
+                            player.x - x_offset-this.screenOffset.x, 
+                            player.y + y_offset-this.screenOffset.y, 
                             x_offset*2, 
                             5*(y_offset/y_offset_abs),
                         );
                         strokeWeight(0);
                         fill(gameSettings.playerTypes[player.type].colors.light);
                         rect(
-                            player.x - x_offset-Render.screenOffset.x, 
-                            player.y + y_offset-Render.screenOffset.y, 
+                            player.x - x_offset-this.screenOffset.x, 
+                            player.y + y_offset-this.screenOffset.y, 
                             x_offset*2*(player.health/gameSettings.playerTypes[player.type].maxHealth), 
                             5*(y_offset/y_offset_abs),
                         );
@@ -570,10 +570,10 @@ var Render = {
             if (id != socket.id) {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
-                    player.x-Render.screenOffset.x > -50 &&
-                    player.x-Render.screenOffset.x < windowWidth + 50 &&
-                    player.y-Render.screenOffset.y > -50 &&
-                    player.y-Render.screenOffset.y < windowHeight + 50) {
+                    player.x-this.screenOffset.x > -50 &&
+                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.y-this.screenOffset.y > -50 &&
+                    player.y-this.screenOffset.y < windowHeight + 50) {
 
                         let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
                         let y_offset = -y_offset_abs;
@@ -583,8 +583,8 @@ var Render = {
 
                         text(
                             player.name, 
-                            player.x-Render.screenOffset.x,
-                            player.y-Render.screenOffset.y+y_offset,
+                            player.x-this.screenOffset.x,
+                            player.y-this.screenOffset.y+y_offset,
                         )
                 }
             }
@@ -603,8 +603,8 @@ var Render = {
             stroke(gameSettings.playerTypes[player.type].colors.dark);
             strokeWeight(4);
             circle(
-                player.x-Render.screenOffset.x, 
-                player.y-Render.screenOffset.y, 
+                player.x-this.screenOffset.x, 
+                player.y-this.screenOffset.y, 
                 gameSettings.playerTypes[player.type].radius*2 - 1, 
             );
 
@@ -621,8 +621,8 @@ var Render = {
 
             text(
                 player.name, 
-                player.x-Render.screenOffset.x,
-                player.y-Render.screenOffset.y+y_offset,
+                player.x-this.screenOffset.x,
+                player.y-this.screenOffset.y+y_offset,
             )
         }
         
@@ -636,8 +636,8 @@ var Render = {
             stroke(strokecolor);
             strokeWeight(4);
             circle(
-                player.x-Render.screenOffset.x, 
-                player.y-Render.screenOffset.y, 
+                player.x-this.screenOffset.x, 
+                player.y-this.screenOffset.y, 
                 gameSettings.playerTypes[player.type].radius*2 - 1, 
             );
         }

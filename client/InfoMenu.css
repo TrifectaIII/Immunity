@@ -1,7 +1,7 @@
 /* info menu */
 
 .InfoMenu {
-
+    box-sizing: border-box;
     z-index: 1;
     position:fixed;
     right: 0%;
@@ -9,13 +9,21 @@
     bottom: 0%;
     max-width: 100%;
     width: 400px;
+    transition: right 0.2s, border-left 0.5s;
     border-left: 4px solid black;
+    border-right: 4px solid black;
 
-    background-color:var(--p8-white);
+    background-color: rgb(200, 200, 200);
 
     text-align:center;
 
     font-family: 'Aldrich', sans-serif;
+}
+
+/* when menu is hidden */
+.InfoMenu.hidden {
+    /* should be negative width of .InfoMenu */
+    right:  -400px;
 }
 
 .InfoMenu .InfoMenu-inner {
@@ -23,8 +31,8 @@
     margin:auto;
     overflow-y: auto;
     height: 100%;
-    padding-right:20px;
-    padding-left: 20px;
+    padding-right:30px;
+    padding-left: 30px;
 }
 
 .InfoMenu hr {

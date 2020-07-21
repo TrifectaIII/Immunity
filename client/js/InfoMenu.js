@@ -7,20 +7,9 @@ var InfoMenu = {
 
     //function to toggle display of settings
     toggle: function () {
-        if (this.div.style.display == 'none') {
-            this.div.style.display = 'initial';
-        }
-        else if (
-            this.div.style.display == 'initial' ||
-            this.div.style.display == ''
-        ) {
-                this.div.style.display = 'none';
-        }
+        this.div.classList.toggle('hidden');
     },
 }
-
-//default is hidden
-InfoMenu.div.style.display = 'none';
 
 //toggle display of InfoMenu when button pressed
 window.addEventListener('keypress', function (event) {

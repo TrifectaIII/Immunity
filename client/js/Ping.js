@@ -15,32 +15,32 @@ var Ping = {
 
         //recieve pong from server
         socket.on('ponging', function () {
-            Ping.waiting = false;
-            Ping.value = Date.now() - Ping.time;
-        });
+            this.waiting = false;
+            this.value = Date.now() - this.time;
+        }.bind(this));
 
         //clear old interval
-        clearInterval(Ping.interval);
+        clearInterval(this.interval);
 
         //first ping
-        Ping.waiting = true,
-        Ping.time = Date.now();
+        this.waiting = true,
+        this.time = Date.now();
         socket.emit('pinging');
 
         //start interval
-        Ping.interval = setInterval(function () {
-            if (!Ping.waiting) {
-                Ping.waiting = true;
-                Ping.time = Date.now();
+        this.interval = setInterval(function () {
+            if (!this.waiting) {
+                this.waiting = true;
+                this.time = Date.now();
                 socket.emit('pinging');
             }
         //get rate from settings
-        }, gameSettings.pingRate);
+        }.bind(this), gameSettings.pingRate);
     },
 
     //stop checking ping
     stop: function () {
-        clearInterval(Ping.interval);
-        Ping.interval = null;
+        clearInterval(this.interval);
+        this.interval = null;
     },
 }

@@ -16,36 +16,36 @@ var Movement = {
 
         let newAngle = 'none';
 
-        if (Movement.right && !Movement.left && Movement.up && !Movement.down) {
+        if (this.right && !this.left && this.up && !this.down) {
             newAngle = Math.PI*(7/4);
         }
-        else if (!Movement.right && Movement.left && Movement.up && !Movement.down) {
+        else if (!this.right && this.left && this.up && !this.down) {
             newAngle = Math.PI*(5/4);
         }
-        else if (Movement.right && !Movement.left && !Movement.up && Movement.down) {
+        else if (this.right && !this.left && !this.up && this.down) {
             newAngle = Math.PI*(1/4);
         }
-        else if (!Movement.right && Movement.left && !Movement.up && Movement.down) {
+        else if (!this.right && this.left && !this.up && this.down) {
             newAngle = Math.PI*(3/4);
         }
-        else if (Movement.right && !Movement.left) {
+        else if (this.right && !this.left) {
             newAngle = 0;
         }
-        else if (!Movement.right && Movement.left) {
+        else if (!this.right && this.left) {
             newAngle = Math.PI;
         }
-        else if (Movement.up && !Movement.down) {
+        else if (this.up && !this.down) {
             newAngle = Math.PI*(3/2);
         }
-        else if (!Movement.up && Movement.down) {
+        else if (!this.up && this.down) {
             newAngle = Math.PI*(1/2);
         }
 
         //if any change, send to server
-        if (newAngle != Movement.angle) {
+        if (newAngle != this.angle) {
             socket.emit('angle', newAngle);
             //update current angle to new angle
-            Movement.angle = newAngle;
+            this.angle = newAngle;
         }
     },
 }

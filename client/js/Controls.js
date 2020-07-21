@@ -25,17 +25,17 @@ var Controls = {
 
     start: function (socket) {
         //execute direction emits from movement.js
-        clearInterval(Controls.moveInterval);
-        Controls.moveInterval = setInterval(
-            function () {Controls.directionHandler(socket)},
+        clearInterval(this.moveInterval);
+        this.moveInterval = setInterval(
+            function () {this.directionHandler(socket)}.bind(this),
             //uses half of games tickRate
             gameSettings.tickRate/2 
         );
 
         //execute click emits from shoot.js
-        clearInterval(Controls.clickInterval);
-        Controls.clickInterval = setInterval(
-            function () {Controls.clickHandler(socket)},
+        clearInterval(this.clickInterval);
+        this.clickInterval = setInterval(
+            function () {this.clickHandler(socket)}.bind(this),
             //uses half of games tickRate
             gameSettings.tickRate/2 
         );
@@ -51,9 +51,9 @@ var Controls = {
     },
 
     stop: function () {
-        clearInterval(Controls.moveInterval);
-        Controls.moveInterval = null;
-        clearInterval(Controls.clickInterval);
-        Controls.clickInterval = null;
+        clearInterval(this.moveInterval);
+        this.moveInterval = null;
+        clearInterval(this.clickInterval);
+        this.clickInterval = null;
     },
 }
