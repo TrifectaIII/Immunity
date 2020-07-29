@@ -1,5 +1,5 @@
 //handles controls
-var Controls = {
+var Control = {
 
     moveInterval: null,
 

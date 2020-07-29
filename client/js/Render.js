@@ -181,23 +181,11 @@ var Render = {
         pop();
     },
 
-    //for pickup color animation
-    pickupProg: 0,
-
-    pickupColors: [
-        gameSettings.colors.blue,
-        gameSettings.colors.green,
-        gameSettings.colors.yellow,
-        gameSettings.colors.pink
-    ],
-
     //draws pickup-able objects
     drawPickups: function (gameState) {
         push();
 
-        this.pickupProg -= 0.5;
-        let progColor = this.pickupColors[Math.floor(-(this.pickupProg/this.pickupColors.length)%this.pickupColors.length)];
-        stroke(progColor);
+        stroke(Animation.getColor());
         fill(gameSettings.colors.white);
         strokeWeight(4);
         for (let id in gameState.pickups) {

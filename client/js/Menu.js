@@ -53,44 +53,59 @@ Button.prototype.draw = function () {
     pop();
 }
 
+Button.prototype.updateAndDraw = function (x,y,width,height) {
+    this.update(x,y,width,height)
+    this.draw();
+}
+
 // TextInput Object Constructor
 //////////////////////////////////////////
 
-function TextInput (canvas, maxLength) {
-    this.element = createElement('input');
-    //hide by default
-    this.element.hide();
-    this.canvas = canvas;
-    this.element.elt.maxLength = maxLength;
-    this.element.class('gameInput');
+function TextInput (maxLength) {
+    this.element = false;
+    this.maxLength = maxLength;
 }
 
 // returns value of the input
 TextInput.prototype.getValue = function () {
+    if (!this.element) {
+        return ''
+    }
     return this.element.elt.value.trim();
 }
 
 // hides input
 TextInput.prototype.hide = function () {
-    this.element.hide();
+    if (this.element) {
+        this.element.hide();
+    }
 }
 
 TextInput.prototype.clear = function () {
-    this.element.elt.value = '';
+    if (this.element) {
+        this.element.elt.value = '';
+    } 
 }
 
 //shows input at certain location and size
-TextInput.prototype.showAt = function (x, y, w, h) {
+TextInput.prototype.showAt = function (canvas, x, y, w, h) {
+    //setup element if not created yet
+    if (!this.element) {
+        this.element = createElement('input');
+        this.element.class('gameInput');
+        this.element.elt.maxLength = this.maxLength;
+    }
+    //show at given location with given size
     this.element.size(w,h);
     this.element.position(
-        this.canvas.position().x + x - w/2,
-        this.canvas.position().y + y - h/2
+        canvas.position().x + x - w/2,
+        canvas.position().y + y - h/2
     )
     this.element.show();
 }
 
 // out-of-game menu system
-var Menus = {
+var Menu = {
 
     // draw cosshair for menu
     drawMenuCrosshair: function () {
@@ -150,15 +165,6 @@ var Menus = {
         );
         this.backButton.draw();
     },
-    
-    titleProg: 0,
-
-    titleColors: [
-        gameSettings.colors.blue,
-        gameSettings.colors.green,
-        gameSettings.colors.yellow,
-        gameSettings.colors.pink
-    ],
 
     startButton: new Button(
         "START",
@@ -186,8 +192,7 @@ var Menus = {
         //draw title
         stroke('black');
         strokeWeight(8);
-        this.titleProg -= 0.1;
-        fill(this.titleColors[Math.floor(-(this.titleProg/this.titleColors.length)%this.titleColors.length)]);
+        fill(Animation.getColor());
         textSize(100);
         text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
 
@@ -215,7 +220,7 @@ var Menus = {
     /////////////////////////////////////////
 
     //input element to type in name
-    nameInput: false,
+    nameInput: new TextInput(gameSettings.nameMax),
 
     //button to submit name
     setNameButton: new Button(
@@ -225,11 +230,6 @@ var Menus = {
     ),
 
     drawNameMenu: function (canvas) {
-
-        // set up nameInput if not setup yet
-        if (!this.nameInput) {
-            this.nameInput = new TextInput(canvas, gameSettings.nameMax);
-        }
 
         push();
         textAlign(CENTER, CENTER);
@@ -252,6 +252,7 @@ var Menus = {
 
         //display input for name entry
         this.nameInput.showAt(
+            canvas,
             windowWidth/2, 
             windowHeight/2, 
             windowWidth/3, 
@@ -269,7 +270,7 @@ var Menus = {
     /////////////////////////////////////////
 
     //input element to type in game code
-    codeInput: false,
+    codeInput: new TextInput(gameSettings.nameMax),
 
     createGameButton: new Button( 
         "NEW GAME", 
@@ -284,11 +285,6 @@ var Menus = {
     ),
 
     drawServerMenu: function (canvas) {
-
-        //setup codeInput if not setup yet
-        if (!this.codeInput) {
-            this.codeInput = new TextInput(canvas, gameSettings.nameMax);
-        }
 
         push();
         textAlign(CENTER, CENTER);
@@ -320,6 +316,7 @@ var Menus = {
 
         //display input for game code
         this.codeInput.showAt(
+            canvas,
             windowWidth/2, 
             windowHeight*2/3,
             windowWidth/4,
@@ -342,15 +339,6 @@ var Menus = {
     // LOADING SCREEN
     /////////////////////////////////////////
 
-    loadingProg: 0,
-
-    loadingColors: [
-        gameSettings.colors.blue,
-        gameSettings.colors.green,
-        gameSettings.colors.yellow,
-        gameSettings.colors.pink
-    ],
-
     drawLoading: function () {
         push();
         textAlign(CENTER, CENTER);
@@ -364,9 +352,7 @@ var Menus = {
         fill('black');
         textSize(40);
         text("Loading...", windowWidth/2, windowHeight/2);
-
-        this.loadingProg -= 0.1;
-        stroke(this.loadingColors[Math.floor(-(this.loadingProg/this.loadingColors.length)%this.loadingColors.length)]);
+        stroke(Animation.getColor());
         strokeWeight(10);
         let spokes = 3;
         let spokeLength = 25;
@@ -515,10 +501,10 @@ var Menus = {
     //resets state to first menu
     restartMenus: function () {
     
-        //reset menus
+        //hide inputs
         this.nameInput.hide();
         this.codeInput.hide();
-    
+
         //remove game code input contents
         this.codeInput.clear();
     

@@ -1,6 +1,6 @@
 // Error Message System
 
-var Errors = {
+var Error = {
     //switch for whether or not error is shown
     active: false,
 
@@ -48,4 +48,4 @@ var Errors = {
 }
 
 // EXAMPLE ERROR EMIT
-// Errors.displayError('Testing Testing 123',3000);
+// Error.displayError('Testing Testing 123',3000);

@@ -654,7 +654,7 @@ var UI = {
 
     deathMenuMouseClicked: function (socket, gameState) {
         if(this.exitGameButton.mouseOver()) {
-            Errors.displayError('Left Game', 5000);
+            Error.displayError('Left Game', 5000);
             endGame();
             return;
         }

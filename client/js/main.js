@@ -31,8 +31,8 @@ var socket;
 //function to close game and return to menus
 function endGame() {
     Ping.stop();
-    Controls.stop();
-    Menus.restartMenus();
+    Control.stop();
+    Menu.restartMenus();
     socket.close();
     state = "menu";
 }
@@ -55,24 +55,24 @@ function joinGame(menuChoices) {
     //capture socket errors
     socket.once('connect_error', function (error) {
         console.log('connect_error', error);
-        Errors.displayError('Server Connection Error', 5000);
+        Error.displayError('Server Connection Error', 5000);
         endGame();
     });
     socket.once('connect_timeout', function (timeout) {
         console.log('connect_timeout', timeout);
-        Errors.displayError('Server Connection Timeout', 5000);
+        Error.displayError('Server Connection Timeout', 5000);
         endGame();
     });
     socket.on('error', function (error) {
         console.log('error', error);
-        Errors.displayError('Socket Error', 5000);
+        Error.displayError('Socket Error', 5000);
     });
 
     //return to server menu if disconnected
     socket.once('disconnect', function (reason) {
         console.log('disconnect', reason);
-        if(!Errors.active) {
-            Errors.displayError('Server Disconnected', 5000);
+        if(!Error.active) {
+            Error.displayError('Server Disconnected', 5000);
         }
         endGame();
     })
@@ -87,7 +87,7 @@ function joinGame(menuChoices) {
     //if socket rejected, send back to menu and display reason error
     socket.once('rejection', function (reason) {
         console.log('rejection', reason);
-        Errors.displayError(`REJECTED: ${reason}`, 5000);
+        Error.displayError(`REJECTED: ${reason}`, 5000);
         endGame();
     });
 
@@ -98,10 +98,10 @@ function joinGame(menuChoices) {
         roomId = newId;
 
         //Start controls (controls.js)
-        Controls.start(socket);
+        Control.start(socket);
 
         //remove error message if shown
-        Errors.hideError();
+        Error.hideError();
 
         //change state
         state = 'game';
@@ -156,12 +156,12 @@ function draw () {
 
         //draw loading screen (menu.js)
         case 'load':
-            Menus.drawLoading();
+            Menu.drawLoading();
             break;
 
         //draw menus (menu.js)
         case 'menu':
-            Menus.drawMenus(canvas);
+            Menu.drawMenus(canvas);
             break;
         
         //draw game (game.js)
@@ -172,7 +172,7 @@ function draw () {
     }
 
     //no matter state, draw error if active (error.js)
-    Errors.drawError();
+    Error.drawError();
 }
 
 //look for button clicks during menus
@@ -181,7 +181,7 @@ function mouseClicked () {
     switch (state) {
 
         case 'menu':
-            Menus.menuMouseClicked(); //(menu.js)
+            Menu.menuMouseClicked(); //(menu.js)
             break;
 
         case 'game':
@@ -199,7 +199,7 @@ function keyPressed () {
     switch (state) {
 
         case 'menu':
-            Menus.menuKeyPressed(keyCode); //(menu.js)
+            Menu.menuKeyPressed(keyCode); //(menu.js)
             break;
     }
 }

@@ -11,7 +11,7 @@ var Movement = {
     angle: 'none',
 
     //move based on currently pressed keys
-    //NOTE: this is called in a setInterval in Controls.js
+    //NOTE: this is called in a setInterval in Control.js
     sendAngle: function (socket) {
 
         let newAngle = 'none';

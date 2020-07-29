@@ -28,7 +28,7 @@ InfoMenu.div.querySelector('.InfoMenu-close').addEventListener(
 InfoMenu.div.querySelector('.InfoMenu-exit').addEventListener(
     'click', 
     function () {
-        Errors.displayError('Left Game', 5000);
+        Error.displayError('Left Game', 5000);
         endGame();
         return;
     }
