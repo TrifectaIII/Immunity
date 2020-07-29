@@ -14,6 +14,10 @@ var InfoMenu = {
 //toggle display of InfoMenu when button pressed
 window.addEventListener('keypress', function (event) {
     if (event.keyCode == gameSettings.menuToggleButton.charCodeAt(0)) {
+
+        //prevent default action
+        event.preventDefault();
+
         InfoMenu.toggle();
     }
 });
