@@ -1,51 +1,5 @@
-// draw cosshair for menu
-//////////////////////////////////////////////////////////////////////////////
-
-function drawMenuCrosshair () {
-    push();
-    stroke("black");
-    strokeWeight(2);
-    fill(0,0);
-    ellipse(mouseX, mouseY, 30, 30);
-    line(mouseX+20, mouseY, mouseX-20, mouseY);
-    line(mouseX, mouseY+20, mouseX, mouseY-20);
-    pop();
-}
-
-//draw grid background for menus
-//////////////////////////////////////////////////////////////////////////////
-
-var menuGridOff = 0;
-
-function drawMenuGrid () {
-    push();
-    background('#FFF1E8');
-    strokeWeight(1);
-    stroke('#C2C3C7');
-
-    menuGridOff++;
-    if (menuGridOff >= 100) {
-        menuGridOff = 0;
-    }
-
-
-    for (let x = menuGridOff; x < windowWidth; x+=100) {
-        line(
-            x, 0,
-            x, windowHeight
-        );
-    }
-    for (let y = menuGridOff; y < windowHeight; y+=100) {
-        line(
-            0, y,
-            windowWidth, y
-        );
-    }
-    pop();
-}
-
 //Button Object Constructor
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////
 
 function Button (text, colorOff, colorOn) {
     this.text = text;
@@ -100,7 +54,7 @@ Button.prototype.draw = function () {
 }
 
 // TextInput Object Constructor
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////
 
 function TextInput (canvas, maxLength) {
     this.element = createElement('input');
@@ -135,408 +89,441 @@ TextInput.prototype.showAt = function (x, y, w, h) {
     this.element.show();
 }
 
-//Back Button
-//////////////////////////////////////////////////////////////////////////////
+// out-of-game menu system
+var Menus = {
 
-//button to go to previous menu
-var backButton = new Button(
-    "BACK",
-    gameSettings.colors.darkpink,
-    gameSettings.colors.pink
-);
+    // draw cosshair for menu
+    drawMenuCrosshair: function () {
+        push();
+        stroke("black");
+        strokeWeight(2);
+        fill(0,0);
+        ellipse(mouseX, mouseY, 30, 30);
+        line(mouseX+20, mouseY, mouseX-20, mouseY);
+        line(mouseX, mouseY+20, mouseX, mouseY-20);
+        pop();
+    },
 
-function drawBackButton() {
-    backButton.update(
-        100, 
-        windowHeight - 100, 
-        windowHeight/8, 
-        windowHeight/8
-    );
-    backButton.draw();
-}
+    //draw grid background for menus
+    menuGridOffset: 0,
 
-
-
-
-// TITLE MENU
-//////////////////////////////////////////////////////////////////////////////
-
-var titleProg = 0;
-var titleColors = [
-    gameSettings.colors.blue,
-    gameSettings.colors.green,
-    gameSettings.colors.yellow,
-    gameSettings.colors.pink
-];
-
-var startButton = new Button(
-    "START",
-    gameSettings.colors.darkgreen,
-    gameSettings.colors.green
-);
-
-function drawTitleMenu () {
-
-    push();
-
-    textAlign(CENTER, CENTER);
-
-    //update and draw set name button
-    startButton.update(
-        windowWidth/2,
-        windowHeight*2/3, 
-        windowWidth/4, 
-        windowHeight/8
-    );
-    startButton.draw();
-
-    //draw title
-    stroke('black');
-    strokeWeight(8);
-    titleProg -= 0.1;
-    fill(titleColors[Math.floor(-(titleProg/titleColors.length)%titleColors.length)]);
-    textSize(100);
-    text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
-
-    //draw controls
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("WASD to Move\nClick to Shoot", windowWidth/2, windowHeight/2);
-
-    //draw menu hint
-    textSize(35);
-    text(
-        "Press " + gameSettings.menuToggleButton + " to open the info menu at any time.",
-        windowWidth/2, 30,
-    );
-
-    pop();
-}
-
-function clickTitleMenu () {
-    return startButton.mouseOver();
-}
-
-
-// NAME MENU
-//////////////////////////////////////////////////////////////////////////////
-
-//input element to type in name
-var nameInput;
-
-//button to submit name
-var setNameButton = new Button(
-    "SUBMIT", 
-    gameSettings.colors.darkblue, 
-    gameSettings.colors.blue
-);
-
-function drawNameMenu (canvas) {
-
-    // set up nameInput if not setup yet
-    if (nameInput == null) {
-        nameInput = new TextInput(canvas, gameSettings.nameMax);
-    }
-
-    push();
-    textAlign(CENTER, CENTER);
-
-    //update and draw set name button
-    setNameButton.update(
-        windowWidth/2,
-        windowHeight*2/3, 
-        windowWidth/4, 
-        windowHeight/8
-    );
-    setNameButton.draw();
-
-    //draw text for name entry
-    stroke('black');
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("Enter Name:", windowWidth/2, windowHeight/3);
-
-    //display input for name entry
-    nameInput.showAt(
-        windowWidth/2, 
-        windowHeight/2, 
-        windowWidth/3, 
-        75
-    );
-
-    pop();
-}
-
-function clickNameMenu () {
-    return setNameButton.mouseOver();
-}
-
-// SERVER MENU
-//////////////////////////////////////////////////////////////////////////////
-
-//input element to type in game code
-var codeInput;
-
-var createGameButton = new Button( 
-    "NEW GAME", 
-    gameSettings.colors.darkgreen, 
-    gameSettings.colors.green
-);
-
-var joinButton = new Button( 
-    "JOIN", 
-    gameSettings.colors.darkblue, 
-    gameSettings.colors.blue
-);
-
-function drawServerMenu (canvas) {
-
-    //setup codeInput if not setup yet
-    if (codeInput == null) {
-        codeInput = new TextInput(canvas, gameSettings.nameMax);
-    }
-
-    push();
-    textAlign(CENTER, CENTER);
-
-    //update and draw buttons
-    createGameButton.update(
-        windowWidth/2, 
-        windowHeight/4, 
-        windowWidth/4, 
-        windowHeight/8
-    );
-    joinButton.update(
-        windowWidth/2, 
-        windowHeight*5/6, 
-        windowWidth/5, 
-        windowHeight/8
-    );
-
-    createGameButton.draw();
-    joinButton.draw();
-
-    //draw text for code entry
-    stroke('black');
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("- OR -", windowWidth/2, windowHeight*17/40);
-    text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
-
-    //display input for game code
-    codeInput.showAt(
-        windowWidth/2, 
-        windowHeight*2/3,
-        windowWidth/4,
-        75
-    );
-
-    pop();
-}
-
-function clickServerMenu () {
-    if (createGameButton.mouseOver()) {
-        return "new_game";
-    }
-    if (joinButton.mouseOver()) {
-        return "join";
-    }
-    return false;
-}
-
-// Loading Screen
-//////////////////////////////////////////////////////////////////////////////
-
-var loadingProg = 0;
-var loadingColors = [
-    gameSettings.colors.blue,
-    gameSettings.colors.green,
-    gameSettings.colors.yellow,
-    gameSettings.colors.pink
-];
-
-function drawLoading () {
-    push();
-    textAlign(CENTER, CENTER);
-
-    //draw background
-    drawMenuGrid();
-
-    //draw text
-    stroke('black');
-    strokeWeight(2);
-    fill('black');
-    textSize(40);
-    text("Loading...", windowWidth/2, windowHeight/2);
-
-    loadingProg -= 0.1;
-    stroke(loadingColors[Math.floor(-(loadingProg/loadingColors.length)%loadingColors.length)]);
-    strokeWeight(10);
-    let spokes = 3;
-    let spokeLength = 25;
-    for (let i=1; i<=spokes; i++) {
-        line(
-            windowWidth/2 - Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength, 
-            windowHeight/3*2 - Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            windowWidth/2 + Math.sin(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-            windowHeight/3*2 + Math.cos(loadingProg+(Math.PI/spokes)*i) * spokeLength,
-        );
-    }
+    drawMenuGrid: function () {
+        push();
+        background('#FFF1E8');
+        strokeWeight(1);
+        stroke('#C2C3C7');
     
-    drawMenuCrosshair();
+        this.menuGridOffset++;
+        if (this.menuGridOffset >= 100) {
+            this.menuGridOffset = 0;
+        }
+    
+    
+        for (let x = this.menuGridOffset; x < windowWidth; x+=100) {
+            line(
+                x, 0,
+                x, windowHeight
+            );
+        }
+        for (let y = this.menuGridOffset; y < windowHeight; y+=100) {
+            line(
+                0, y,
+                windowWidth, y
+            );
+        }
+        pop();
+    },
 
-    pop();
-}
+    //button to go to previous menu
+    backButton: new Button(
+        "BACK",
+        gameSettings.colors.darkpink,
+        gameSettings.colors.pink
+    ),
 
-// Menu State Machine
-//////////////////////////////////////////////////////////////////////////////
+    drawBackButton: function () {
+        this.backButton.update(
+            100, 
+            windowHeight - 100, 
+            windowHeight/8, 
+            windowHeight/8
+        );
+        this.backButton.draw();
+    },
+    
+    titleProg: 0,
 
-var menuChoices = {
-    name: '',
-    roomId: '',
-    className: '',
-}
+    titleColors: [
+        gameSettings.colors.blue,
+        gameSettings.colors.green,
+        gameSettings.colors.yellow,
+        gameSettings.colors.pink
+    ],
 
-//list of menu progression (first to last)
-const menuList = ['title', 'name', 'server'];
+    startButton: new Button(
+        "START",
+        gameSettings.colors.darkgreen,
+        gameSettings.colors.green
+    ),
 
-//tracks which menu we are on, starts at first
-var menuIndex = 0;
+    // TITLE MENU
+    /////////////////////////////////////////
+    drawTitleMenu: function () {
 
+        push();
 
-//draws each menu
-function drawMenus (canvas) {
+        textAlign(CENTER, CENTER);
 
-    //draw background
-    drawMenuGrid();
+        //update and draw set name button
+        this.startButton.update(
+            windowWidth/2,
+            windowHeight*2/3, 
+            windowWidth/4, 
+            windowHeight/8
+        );
+        this.startButton.draw();
 
-    //draw contents of menu based on state
-    switch (menuList[menuIndex]) {
+        //draw title
+        stroke('black');
+        strokeWeight(8);
+        this.titleProg -= 0.1;
+        fill(this.titleColors[Math.floor(-(this.titleProg/this.titleColors.length)%this.titleColors.length)]);
+        textSize(100);
+        text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
 
-        //draw title menu
-        case 'title':
-            drawTitleMenu();
-            break;
+        //draw controls
+        strokeWeight(2);
+        fill('black');
+        textSize(40);
+        text("WASD to Move\nClick to Shoot", windowWidth/2, windowHeight/2);
 
-        //draw name menu
-        case 'name':
-            drawNameMenu(canvas);
-            break;
+        //draw menu hint
+        textSize(35);
+        text(
+            "Press " + gameSettings.menuToggleButton + " to open the info menu at any time.",
+            windowWidth/2, 30,
+        );
 
-        //draw server menu
-        case 'server':
-            drawServerMenu(canvas);
-            break;
-    }
+        pop();
+    },
 
-    if (menuIndex > 0) {
-        drawBackButton();
-    }
+    clickTitleMenu: function () {
+        return this.startButton.mouseOver();
+    },
 
-    //draw mouse crosshair
-    drawMenuCrosshair();
+    // NAME MENU
+    /////////////////////////////////////////
 
-    //if at the end of menus, try to join game
-    if (menuIndex == menuList.length) {
-        joinGame(menuChoices);
-    }
-}
+    //input element to type in name
+    nameInput: false,
 
-//checks for clicks when menu is active
-function menuMouseClicked () {
+    //button to submit name
+    setNameButton: new Button(
+        "SUBMIT", 
+        gameSettings.colors.darkblue, 
+        gameSettings.colors.blue
+    ),
 
-    //go back 1 if button clicked
-    if (backButton.mouseOver() && menuIndex > 0) {
-        menuIndex--;
-        nameInput.hide();
-        codeInput.hide();
-        return;
-    }
+    drawNameMenu: function (canvas) {
 
-    //otherwise, menu specific
-    switch (menuList[menuIndex]) {
+        // set up nameInput if not setup yet
+        if (!this.nameInput) {
+            this.nameInput = new TextInput(canvas, gameSettings.nameMax);
+        }
 
-        case 'title':
-            if (clickTitleMenu()) {
-                menuIndex++;
-            }
-            break;
+        push();
+        textAlign(CENTER, CENTER);
 
-        case 'name':
-            if (clickNameMenu() && nameInput.getValue() != '') {
-                menuChoices.name = nameInput.getValue();
-                nameInput.hide();
-                menuIndex++;
-            }
-            break;
+        //update and draw set name button
+        this.setNameButton.update(
+            windowWidth/2,
+            windowHeight*2/3, 
+            windowWidth/4, 
+            windowHeight/8
+        );
+        this.setNameButton.draw();
+
+        //draw text for name entry
+        stroke('black');
+        strokeWeight(2);
+        fill('black');
+        textSize(40);
+        text("Enter Name:", windowWidth/2, windowHeight/3);
+
+        //display input for name entry
+        this.nameInput.showAt(
+            windowWidth/2, 
+            windowHeight/2, 
+            windowWidth/3, 
+            75
+        );
+
+        pop();
+    },
+
+    clickNameMenu: function () {
+        return this.setNameButton.mouseOver();
+    },
+
+    // SERVER MENU
+    /////////////////////////////////////////
+
+    //input element to type in game code
+    codeInput: false,
+
+    createGameButton: new Button( 
+        "NEW GAME", 
+        gameSettings.colors.darkgreen, 
+        gameSettings.colors.green
+    ),
+
+    joinButton: new Button( 
+        "JOIN", 
+        gameSettings.colors.darkblue, 
+        gameSettings.colors.blue
+    ),
+
+    drawServerMenu: function (canvas) {
+
+        //setup codeInput if not setup yet
+        if (!this.codeInput) {
+            this.codeInput = new TextInput(canvas, gameSettings.nameMax);
+        }
+
+        push();
+        textAlign(CENTER, CENTER);
+
+        //update and draw buttons
+        this.createGameButton.update(
+            windowWidth/2, 
+            windowHeight/4, 
+            windowWidth/4, 
+            windowHeight/8
+        );
+        this.joinButton.update(
+            windowWidth/2, 
+            windowHeight*5/6, 
+            windowWidth/5, 
+            windowHeight/8
+        );
+
+        this.createGameButton.draw();
+        this.joinButton.draw();
+
+        //draw text for code entry
+        stroke('black');
+        strokeWeight(2);
+        fill('black');
+        textSize(40);
+        text("- OR -", windowWidth/2, windowHeight*17/40);
+        text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
+
+        //display input for game code
+        this.codeInput.showAt(
+            windowWidth/2, 
+            windowHeight*2/3,
+            windowWidth/4,
+            75
+        );
+
+        pop();
+    },
+
+    clickServerMenu: function () {
+        if (this.createGameButton.mouseOver()) {
+            return "new_game";
+        }
+        if (this.joinButton.mouseOver()) {
+            return "join";
+        }
+        return false;
+    },
+
+    // LOADING SCREEN
+    /////////////////////////////////////////
+
+    loadingProg: 0,
+
+    loadingColors: [
+        gameSettings.colors.blue,
+        gameSettings.colors.green,
+        gameSettings.colors.yellow,
+        gameSettings.colors.pink
+    ],
+
+    drawLoading: function () {
+        push();
+        textAlign(CENTER, CENTER);
+
+        //draw background
+        this.drawMenuGrid();
+
+        //draw text
+        stroke('black');
+        strokeWeight(2);
+        fill('black');
+        textSize(40);
+        text("Loading...", windowWidth/2, windowHeight/2);
+
+        this.loadingProg -= 0.1;
+        stroke(this.loadingColors[Math.floor(-(this.loadingProg/this.loadingColors.length)%this.loadingColors.length)]);
+        strokeWeight(10);
+        let spokes = 3;
+        let spokeLength = 25;
+        for (let i=1; i<=spokes; i++) {
+            line(
+                windowWidth/2 - Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength, 
+                windowHeight/3*2 - Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+                windowWidth/2 + Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+                windowHeight/3*2 + Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+            );
+        }
         
-        case 'server':
-            switch (clickServerMenu()) {
-                case 'new_game':
-                    menuChoices.roomId = 'new_game';
-                    codeInput.hide();
-                    menuIndex++;
-                    break;
-                case 'join':
-                    if (codeInput.getValue() != '') {
-                        menuChoices.roomId = codeInput.getValue();
-                        codeInput.hide();
-                        menuIndex++;
+        this.drawMenuCrosshair();
+
+        pop();
+    },
+
+    // Menu State Machine
+    /////////////////////////////////////////
+
+    menuChoices: {
+        name: '',
+        roomId: '',
+        className: '',
+    },
+    
+    //list of menu progression (first to last)
+    menuList: ['title', 'name', 'server'],
+    
+    //tracks which menu we are on, starts at first
+    menuIndex: 0,
+    
+    //draws each menu
+    drawMenus: function (canvas) {
+    
+        //draw background
+        this.drawMenuGrid();
+    
+        //draw contents of menu based on state
+        switch (this.menuList[this.menuIndex]) {
+    
+            //draw title menu
+            case 'title':
+                this.drawTitleMenu();
+                break;
+    
+            //draw name menu
+            case 'name':
+                this.drawNameMenu(canvas);
+                break;
+    
+            //draw server menu
+            case 'server':
+                this.drawServerMenu(canvas);
+                break;
+        }
+    
+        if (this.menuIndex > 0) {
+            this.drawBackButton();
+        }
+    
+        //draw mouse crosshair
+        this.drawMenuCrosshair();
+    
+        //if at the end of menus, try to join game
+        if (this.menuIndex == this.menuList.length) {
+            joinGame(this.menuChoices);
+        }
+    },
+    
+    //checks for clicks when menu is active
+    menuMouseClicked: function () {
+    
+        //go back 1 if button clicked
+        if (this.backButton.mouseOver() && this.menuIndex > 0) {
+            this.menuIndex--;
+            this.nameInput.hide();
+            this.codeInput.hide();
+            return;
+        }
+    
+        //otherwise, menu specific
+        switch (this.menuList[this.menuIndex]) {
+    
+            case 'title':
+                if (this.clickTitleMenu()) {
+                    this.menuIndex++;
+                }
+                break;
+    
+            case 'name':
+                if (this.clickNameMenu() && this.nameInput.getValue() != '') {
+                    this.menuChoices.name = this.nameInput.getValue();
+                    this.nameInput.hide();
+                    this.menuIndex++;
+                }
+                break;
+            
+            case 'server':
+                switch (this.clickServerMenu()) {
+                    case 'new_game':
+                        this.menuChoices.roomId = 'new_game';
+                        this.codeInput.hide();
+                        this.menuIndex++;
+                        break;
+                    case 'join':
+                        if (this.codeInput.getValue() != '') {
+                            this.menuChoices.roomId = this.codeInput.getValue();
+                            this.codeInput.hide();
+                            this.menuIndex++;
+                        }
+                        break;
+                }
+                break;
+        }
+    },
+    
+    //checks for key presses when menu is active
+    menuKeyPressed: function (keyCode) {
+        switch (this.menuList[this.menuIndex]) {
+    
+            case 'name':
+                if (keyCode == ENTER) {
+                    if (this.nameInput.getValue() != '') {
+                        this.menuChoices.name = this.nameInput.getValue();
+                        this.nameInput.hide();
+                        this.menuIndex++;
                     }
-                    break;
-            }
-            break;
+                    return false;
+                }
+                break;
+    
+            case 'server':
+                if (keyCode == ENTER) {
+                    if (this.codeInput.getValue() != '') {
+                        this.menuChoices.roomId = this.codeInput.getValue();
+                        this.codeInput.hide();
+                        this.menuIndex++;
+                    }
+                    return false;
+                }
+                break;
+        }
+    },
+    
+    //resets state to first menu
+    restartMenus: function () {
+    
+        //reset menus
+        this.nameInput.hide();
+        this.codeInput.hide();
+    
+        //remove game code input contents
+        this.codeInput.clear();
+    
+        //set index to first menu in list
+        this.menuIndex = 0;
     }
 }
 
-//checks for key presses when menu is active
-function menuKeyPressed (keyCode) {
-    switch (menuList[menuIndex]) {
-
-        case 'name':
-            if (keyCode == ENTER) {
-                if (nameInput.getValue() != '') {
-                    menuChoices.name = nameInput.getValue();
-                    nameInput.hide();
-                    menuIndex++;
-                }
-                return false;
-            }
-            break;
-
-        case 'server':
-            if (keyCode == ENTER) {
-                if (codeInput.getValue() != '') {
-                    menuChoices.roomId = codeInput.getValue();
-                    codeInput.hide();
-                    menuIndex++;
-                }
-                return false;
-            }
-            break;
-    }
-}
-
-
-//resets state to first menu
-function restartMenus () {
-
-    //change global state to menu
-    state = 'menu';
-
-    //reset menus
-    nameInput.hide();
-    codeInput.hide();
-
-    //return to first menu
-    menuIndex = 0;
-
-    //remove game code input contents
-    codeInput.clear();
-
-    //set index to first menu in list
-    menuIndex = 0;
-}

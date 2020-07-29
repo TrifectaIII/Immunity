@@ -32,8 +32,9 @@ var socket;
 function endGame() {
     Ping.stop();
     Controls.stop();
-    restartMenus();
+    Menus.restartMenus();
     socket.close();
+    state = "menu";
 }
 
 // function to join the game
@@ -155,12 +156,12 @@ function draw () {
 
         //draw loading screen (menu.js)
         case 'load':
-            drawLoading();
+            Menus.drawLoading();
             break;
 
         //draw menus (menu.js)
         case 'menu':
-            drawMenus(canvas);
+            Menus.drawMenus(canvas);
             break;
         
         //draw game (game.js)
@@ -180,7 +181,7 @@ function mouseClicked () {
     switch (state) {
 
         case 'menu':
-            menuMouseClicked(); //(menu.js)
+            Menus.menuMouseClicked(); //(menu.js)
             break;
 
         case 'game':
@@ -198,7 +199,7 @@ function keyPressed () {
     switch (state) {
 
         case 'menu':
-            menuKeyPressed(keyCode); //(menu.js)
+            Menus.menuKeyPressed(keyCode); //(menu.js)
             break;
     }
 }
