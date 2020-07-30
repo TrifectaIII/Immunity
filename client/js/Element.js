@@ -9,23 +9,23 @@ function Button (text, colorOff, colorOn) {
     this.colorOff = colorOff;
     this.x = 0;
     this.y = 0;
-    this.width = 0;
-    this.height = 0;
+    this.w = 0;
+    this.h = 0;
 }
 
-Button.prototype.update = function (x,y,width,height) {
+Button.prototype.update = function (x,y,w,h) {
     this.x = x;
     this.y = y;
-    this.width = width;
-    this.height = height;
+    this.w = w;
+    this.h = h;
 }
 
 //checks if mouse is over the button
 Button.prototype.mouseOver = function () {
-    return (mouseX > this.x - this.width/2 &&
-        mouseX < this.x + this.width/2 &&
-        mouseY > this.y - this.height/2 &&
-        mouseY < this.y + this.height/2);
+    return (mouseX > this.x - this.w/2 &&
+        mouseX < this.x + this.w/2 &&
+        mouseY > this.y - this.h/2 &&
+        mouseY < this.y + this.h/2);
 }
 
 //draws button
@@ -40,10 +40,10 @@ Button.prototype.draw = function () {
         fill(this.colorOn);
     }
     rect(
-        this.x-this.width/2,
-        this.y-this.height/2, 
-        this.width, 
-        this.height
+        this.x-this.w/2,
+        this.y-this.h/2, 
+        this.w, 
+        this.h
     );
 
     //draw text
@@ -55,8 +55,8 @@ Button.prototype.draw = function () {
     pop();
 }
 
-Button.prototype.updateAndDraw = function (x,y,width,height) {
-    this.update(x,y,width,height)
+Button.prototype.updateAndDraw = function (x,y,w,h) {
+    this.update(x,y,w,h)
     this.draw();
 }
 

@@ -40,7 +40,7 @@ var Error = {
             fill(gameSettings.colors.red);
             text(
                 this.message, 
-                windowWidth/2, 
+                width/2, 
                 50,
             );
             pop();

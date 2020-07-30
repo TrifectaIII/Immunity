@@ -79,8 +79,8 @@ var UI = {
         let defaults = {
             x: 0,
             y: 0,
-            width: 100,
-            height: 10,
+            w: 100,
+            h: 10,
             color: 'white',
             prog: 0.5,
             leftText: '',
@@ -105,13 +105,13 @@ var UI = {
         fill('black');
         strokeWeight(0);
         rect(
-            options.x-options.width/2, options.y-options.height/2,
-            options.width, options.height,
+            options.x-options.w/2, options.y-options.h/2,
+            options.w, options.h,
         );
         fill(options.color);
         rect(
-            options.x-options.width/2+2, options.y - options.height/2 + 2,
-            (options.width-4)*(options.prog), options.height-4
+            options.x-options.w/2+2, options.y - options.h/2 + 2,
+            (options.w-4)*(options.prog), options.h-4
         );
 
         //draw texts
@@ -124,16 +124,16 @@ var UI = {
         textAlign(LEFT, CENTER);
         text(
             options.leftText,
-            options.x - options.width/2 + 8,
-            options.y - options.height/2 + (options.height-4)/2
+            options.x - options.w/2 + 8,
+            options.y - options.h/2 + (options.h-4)/2
         );
 
         //second text(right side)
         textAlign(RIGHT, CENTER);
         text(
             options.rightText,
-            options.x + options.width/2 - 8,
-            options.y - options.height/2 + (options.height-4)/2
+            options.x + options.w/2 - 8,
+            options.y - options.h/2 + (options.h-4)/2
         );
 
         pop();
@@ -143,10 +143,10 @@ var UI = {
     drawHealthBar: function (player) {
 
         this.drawBar({
-            x: windowWidth*3/8 - 10,
-            y: windowHeight - 40,
-            width: windowWidth/4,
-            height: 40,
+            x: width*3/8 - 10,
+            y: height - 40,
+            w: width/4,
+            h: 40,
             color: gameSettings.playerTypes[player.type].colors.light,
             prog: player.health/gameSettings.playerTypes[player.type].maxHealth,
             leftText: 'Health',
@@ -161,10 +161,10 @@ var UI = {
             color = gameSettings.colors.mango;
         }
         this.drawBar({
-            x: windowWidth*5/8 + 10,
-            y: windowHeight - 40,
-            width: windowWidth/4,
-            height: 40,
+            x: width*5/8 + 10,
+            y: height - 40,
+            w: width/4,
+            h: 40,
             color: color,
             prog: player.abilityProgress/gameSettings.abilityCap,
             leftText: 'Ability',
@@ -178,10 +178,10 @@ var UI = {
         if (Object.keys(gameState.bosses).length > 0) {
             let boss = gameState.bosses[Object.keys(gameState.bosses)[0]];
             this.drawBar({
-                x: windowWidth/2,
+                x: width/2,
                 y: 40,
-                width: windowWidth/2,
-                height: 40,
+                w: width/2,
+                h: 40,
                 color: gameSettings.boss.colors.light,
                 prog: boss.health/boss.maxHealth,
                 leftText: 'Boss',
@@ -194,12 +194,12 @@ var UI = {
     drawMiniMap: function (gameState, player) {
 
         //settings for the minimap
-        let minimapWidth = Math.min(250, Math.max(windowWidth/6, windowHeight/6));
+        let minimapWidth = Math.min(250, Math.max(width/6, height/6));
         let minimapHeight = (minimapWidth/gameSettings.width) * gameSettings.height;
         let minimapOverflow = 3;
         let minimapOffset = {
             x:minimapOverflow + 3,
-            y:windowHeight - minimapHeight - minimapOverflow - 3,
+            y:height - minimapHeight - minimapOverflow - 3,
         }
         let minimapPipSize = 5;
 
@@ -328,7 +328,7 @@ var UI = {
 
             //draw name and killstreak
             fill(gameSettings.playerTypes[player.type].colors.dark);
-            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+            text(player.name + ' : '+player.killStreak, width-15, 20+counter*50);
             
             //draw healthbar
             let barWidth = 110;
@@ -338,14 +338,14 @@ var UI = {
             stroke(gameSettings.playerTypes[player.type].colors.dark);
             strokeWeight(2);
             rect(
-                windowWidth-(barWidth+barOffset), 40+counter*50, 
-                windowWidth-(barOffset), 40+counter*50 + barHeight
+                width-(barWidth+barOffset), 40+counter*50, 
+                width-(barOffset), 40+counter*50 + barHeight
             );
             strokeWeight(0);
             fill(gameSettings.playerTypes[player.type].colors.light);
             rect(
-                windowWidth-barOffset - barWidth*(player.health/gameSettings.playerTypes[player.type].maxHealth), 40+counter*50, 
-                windowWidth-(barOffset), 40+counter*50 + barHeight
+                width-barOffset - barWidth*(player.health/gameSettings.playerTypes[player.type].maxHealth), 40+counter*50, 
+                width-(barOffset), 40+counter*50 + barHeight
             );
 
             counter++;
@@ -358,7 +358,7 @@ var UI = {
 
             //draw name and killstreak
             fill(gameSettings.colors.darkgrey);
-            text(player.name + ' : '+player.killStreak, windowWidth-15, 20+counter*50);
+            text(player.name + ' : '+player.killStreak, width-15, 20+counter*50);
             
             //draw healthbar
             let barWidth = 110;
@@ -368,8 +368,8 @@ var UI = {
             stroke(gameSettings.colors.darkgrey);
             strokeWeight(2);
             rect(
-                windowWidth-(barWidth+barOffset), 40+counter*50, 
-                windowWidth-(barOffset), 40+counter*50 + barHeight
+                width-(barWidth+barOffset), 40+counter*50, 
+                width-(barOffset), 40+counter*50 + barHeight
             );
             strokeWeight(0);
             if (player.respawnTimer == 0) {
@@ -379,8 +379,8 @@ var UI = {
                 fill(gameSettings.colors.red);
             }
             rect(
-                windowWidth-barOffset - barWidth*(1-(player.respawnTimer/gameSettings.respawnTime)), 40+counter*50, 
-                windowWidth-(barOffset), 40+counter*50 + barHeight
+                width-barOffset - barWidth*(1-(player.respawnTimer/gameSettings.respawnTime)), 40+counter*50, 
+                width-(barOffset), 40+counter*50 + barHeight
             );
 
             counter++;
@@ -408,8 +408,8 @@ var UI = {
 
                 text(
                     countdownNum,
-                    windowWidth/2,
-                    windowHeight/4,
+                    width/2,
+                    height/4,
                 );
         }
 
@@ -440,15 +440,15 @@ var UI = {
         //draw fps
         text(
             `FPS: ${fps}`, 
-            windowWidth-15, 
-            windowHeight-30,
+            width-15, 
+            height-30,
         );
         //draw ping
         let ms = Ping.value;
         text(
             `Ping: ${ms}`,
-            windowWidth-15,
-            windowHeight-70,
+            width-15,
+            height-70,
         );
         pop();
     },
@@ -477,10 +477,10 @@ var UI = {
     ),
     drawExitGameButton: function() {
         this.exitGameButton.update(
-            windowWidth - 100, 
-            windowHeight - 100, 
-            windowHeight/8, 
-            windowHeight/8
+            width - 100, 
+            height - 100, 
+            height/8, 
+            height/8
         );
         this.exitGameButton.draw();
     },
@@ -514,10 +514,10 @@ var UI = {
         for (let className in this.classButtons) {
             let button = this.classButtons[className];
             button.update(
-                windowWidth/2, 
-                windowHeight*counter/(1+classCount), 
-                windowWidth/3,
-                windowHeight/(4+classCount)
+                width/2, 
+                height*counter/(1+classCount), 
+                width/3,
+                height/(4+classCount)
             );
             button.draw();
             counter++;
@@ -528,7 +528,7 @@ var UI = {
         strokeWeight(3);
         fill(gameSettings.colors.white);
         textSize(40);
-        text("Choose a Class:", windowWidth/2, windowHeight/12);
+        text("Choose a Class:", width/2, height/12);
         pop();
     },
 
@@ -553,7 +553,7 @@ var UI = {
         strokeWeight(3);
         fill(gameSettings.colors.red);
         textSize(60);
-        text("No Lives Remaining", windowWidth/2, windowHeight/2);
+        text("No Lives Remaining", width/2, height/2);
         pop();
     },
 
@@ -569,12 +569,12 @@ var UI = {
         stroke('black');
         strokeWeight(3);
         textSize(60);
-        text("YOU ARE DEAD", windowWidth/2, windowHeight/2);
+        text("YOU ARE DEAD", width/2, height/2);
         this.drawBar({
-            x: windowWidth/2,
-            y: windowHeight - 40,
-            width: windowWidth/2,
-            height: 40,
+            x: width/2,
+            y: height - 40,
+            w: width/2,
+            h: 40,
             color: gameSettings.colors.red,
             prog: 1-player.respawnTimer/gameSettings.respawnTime,
         })
@@ -597,10 +597,10 @@ var UI = {
     
         //update and draw restart button
         this.restartButton.update(
-            windowWidth/2,
-            windowHeight*2/3,
-            windowWidth/3,
-            windowHeight/8,
+            width/2,
+            height*2/3,
+            width/3,
+            height/8,
         )
     
         this.restartButton.draw();
@@ -610,10 +610,10 @@ var UI = {
         strokeWeight(3);
         fill(gameSettings.colors.red);
         textSize(60);
-        text("GAME OVER", windowWidth/2, windowHeight/3);
+        text("GAME OVER", width/2, height/3);
     
         fill(gameSettings.colors.white);
-        text(`WAVE: ${gameState.roomInfo.waveCount}`, windowWidth/2, windowHeight/2);
+        text(`WAVE: ${gameState.roomInfo.waveCount}`, width/2, height/2);
         pop();
     },
 

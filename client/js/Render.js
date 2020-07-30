@@ -103,17 +103,17 @@ var Render = {
         let margin = 100;
         
         //account for screens too large for the game area
-        if (windowWidth > gameSettings.width + 2*margin) {
-            this.screenOffset.x = (gameSettings.width-windowWidth)/2;
+        if (width > gameSettings.width + 2*margin) {
+            this.screenOffset.x = (gameSettings.width-width)/2;
         }
         else {
-            this.screenOffset.x = Math.min(Math.max(-margin, player.x - windowWidth/2), gameSettings.width-windowWidth + margin);
+            this.screenOffset.x = Math.min(Math.max(-margin, player.x - width/2), gameSettings.width-width + margin);
         }
-        if (windowHeight > gameSettings.height + 2*margin) {
-            this.screenOffset.y = (gameSettings.height-windowHeight)/2;
+        if (height > gameSettings.height + 2*margin) {
+            this.screenOffset.y = (gameSettings.height-height)/2;
         }
         else {
-            this.screenOffset.y = Math.min(Math.max(-margin, player.y - windowHeight/2), gameSettings.height-windowHeight + margin);
+            this.screenOffset.y = Math.min(Math.max(-margin, player.y - height/2), gameSettings.height-height + margin);
         }
     },
 
@@ -125,19 +125,19 @@ var Render = {
         background(gameSettings.colors.white);
         for (let x = 100; x < gameSettings.width; x+=100) {
             if (x-this.screenOffset.x > 0 &&
-                x-this.screenOffset.x < windowWidth) {
+                x-this.screenOffset.x < width) {
                     line(
                         x-this.screenOffset.x, 0,
-                        x-this.screenOffset.x, windowHeight
+                        x-this.screenOffset.x, height
                     );
             }
         }
         for (let y = 100; y < gameSettings.height; y+=100) {
             if (y-this.screenOffset.y > 0 &&
-                y-this.screenOffset.y < windowHeight) {
+                y-this.screenOffset.y < height) {
                     line(
                         0, y-this.screenOffset.y,
-                        windowWidth, y-this.screenOffset.y
+                        width, y-this.screenOffset.y
                     );
             }
         }
@@ -154,28 +154,28 @@ var Render = {
         if (this.screenOffset.x < 0) {
             rect(
                 0, 0, 
-                -this.screenOffset.x, windowHeight
+                -this.screenOffset.x, height
             )
         }
         //right
-        if (this.screenOffset.x > gameSettings.width-windowWidth) {
+        if (this.screenOffset.x > gameSettings.width-width) {
             rect(
                 gameSettings.width - this.screenOffset.x, 0, 
-                windowWidth, windowHeight
+                width, height
             )
         }
         //top
         if (this.screenOffset.y < 0) {
             rect(
                 0, 0, 
-                windowWidth, -this.screenOffset.y
+                width, -this.screenOffset.y
             )
         }
         //bottom
-        if (this.screenOffset.y > gameSettings.height-windowHeight) {
+        if (this.screenOffset.y > gameSettings.height-height) {
             rect(
                 0, gameSettings.height - this.screenOffset.y, 
-                windowWidth, windowHeight
+                width, height
             )
         }
         pop();
@@ -191,9 +191,9 @@ var Render = {
         for (let id in gameState.pickups) {
             let pickup = gameState.pickups[id];
             if (pickup.x-this.screenOffset.x > -50 &&
-                pickup.x-this.screenOffset.x < windowWidth + 50 &&
+                pickup.x-this.screenOffset.x < width + 50 &&
                 pickup.y-this.screenOffset.y > -50 &&
-                pickup.y-this.screenOffset.y < windowHeight + 50) {
+                pickup.y-this.screenOffset.y < height + 50) {
                     //draw circle
                     circle(
                         pickup.x-this.screenOffset.x,
@@ -251,9 +251,9 @@ var Render = {
         for (let id in gameState.shots.enemyShots) {
             let shot = gameState.shots.enemyShots[id];
             if (shot.x-this.screenOffset.x > 0 &&
-                shot.x-this.screenOffset.x < windowWidth &&
+                shot.x-this.screenOffset.x < width &&
                 shot.y-this.screenOffset.y > 0 &&
-                shot.y-this.screenOffset.y < windowHeight) {
+                shot.y-this.screenOffset.y < height) {
                     fill(gameSettings.enemyTypes[shot.type].colors.dark);
                     stroke(gameSettings.enemyTypes[shot.type].colors.light);
                     circle(
@@ -268,9 +268,9 @@ var Render = {
         for (let id in gameState.shots.bossShots) {
             let shot = gameState.shots.bossShots[id];
             if (shot.x-this.screenOffset.x > 0 &&
-                shot.x-this.screenOffset.x < windowWidth &&
+                shot.x-this.screenOffset.x < width &&
                 shot.y-this.screenOffset.y > 0 &&
-                shot.y-this.screenOffset.y < windowHeight) {
+                shot.y-this.screenOffset.y < height) {
                     fill(gameSettings.boss.colors.light);
                     stroke(gameSettings.boss.colors.dark);
                     circle(
@@ -285,9 +285,9 @@ var Render = {
         for (let id in gameState.shots.playerShots) {
             let shot = gameState.shots.playerShots[id];
             if (shot.x-this.screenOffset.x > 0 &&
-                shot.x-this.screenOffset.x < windowWidth &&
+                shot.x-this.screenOffset.x < width &&
                 shot.y-this.screenOffset.y > 0 &&
-                shot.y-this.screenOffset.y < windowHeight) {
+                shot.y-this.screenOffset.y < height) {
                     fill(gameSettings.playerTypes[shot.type].colors.light);
                     stroke(gameSettings.playerTypes[shot.type].colors.dark);
                     circle(
@@ -310,9 +310,9 @@ var Render = {
         for (let id in gameState.enemies) {
             let enemy = gameState.enemies[id];
             if (enemy.x-this.screenOffset.x > -50 &&
-                enemy.x-this.screenOffset.x < windowWidth + 50 &&
+                enemy.x-this.screenOffset.x < width + 50 &&
                 enemy.y-this.screenOffset.y > -50 &&
-                enemy.y-this.screenOffset.y < windowHeight + 50) {
+                enemy.y-this.screenOffset.y < height + 50) {
 
                     //setup
                     fill(gameSettings.enemyTypes[enemy.type].colors.dark);
@@ -345,14 +345,14 @@ var Render = {
         for (let id in gameState.enemies) {
             let enemy = gameState.enemies[id];
             if (enemy.x-this.screenOffset.x > -50 &&
-                enemy.x-this.screenOffset.x < windowWidth + 50 &&
+                enemy.x-this.screenOffset.x < width + 50 &&
                 enemy.y-this.screenOffset.y > -50 &&
-                enemy.y-this.screenOffset.y < windowHeight + 50) {
+                enemy.y-this.screenOffset.y < height + 50) {
 
                     let x_offset = 15
                     let y_offset_abs = gameSettings.enemyTypes[enemy.type].radius + 10;
                     let y_offset = y_offset_abs;
-                    if (enemy.y-this.screenOffset.y > windowHeight - 50) {
+                    if (enemy.y-this.screenOffset.y > height - 50) {
                         y_offset = -y_offset_abs;
                     }
                     stroke(gameSettings.enemyTypes[enemy.type].colors.dark);
@@ -386,9 +386,9 @@ var Render = {
         for (let id in gameState.bosses) {
             let boss = gameState.bosses[id];
             if (boss.x-this.screenOffset.x > -200 &&
-                boss.x-this.screenOffset.x < windowWidth + 200 &&
+                boss.x-this.screenOffset.x < width + 200 &&
                 boss.y-this.screenOffset.y > -200 &&
-                boss.y-this.screenOffset.y < windowHeight + 200) {
+                boss.y-this.screenOffset.y < height + 200) {
 
                     //setup
                     fill(gameSettings.boss.colors.dark);
@@ -464,9 +464,9 @@ var Render = {
     //             let player = gameState.players.playing[id];
     //             if (player.health <= 0 &&
     //                 player.x-this.screenOffset.x > -50 &&
-    //                 player.x-this.screenOffset.x < windowWidth + 50 &&
+    //                 player.x-this.screenOffset.x < width + 50 &&
     //                 player.y-this.screenOffset.y > -50 &&
-    //                 player.y-this.screenOffset.y < windowHeight + 50) {
+    //                 player.y-this.screenOffset.y < height + 50) {
     //                     //draw player as transparent
     //                     let fillcolor = color(gameSettings.playerTypes[player.type].colors.light);
     //                     fillcolor.setAlpha(100);
@@ -498,9 +498,9 @@ var Render = {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
                     player.x-this.screenOffset.x > -50 &&
-                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.x-this.screenOffset.x < width + 50 &&
                     player.y-this.screenOffset.y > -50 &&
-                    player.y-this.screenOffset.y < windowHeight + 50) {
+                    player.y-this.screenOffset.y < height + 50) {
                         
                         fill(gameSettings.playerTypes[player.type].colors.light);
                         stroke(gameSettings.playerTypes[player.type].colors.dark);
@@ -520,13 +520,13 @@ var Render = {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
                     player.x-this.screenOffset.x > -50 &&
-                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.x-this.screenOffset.x < width + 50 &&
                     player.y-this.screenOffset.y > -50 &&
-                    player.y-this.screenOffset.y < windowHeight + 50) {
+                    player.y-this.screenOffset.y < height + 50) {
                         let x_offset = 15
                         let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
                         let y_offset = y_offset_abs;
-                        // if (player.y-this.screenOffset.y > windowHeight - 50) {
+                        // if (player.y-this.screenOffset.y > height - 50) {
                         //     y_offset = -y_offset_abs;
                         // }
                         stroke(gameSettings.playerTypes[player.type].colors.dark);
@@ -559,9 +559,9 @@ var Render = {
                 let player = gameState.players.playing[id];
                 if (player.health > 0 &&
                     player.x-this.screenOffset.x > -50 &&
-                    player.x-this.screenOffset.x < windowWidth + 50 &&
+                    player.x-this.screenOffset.x < width + 50 &&
                     player.y-this.screenOffset.y > -50 &&
-                    player.y-this.screenOffset.y < windowHeight + 50) {
+                    player.y-this.screenOffset.y < height + 50) {
 
                         let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
                         let y_offset = -y_offset_abs;

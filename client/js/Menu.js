@@ -24,16 +24,16 @@ var Menu = {
     
         this.menuGridOffset = (this.menuGridOffset+1)%100;
     
-        for (let x = this.menuGridOffset; x < windowWidth; x+=100) {
+        for (let x = this.menuGridOffset; x < width; x+=100) {
             line(
                 x, 0,
-                x, windowHeight
+                x, height
             );
         }
-        for (let y = this.menuGridOffset; y < windowHeight; y+=100) {
+        for (let y = this.menuGridOffset; y < height; y+=100) {
             line(
                 0, y,
-                windowWidth, y
+                width, y
             );
         }
         pop();
@@ -49,9 +49,9 @@ var Menu = {
     drawBackButton: function () {
         this.backButton.update(
             100, 
-            windowHeight - 100, 
-            windowHeight/8, 
-            windowHeight/8
+            height - 100, 
+            height/8, 
+            height/8
         );
         this.backButton.draw();
     },
@@ -72,10 +72,10 @@ var Menu = {
 
         //update and draw set name button
         this.startButton.update(
-            windowWidth/2,
-            windowHeight*2/3, 
-            windowWidth/4, 
-            windowHeight/8
+            width/2,
+            height*2/3, 
+            width/4, 
+            height/8
         );
         this.startButton.draw();
 
@@ -84,19 +84,19 @@ var Menu = {
         strokeWeight(8);
         fill(Animation.getColor());
         textSize(100);
-        text(gameSettings.title.toUpperCase(), windowWidth/2, windowHeight/3);
+        text(gameSettings.title.toUpperCase(), width/2, height/3);
 
         //draw controls
         strokeWeight(2);
         fill('black');
         textSize(40);
-        text("WASD to Move\nClick to Shoot", windowWidth/2, windowHeight/2);
+        text("WASD to Move\nClick to Shoot", width/2, height/2);
 
         //draw menu hint
         textSize(35);
         text(
             "Press " + gameSettings.menuToggleButton + " to open the info menu at any time.",
-            windowWidth/2, 30,
+            width/2, 30,
         );
 
         pop();
@@ -126,10 +126,10 @@ var Menu = {
 
         //update and draw set name button
         this.setNameButton.update(
-            windowWidth/2,
-            windowHeight*2/3, 
-            windowWidth/4, 
-            windowHeight/8
+            width/2,
+            height*2/3, 
+            width/4, 
+            height/8
         );
         this.setNameButton.draw();
 
@@ -138,14 +138,14 @@ var Menu = {
         strokeWeight(2);
         fill('black');
         textSize(40);
-        text("Enter Name:", windowWidth/2, windowHeight/3);
+        text("Enter Name:", width/2, height/3);
 
         //display input for name entry
         this.nameInput.showAt(
             canvas,
-            windowWidth/2, 
-            windowHeight/2, 
-            windowWidth/3, 
+            width/2, 
+            height/2, 
+            width/3, 
             75
         );
 
@@ -181,16 +181,16 @@ var Menu = {
 
         //update and draw buttons
         this.createGameButton.update(
-            windowWidth/2, 
-            windowHeight/4, 
-            windowWidth/4, 
-            windowHeight/8
+            width/2, 
+            height/4, 
+            width/4, 
+            height/8
         );
         this.joinButton.update(
-            windowWidth/2, 
-            windowHeight*5/6, 
-            windowWidth/5, 
-            windowHeight/8
+            width/2, 
+            height*5/6, 
+            width/5, 
+            height/8
         );
 
         this.createGameButton.draw();
@@ -201,15 +201,15 @@ var Menu = {
         strokeWeight(2);
         fill('black');
         textSize(40);
-        text("- OR -", windowWidth/2, windowHeight*17/40);
-        text("Enter Game Code:", windowWidth/2, windowHeight*16/30);
+        text("- OR -", width/2, height*17/40);
+        text("Enter Game Code:", width/2, height*16/30);
 
         //display input for game code
         this.codeInput.showAt(
             canvas,
-            windowWidth/2, 
-            windowHeight*2/3,
-            windowWidth/4,
+            width/2, 
+            height*2/3,
+            width/4,
             75
         );
 
@@ -241,17 +241,17 @@ var Menu = {
         strokeWeight(2);
         fill('black');
         textSize(40);
-        text("Loading...", windowWidth/2, windowHeight/2);
+        text("Loading...", width/2, height/2);
         stroke(Animation.getColor());
         strokeWeight(10);
         let spokes = 3;
         let spokeLength = 25;
         for (let i=1; i<=spokes; i++) {
             line(
-                windowWidth/2 - Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength, 
-                windowHeight/3*2 - Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
-                windowWidth/2 + Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
-                windowHeight/3*2 + Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+                width/2 - Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength, 
+                height/3*2 - Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+                width/2 + Math.sin(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
+                height/3*2 + Math.cos(this.loadingProg+(Math.PI/spokes)*i) * spokeLength,
             );
         }
         
