@@ -13,15 +13,17 @@ var Animation = {
     //current index in array
     colorIndex: 0,
 
-    //moves to next color every 500ms
-    interval: setInterval(function () {
-        if (++Animation.colorIndex >= Animation.colors.length){
-            Animation.colorIndex = 0;
-        }
-    },500),
+    //time between color switches in MS
+    colorTime: 400,
 
     //returns current color
     getColor: function () {
         return this.colors[this.colorIndex];
     }
 }
+
+//switch colors every colorTime ms
+setInterval(function () {
+    //increase index and return to 0 if at length of colors array
+    this.colorIndex = (this.colorIndex+1)%this.colors.length;
+}.bind(Animation), Animation.colorTime);

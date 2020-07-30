@@ -1,6 +1,6 @@
 // Error Message System
-
 var Error = {
+
     //switch for whether or not error is shown
     active: false,
 
@@ -18,6 +18,7 @@ var Error = {
             clearTimeout(this.timer);
             this.timer = setTimeout(function () {
                 this.active = false;
+                this.message = "";
             }.bind(this), time);
         }
     },

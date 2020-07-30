@@ -1,8 +1,15 @@
 //SOCKET.IO
 /////////////////////////////
 
-// global game state
-var state = 'menu';
+//enum for game states
+var States = Object.freeze({
+    MENU: 'MENU',
+    LOAD: 'LOAD',
+    GAME: 'GAME',
+});
+
+// global game state starts at menu
+var state = States.MENU;
 
 //info on game state from server (starts empty)
 var gameState = {
@@ -34,14 +41,14 @@ function endGame() {
     Control.stop();
     Menu.restartMenus();
     socket.close();
-    state = "menu";
+    state = States.MENU;
 }
 
 // function to join the game
 function joinGame(menuChoices) {
 
     //switch state
-    state = 'load';
+    state = States.LOAD;
 
     //connect socket to server
     socket = io({
@@ -104,7 +111,7 @@ function joinGame(menuChoices) {
         Error.hideError();
 
         //change state
-        state = 'game';
+        state = States.GAME;
 
         //recieve player info from server
         socket.on ('game_update', function (serverState) {
@@ -155,17 +162,17 @@ function draw () {
     switch (state) {
 
         //draw loading screen (menu.js)
-        case 'load':
+        case States.LOAD:
             Menu.drawLoading();
             break;
 
         //draw menus (menu.js)
-        case 'menu':
+        case States.MENU:
             Menu.drawMenus(canvas);
             break;
         
         //draw game (game.js)
-        case 'game':
+        case States.GAME:
             Render.drawGame(socket, gameState);
             UI.drawUI(socket, gameState);
             break;
@@ -180,11 +187,11 @@ function mouseClicked () {
 
     switch (state) {
 
-        case 'menu':
+        case States.MENU:
             Menu.menuMouseClicked(); //(menu.js)
             break;
 
-        case 'game':
+        case States.GAME:
             //listen for clicks when player is dead
             if (socket.id in gameState.players.waiting) {
                 UI.deathMenuMouseClicked(socket, gameState);
@@ -198,7 +205,7 @@ function keyPressed () {
 
     switch (state) {
 
-        case 'menu':
+        case States.MENU:
             Menu.menuKeyPressed(keyCode); //(menu.js)
             break;
     }

@@ -1,28 +1,27 @@
 //handles controls
 var Control = {
 
+    //intervals start empty, waiting for start() to be called
     moveInterval: null,
-
     clickInterval: null,
 
+    //sends direction info to server using Movement.js
     directionHandler: function (socket) {
-        if (state == "game" &&
-            gameState.players.playing &&
-            socket.id in gameState.players.playing && 
-            gameState.players.playing[socket.id].health > 0) {
+        if (state == States.GAME &&
+            socket.id in gameState.players.playing) {
                 Movement.sendAngle(socket);
         }
     },
 
+    //sends click info to server using Shoot.js
     clickHandler: function (socket) {
-        if (state == "game" &&
-            gameState.players.playing &&
-            socket.id in gameState.players.playing && 
-            gameState.players.playing[socket.id].health > 0) {
+        if (state == States.GAME &&
+            socket.id in gameState.players.playing) {
                 Shoot.sendClicking(socket);
         }
     },
 
+    //starts control system
     start: function (socket) {
         //execute direction emits from movement.js
         clearInterval(this.moveInterval);
@@ -50,6 +49,7 @@ var Control = {
         });
     },
 
+    //stops control system
     stop: function () {
         clearInterval(this.moveInterval);
         this.moveInterval = null;

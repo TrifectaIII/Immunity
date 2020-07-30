@@ -25,7 +25,7 @@ window.addEventListener('keypress', function (event) {
 //event listener for close button
 InfoMenu.div.querySelector('.InfoMenu-close').addEventListener(
     'click', 
-    InfoMenu.toggle.bind(InfoMenu)
+    InfoMenu.toggle.bind(InfoMenu),
 );
 
 //event listener for exit game button
@@ -34,6 +34,5 @@ InfoMenu.div.querySelector('.InfoMenu-exit').addEventListener(
     function () {
         Error.displayError('Left Game', 5000);
         endGame();
-        return;
-    }
+    },
 );
