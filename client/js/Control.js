@@ -4,6 +4,7 @@ var Control = {
     //intervals start empty, waiting for start() to be called
     moveInterval: null,
     clickInterval: null,
+    superInterval: null,
 
     //sends direction info to server using Movement.js
     directionHandler: function (socket) {
@@ -21,6 +22,13 @@ var Control = {
         }
     },
 
+    superHandler: function (socket) {
+        if (state == States.GAME &&
+            socket.id in gameState.players.playing) {
+                Super.sendActivation(socket);
+        } 
+    },
+
     //starts control system
     start: function (socket) {
         //execute direction emits from movement.js
@@ -35,6 +43,14 @@ var Control = {
         clearInterval(this.clickInterval);
         this.clickInterval = setInterval(
             function () {this.clickHandler(socket)}.bind(this),
+            //uses half of games tickRate
+            gameSettings.tickRate/2 
+        );
+
+        //execute ability usage from super.js
+        clearInterval(this.superInterval);
+        this.superInterval = setInterval(
+            function () {this.superHandler(socket)}.bind(this),
             //uses half of games tickRate
             gameSettings.tickRate/2 
         );
