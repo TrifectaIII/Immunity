@@ -1,5 +1,5 @@
 // tracks player super activation
-var Super = {
+var Ability = {
 
     //track pressing
     pressing: false,
@@ -12,10 +12,10 @@ var Super = {
     sendActivation: function (socket) {
         //if any change, send to server
         if (this.pressing && !this.wasPressing) {
-            socket.emit('super');
+            socket.emit('ability');
             this.wasPressing = true;
         }
-        else if (!pressing) {
+        else if (!this.pressing) {
             this.wasPressing = false;
         }
     },
@@ -24,18 +24,18 @@ var Super = {
 //track key downs
 document.addEventListener('keydown', function (event) {
     if (event.keyCode === 69) {
-        Super.pressing = true;
+        Ability.pressing = true;
     }
 });
 
 //track key ups
 document.addEventListener('keyup', function (event) {
     if (event.keyCode === 69) {
-        Super.pressing = false;
+        Ability.pressing = false;
     }
 });
 
 //remove all keys when window loses focus
 window.addEventListener('blur', function () {
-    Super.pressing = false;
+    Ability.pressing = false;
 });
