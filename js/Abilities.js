@@ -16,12 +16,21 @@ const Container = require(__dirname + '/Container.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
-//functions to be added to all ability objects
+//class for other ability classes to inherit
 class Ability {
 
-    constructor () {
-
+    constructor (player) {
+        this.player = player;
     }
+}
+
+//turret ability
+class Turret extends Ability {
+
+     constructor (player) {
+
+        super(player);
+     }
 }
 
 

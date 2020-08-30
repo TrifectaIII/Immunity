@@ -16,7 +16,7 @@ const Container = require(__dirname + '/Container.js');
 const Physics = require(__dirname + '/Physics.js');
 
 
-//functions to be added to all player objects
+//individual player objects
 class Player {
 
     constructor (socket, name) {
