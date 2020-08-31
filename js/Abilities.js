@@ -27,10 +27,37 @@ class Ability {
 //turret ability
 class Turret extends Ability {
 
-     constructor (player) {
+    constructor (player) {
 
         super(player);
-     }
+    }
+}
+
+//freeze ability
+class Freeze extends Ability {
+
+    constructor (player) {
+
+        super(player);
+    }
+}
+
+//full-auto ability
+class FullAuto extends Ability {
+
+    constructor (player) {
+
+        super(player);
+    }
+}
+
+//shield ability
+class Shield extends Ability {
+
+    constructor (player) {
+
+        super(player);
+    }
 }
 
 
