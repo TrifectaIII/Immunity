@@ -20,6 +20,7 @@ const Enemies = require(__dirname + '/Enemies.js');
 const Pickups = require(__dirname + '/Pickups.js');
 const Zones = require(__dirname + '/Zones.js');
 const Bosses = require(__dirname + '/Bosses.js');
+const Abilities = require(__dirname + '/Abilities.js');
 
 
 //Performance.js for benchmarking 
@@ -46,6 +47,7 @@ class Room {
         this.bosses = new Bosses(this);
         this.pickups = new Pickups(this);
         this.zones = new Zones(this);
+        this.abilities = new Abilities(this);
 
         //create a Quad tree covering the game world with capacity of each node at 4
         this.Quadtree = new QT.Qtree(new QT.QT_bound(gameSettings.width / 2, gameSettings.height / 2, gameSettings.width, gameSettings.height, 4));
@@ -99,6 +101,7 @@ class Room {
             this.bosses.update();
             this.pickups.update();
             this.zones.update();
+            this.abilities.update();
             this.update_Quadtree();
         }
 
@@ -116,6 +119,7 @@ class Room {
             bosses: this.bosses.collect(),
             pickups: this.pickups.collect(),
             zones: this.zones.collect(),
+            abilities: this.abilities.collect(),
 
             roomInfo: {
                 waveCount: this.waveCount,
@@ -224,8 +228,9 @@ class Room {
             this.shots = new Shots(this);
             this.enemies = new Enemies(this);
             this.pickups = new Pickups(this);
-            this.zones = new Zones(this);
             this.bosses = new Bosses(this);
+            this.zones = new Zones(this);
+            this.abilities = new Abilities(this);
 
             //reset attributes
             this.waveCount = 0;

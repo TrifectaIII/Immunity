@@ -20,6 +20,7 @@ const Physics = require(__dirname + '/Physics.js');
 class Ability {
 
     constructor (player) {
+
         this.player = player;
     }
 }
@@ -31,6 +32,10 @@ class Turret extends Ability {
 
         super(player);
     }
+
+    update () {
+
+    }
 }
 
 //freeze ability
@@ -39,6 +44,10 @@ class Freeze extends Ability {
     constructor (player) {
 
         super(player);
+    }
+
+    update () {
+
     }
 }
 
@@ -49,6 +58,10 @@ class FullAuto extends Ability {
 
         super(player);
     }
+
+    update () {
+
+    }
 }
 
 //shield ability
@@ -58,22 +71,32 @@ class Shield extends Ability {
 
         super(player);
     }
+
+    update () {
+
+    }
 }
 
 
 // class for abilities container
 class Abilities extends Container {
 
-    constructor(room) {
+    constructor (room) {
 
         //call Container constructor
         super(room);
     }
 
     //updates all ability objects
-    update() {
+    update () {
 
     }
+
+    //spawns an ability for the player
+    spawnAbility (player) {
+
+    }
+
 }
 
 //export to room
