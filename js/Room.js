@@ -270,6 +270,7 @@ class Room {
             //MAX CALL STACK BUG IF YOU INCLUDE SHOTS
             // ...Object.values(this.shots.objects),
             ...Object.values(this.zones.objects),
+            ...Object.values(this.abilities.objects),
         ];
     }
 

@@ -95,6 +95,23 @@ class Abilities extends Container {
     //spawns an ability for the player
     spawnAbility (player) {
 
+        var ability;
+
+        //spawn ability based on player class
+        switch (player.type) {
+            case "soldier":
+                ability = new Shield(player);
+                break;
+            case "engineer":
+                ability = new Turret(player);
+                break;
+            case "sniper":
+                ability = new FullAuto(player);
+                break;
+            case "heavy":
+                ability = new Freeze(player);
+                break;
+        }
     }
 
 }
