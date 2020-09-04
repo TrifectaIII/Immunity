@@ -19,7 +19,9 @@ const Physics = require(__dirname + '/Physics.js');
 //class for other ability classes to inherit
 class Ability {
 
-    constructor (player) {
+    constructor (id, player) {
+
+        this.id = id;
 
         this.player = player;
     }
@@ -28,9 +30,9 @@ class Ability {
 //turret ability
 class Turret extends Ability {
 
-    constructor (player) {
+    constructor (id, player) {
 
-        super(player);
+        super(id, player);
     }
 
     update () {
@@ -41,9 +43,9 @@ class Turret extends Ability {
 //freeze ability
 class Freeze extends Ability {
 
-    constructor (player) {
+    constructor (id, player) {
 
-        super(player);
+        super(id, player);
     }
 
     update () {
@@ -54,9 +56,9 @@ class Freeze extends Ability {
 //full-auto ability
 class FullAuto extends Ability {
 
-    constructor (player) {
+    constructor (id, player) {
 
-        super(player);
+        super(id, player);
     }
 
     update () {
@@ -67,9 +69,9 @@ class FullAuto extends Ability {
 //shield ability
 class Shield extends Ability {
 
-    constructor (player) {
+    constructor (id, player) {
 
-        super(player);
+        super(id, player);
     }
 
     update () {
@@ -85,6 +87,8 @@ class Abilities extends Container {
 
         //call Container constructor
         super(room);
+
+        this.idCounter = 0;
     }
 
     //updates all ability objects
@@ -97,23 +101,28 @@ class Abilities extends Container {
 
         var ability;
 
+        //generate id
+        let id = 'ability' + (this.idCounter++).toString();
+
         //spawn ability based on player class
         switch (player.type) {
             case "soldier":
-                ability = new Shield(player);
+                ability = new Shield(id, player);
                 break;
             case "engineer":
-                ability = new Turret(player);
+                ability = new Turret(id, player);
                 break;
             case "sniper":
-                ability = new FullAuto(player);
+                ability = new FullAuto(id, player);
                 break;
             case "heavy":
-                ability = new Freeze(player);
+                ability = new Freeze(id, player);
                 break;
         }
-    }
 
+        //place into objects
+        this.objects[id] = ability;
+    }
 }
 
 //export to room
