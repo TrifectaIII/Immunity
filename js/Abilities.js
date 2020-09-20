@@ -94,6 +94,13 @@ class Abilities extends Container {
     //updates all ability objects
     update () {
 
+        //loop through all objects
+
+    }
+
+    //collect info on objects to send to clients
+    collect () {
+
     }
 
     //spawns an ability for the player

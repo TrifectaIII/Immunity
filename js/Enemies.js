@@ -80,136 +80,130 @@ class Enemies extends Container {
     //updates all enemies
     update() {
 
-        //make sure game is not over
-        if (!this.room.gameOver) {
+        //get player objects from room
+        let players = this.room.players.playing;
 
-            //get player objects from room
-            let players = this.room.players.playing;
+        //loop through all enemies
+        for (let id in this.objects) {
+            let enemy = this.objects[id];
 
-            //loop through all enemies
-            for (let id in this.objects) {
-                let enemy = this.objects[id];
+            //find closest player
+            let closestDistance = Infinity;
+            let closestId = 0;
 
-                //find closest player
-                let closestDistance = Infinity;
-                let closestId = 0;
-
-                for (let pid in players) {
-                    if (players[pid].health > 0) {
-                        let thisDistance = Physics.distance(players[pid], enemy);
-                        if (thisDistance < closestDistance) {
-                            closestDistance = thisDistance;
-                            closestId = pid;
-                        }
+            for (let pid in players) {
+                if (players[pid].health > 0) {
+                    let thisDistance = Physics.distance(players[pid], enemy);
+                    if (thisDistance < closestDistance) {
+                        closestDistance = thisDistance;
+                        closestId = pid;
                     }
                 }
+            }
 
-                //reduce attack cooldown
-                if (enemy.cooldown > 0) {
-                    enemy.cooldown -= gameSettings.tickRate;
-                }
+            //reduce attack cooldown
+            if (enemy.cooldown > 0) {
+                enemy.cooldown -= gameSettings.tickRate;
+            }
 
-                //if a living player exists
-                if (closestDistance < Infinity) {
+            //if a living player exists
+            if (closestDistance < Infinity) {
 
-                    //get player object
-                    let player = players[closestId];
+                //get player object
+                let player = players[closestId];
 
-                    //accelerate in direction of closest player
-                    let acceleration = Physics.componentVector(
-                        Physics.angleBetween(enemy.x, enemy.y, player.x, player.y),
-                        enemy.getAcceleration()
-                    );
-                    enemy.velocity.x += acceleration.x;
-                    enemy.velocity.y += acceleration.y;
+                //accelerate in direction of closest player
+                let acceleration = Physics.componentVector(
+                    Physics.angleBetween(enemy.x, enemy.y, player.x, player.y),
+                    enemy.getAcceleration()
+                );
+                enemy.velocity.x += acceleration.x;
+                enemy.velocity.y += acceleration.y;
 
-                    //reduce velocity to max, if needed
-                    Physics.capVelocity(enemy, enemy.getMaxSpeed());
+                //reduce velocity to max, if needed
+                Physics.capVelocity(enemy, enemy.getMaxSpeed());
 
-                    //move based on velocity
-                    enemy.x += enemy.velocity.x;
-                    enemy.y += enemy.velocity.y;
+                //move based on velocity
+                enemy.x += enemy.velocity.x;
+                enemy.y += enemy.velocity.y;
 
-                    //attacking
-                    //check for off cooldown
-                    if (enemy.cooldown <= 0) {
+                //attacking
+                //check for off cooldown
+                if (enemy.cooldown <= 0) {
 
-                        //shoot if enemy type has shots are are in range
-                        if (enemy.getShotInfo() &&
-                            enemy.getShotInfo().range >= Physics.distance(enemy, player) - player.getRadius()) {
+                    //shoot if enemy type has shots are are in range
+                    if (enemy.getShotInfo() &&
+                        enemy.getShotInfo().range >= Physics.distance(enemy, player) - player.getRadius()) {
 
-                            //reset enemy cooldown
-                            enemy.cooldown = enemy.getAttackInfo().cooldown;
+                        //reset enemy cooldown
+                        enemy.cooldown = enemy.getAttackInfo().cooldown;
 
-                            //shoot at player
-                            this.room.shots.spawnEnemyShot(enemy, player.x, player.y);
-                        }
-                        else if (Physics.isColliding(
-                            enemy, enemy.getRadius(),
-                            player, player.getRadius()
-                        )) {
+                        //shoot at player
+                        this.room.shots.spawnEnemyShot(enemy, player.x, player.y);
+                    }
+                    else if (Physics.isColliding(
+                        enemy, enemy.getRadius(),
+                        player, player.getRadius()
+                    )) {
 
-                            //reset enemy cooldown
-                            enemy.cooldown = enemy.getAttackInfo().cooldown;
+                        //reset enemy cooldown
+                        enemy.cooldown = enemy.getAttackInfo().cooldown;
 
-                            //do damage to player
-                            this.room.players.damagePlayer(player, enemy.getAttackInfo().damage);
-                        }
+                        //do damage to player
+                        this.room.players.damagePlayer(player, enemy.getAttackInfo().damage);
                     }
                 }
-                //if no living players
-                else {
-                    //slow down
-                    enemy.velocity.x *= 0.95;
-                    enemy.velocity.y *= 0.95;
+            }
+            //if no living players
+            else {
+                //slow down
+                enemy.velocity.x *= 0.95;
+                enemy.velocity.y *= 0.95;
 
-                    //if slow enough, stop
-                    if (Math.abs(enemy.velocity.x) < 0.1) {
-                        enemy.velocity.x = 0;
-                    }
-                    if (Math.abs(enemy.velocity.y) < 0.1) {
-                        enemy.velocity.y = 0;
-                    }
-
-                    //move based on velocity
-                    enemy.x += enemy.velocity.x;
-                    enemy.y += enemy.velocity.y;
+                //if slow enough, stop
+                if (Math.abs(enemy.velocity.x) < 0.1) {
+                    enemy.velocity.x = 0;
+                }
+                if (Math.abs(enemy.velocity.y) < 0.1) {
+                    enemy.velocity.y = 0;
                 }
 
-                //boundaries
-                enemy.x = Math.min(Math.max(enemy.x, 0), gameSettings.width);
-                enemy.y = Math.min(Math.max(enemy.y, 0), gameSettings.height);
-                let near_by_objects = this.room.Quadtree.query(new QT.QT_bound(enemy.x, enemy.y, 150, 150));
+                //move based on velocity
+                enemy.x += enemy.velocity.x;
+                enemy.y += enemy.velocity.y;
+            }
 
-                //check for collisions with other enemies
-                for (let i in near_by_objects) {
-                    //recall that near_by_objects is a list of lists: [[object_id, object_data]...]
-                    let obj = near_by_objects[i];
-                    if (obj.constructor.name == "Enemy") {
-                        if (enemy.id != obj.id) {
-                            Physics.collideAndDisplace(
-                                enemy,
-                                enemy.getRadius(),
-                                obj,
-                                obj.getRadius()
-                            );
-                        }
-                    }
-                    else if (obj.constructor.name == "Player") {
+            //boundaries
+            enemy.x = Math.min(Math.max(enemy.x, 0), gameSettings.width);
+            enemy.y = Math.min(Math.max(enemy.y, 0), gameSettings.height);
+            let near_by_objects = this.room.Quadtree.query(new QT.QT_bound(enemy.x, enemy.y, 150, 150));
 
-                        if (obj.id in this.room.players.playing &&
-                            obj.health > 0) {
-                            Physics.collideAndDisplace(
-                                enemy,
-                                enemy.getRadius(),
-                                obj,
-                                obj.getRadius()
-                            );
-                        }
+            //check for collisions with other enemies
+            for (let i in near_by_objects) {
+                //recall that near_by_objects is a list of lists: [[object_id, object_data]...]
+                let obj = near_by_objects[i];
+                if (obj.constructor.name == "Enemy") {
+                    if (enemy.id != obj.id) {
+                        Physics.collideAndDisplace(
+                            enemy,
+                            enemy.getRadius(),
+                            obj,
+                            obj.getRadius()
+                        );
                     }
                 }
+                else if (obj.constructor.name == "Player") {
 
-
+                    if (obj.id in this.room.players.playing &&
+                        obj.health > 0) {
+                        Physics.collideAndDisplace(
+                            enemy,
+                            enemy.getRadius(),
+                            obj,
+                            obj.getRadius()
+                        );
+                    }
+                }
             }
         }
     }

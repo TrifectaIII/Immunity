@@ -49,57 +49,52 @@ class Zones extends Container {
     //updates all enemies
     update() {
 
-        //make sure game is running and at least 1 player is playing
-        if (!this.room.gameOver &&
-            this.room.players.playingCount() > 0) {
+        //loop through all zones
+        for (let id in this.objects) {
+            let zone = this.objects[id];
 
-            //loop through all zones
-            for (let id in this.objects) {
-                let zone = this.objects[id];
+            //lower cooldown
+            zone.cooldown -= gameSettings.tickRate;
 
-                //lower cooldown
-                zone.cooldown -= gameSettings.tickRate;
+            //spawn enemy if cooldown met
+            if (zone.cooldown <= 0) {
+                this.room.enemies.spawnEnemy();
+                //reset cd
+                zone.cooldown = gameSettings.zoneCooldown;
+            }
 
-                //spawn enemy if cooldown met
-                if (zone.cooldown <= 0) {
-                    this.room.enemies.spawnEnemy();
-                    //reset cd
-                    zone.cooldown = gameSettings.zoneCooldown;
+            //assume no player contact
+            zone.closing = 0;
+
+            //loop through players
+            for (let pid in this.room.players.playing) {
+                let player = this.room.players.playing[pid];
+
+                //check to see if player is colliding with zone
+                if (Physics.isColliding(
+                    zone,
+                    zone.radius,
+                    player,
+                    player.getRadius())) {
+                    //add one to closing count
+                    zone.closing++;
                 }
+            }
 
-                //assume no player contact
-                zone.closing = 0;
+            //close zone if players inside it
+            if (zone.closing > 0) {
+                zone.radius -= zone.closing * gameSettings.zoneCloseRate;
+            }
+            //other wise grow, up to maximum
+            else {
+                zone.radius = Math.min(
+                    zone.maxRadius,
+                    zone.radius + gameSettings.zoneGrowRate);
+            }
 
-                //loop through players
-                for (let pid in this.room.players.playing) {
-                    let player = this.room.players.playing[pid];
-
-                    //check to see if player is colliding with zone
-                    if (Physics.isColliding(
-                        zone,
-                        zone.radius,
-                        player,
-                        player.getRadius())) {
-                        //add one to closing count
-                        zone.closing++;
-                    }
-                }
-
-                //close zone if players inside it
-                if (zone.closing > 0) {
-                    zone.radius -= zone.closing * gameSettings.zoneCloseRate;
-                }
-                //other wise grow, up to maximum
-                else {
-                    zone.radius = Math.min(
-                        zone.maxRadius,
-                        zone.radius + gameSettings.zoneGrowRate);
-                }
-
-                //delete zone if it gets small
-                if (zone.radius < 30) {
-                    delete this.objects[id];
-                }
+            //delete zone if it gets small
+            if (zone.radius < 30) {
+                delete this.objects[id];
             }
         }
     }

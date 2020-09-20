@@ -90,95 +90,91 @@ class Bosses extends Container {
     //updates all bosses
     update() {
 
-        //make sure game is not over
-        if (!this.room.gameOver) {
+        //loop through objects
+        for (let id in this.objects) {
+            let boss = this.objects[id];
 
-            //loop through objects
-            for (let id in this.objects) {
-                let boss = this.objects[id];
+            //countdown focus cooldown
+            if (boss.focusCooldown > 0) {
+                boss.focusCooldown -= gameSettings.tickRate;
+            }
 
-                //countdown focus cooldown
-                if (boss.focusCooldown > 0) {
-                    boss.focusCooldown -= gameSettings.tickRate;
-                }
+            //change focus if needed
+            if ((!(boss.focus in this.room.players.playing) || boss.focusCooldown <= 0) &&
+                this.room.players.playingCount() > 0) {
+                //choose new focus randomly from playing 
+                let playingIds = Object.keys(this.room.players.playing);
+                boss.focus = playingIds[Math.floor(Math.random() * playingIds.length)];
+                //reset cooldown
+                boss.focusCooldown = boss.getFocusTime();
+            }
 
-                //change focus if needed
-                if ((!(boss.focus in this.room.players.playing) || boss.focusCooldown <= 0) &&
-                    this.room.players.playingCount() > 0) {
-                    //choose new focus randomly from playing 
-                    let playingIds = Object.keys(this.room.players.playing);
-                    boss.focus = playingIds[Math.floor(Math.random() * playingIds.length)];
-                    //reset cooldown
-                    boss.focusCooldown = boss.getFocusTime();
-                }
+            //countdown attack cooldown
+            if (boss.cooldown > 0) {
+                boss.cooldown -= gameSettings.tickRate;
+            }
 
-                //countdown attack cooldown
-                if (boss.cooldown > 0) {
-                    boss.cooldown -= gameSettings.tickRate;
-                }
+            //if focus exists
+            if (boss.focus in this.room.players.playing) {
+                let player = this.room.players.playing[boss.focus];
 
-                //if focus exists
-                if (boss.focus in this.room.players.playing) {
-                    let player = this.room.players.playing[boss.focus];
+                //accelerate in direction of focus
+                let acceleration = Physics.componentVector(
+                    Physics.angleBetween(boss.x, boss.y, player.x, player.y),
+                    boss.getAcceleration()
+                );
+                boss.velocity.x += acceleration.x;
+                boss.velocity.y += acceleration.y;
 
-                    //accelerate in direction of focus
-                    let acceleration = Physics.componentVector(
-                        Physics.angleBetween(boss.x, boss.y, player.x, player.y),
-                        boss.getAcceleration()
-                    );
-                    boss.velocity.x += acceleration.x;
-                    boss.velocity.y += acceleration.y;
+                //reduce velocity to max, if needed
+                Physics.capVelocity(boss, boss.getMaxSpeed());
 
-                    //reduce velocity to max, if needed
-                    Physics.capVelocity(boss, boss.getMaxSpeed());
+                //move based on velocity
+                boss.x += boss.velocity.x;
+                boss.y += boss.velocity.y;
 
-                    //move based on velocity
-                    boss.x += boss.velocity.x;
-                    boss.y += boss.velocity.y;
+                //attacking
+                //check for off cooldown
+                if (boss.cooldown <= 0) {
 
-                    //attacking
-                    //check for off cooldown
-                    if (boss.cooldown <= 0) {
+                    //shoot if in range 
+                    if (boss.getShotInfo().range >= Physics.distance(boss, player) - player.getRadius()) {
 
-                        //shoot if in range 
-                        if (boss.getShotInfo().range >= Physics.distance(boss, player) - player.getRadius()) {
+                        //reset boss cooldown
+                        boss.cooldown = boss.getAttackInfo().cooldown;
 
-                            //reset boss cooldown
-                            boss.cooldown = boss.getAttackInfo().cooldown;
-
-                            //shoot at player
-                            this.room.shots.spawnBossShot(boss, player.x, player.y);
-                        }
+                        //shoot at player
+                        this.room.shots.spawnBossShot(boss, player.x, player.y);
                     }
                 }
+            }
 
-                //boundaries
-                boss.x = Math.min(Math.max(boss.x, 0), gameSettings.width);
-                boss.y = Math.min(Math.max(boss.y, 0), gameSettings.height);
+            //boundaries
+            boss.x = Math.min(Math.max(boss.x, 0), gameSettings.width);
+            boss.y = Math.min(Math.max(boss.y, 0), gameSettings.height);
 
-                //check for collision with enemies
-                for (let eid in this.room.enemies.objects) {
-                    let enemy = this.room.enemies.objects[eid];
+            //check for collision with enemies
+            for (let eid in this.room.enemies.objects) {
+                let enemy = this.room.enemies.objects[eid];
 
-                    Physics.collideAndDisplace(
-                        boss,
-                        boss.getRadius(),
-                        enemy,
-                        enemy.getRadius()
-                    );
-                }
+                Physics.collideAndDisplace(
+                    boss,
+                    boss.getRadius(),
+                    enemy,
+                    enemy.getRadius()
+                );
+            }
 
-                //check for collision with players
-                for (let pid in this.room.players.playing) {
-                    let player = this.room.players.playing[pid];
+            //check for collision with players
+            for (let pid in this.room.players.playing) {
+                let player = this.room.players.playing[pid];
 
-                    Physics.collideAndDisplace(
-                        boss,
-                        boss.getRadius(),
-                        player,
-                        player.getRadius()
-                    );
-                }
+                Physics.collideAndDisplace(
+                    boss,
+                    boss.getRadius(),
+                    player,
+                    player.getRadius()
+                );
             }
         }
     }

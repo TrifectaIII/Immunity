@@ -43,54 +43,51 @@ class Pickups extends Container {
     //updates all pickups
     update() {
 
-        if (!this.room.gameOver) {
+        let players = this.room.players.playing;
 
-            let players = this.room.players.playing;
+        //loop through all pickups
+        for (let id in this.objects) {
+            let pickup = this.objects[id];
 
-            //loop through all pickups
-            for (let id in this.objects) {
-                let pickup = this.objects[id];
+            //find closest alive player
+            let closestDistance = Infinity;
+            let closestId = 0;
 
-                //find closest alive player
-                let closestDistance = Infinity;
-                let closestId = 0;
-
-                for (let pid in players) {
-                    if (players[pid].health > 0) {
-                        let thisDistance = Physics.distance(players[pid], pickup);
-                        if (thisDistance < closestDistance) {
-                            closestDistance = thisDistance;
-                            closestId = pid;
-                        }
+            for (let pid in players) {
+                if (players[pid].health > 0) {
+                    let thisDistance = Physics.distance(players[pid], pickup);
+                    if (thisDistance < closestDistance) {
+                        closestDistance = thisDistance;
+                        closestId = pid;
                     }
                 }
-                let player = players[closestId];
+            }
+            let player = players[closestId];
 
-                //if player is close enough
-                if (closestDistance < Infinity &&
-                    Physics.isColliding(
-                        player,
-                        player.getRadius(),
-                        pickup,
-                        gameSettings.pickupRadius
-                    )) {
+            //if player is close enough
+            if (closestDistance < Infinity &&
+                Physics.isColliding(
+                    player,
+                    player.getRadius(),
+                    pickup,
+                    gameSettings.pickupRadius
+                )) {
 
-                    //effect determined by type
-                    switch (pickup.type) {
-                        case "health":
-                            //if player not at max health
-                            if (player.health < player.getMaxHealth()) {
-                                //give health and delete pickup
-                                this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
-                                delete this.objects[id];
-                            }
-                            break;
-
-                        case "life":
-                            //give another life to room
-                            this.room.livesCount++;
+                //effect determined by type
+                switch (pickup.type) {
+                    case "health":
+                        //if player not at max health
+                        if (player.health < player.getMaxHealth()) {
+                            //give health and delete pickup
+                            this.room.players.healPlayer(player, gameSettings.pickupHealthAmount);
                             delete this.objects[id];
-                    }
+                        }
+                        break;
+
+                    case "life":
+                        //give another life to room
+                        this.room.livesCount++;
+                        delete this.objects[id];
                 }
             }
         }

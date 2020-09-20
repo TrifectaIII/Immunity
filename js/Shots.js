@@ -128,186 +128,183 @@ class Shots extends Container {
     //updates all shots
     update() {
 
-        if (!this.room.gameOver) {
+        //loop through all player shots
+        for (let id in this.playerShots) {
+            let shot = this.playerShots[id];
 
-            //loop through all player shots
-            for (let id in this.playerShots) {
-                let shot = this.playerShots[id];
+            //move based on velocity
+            shot.x += shot.velocity.x;
+            shot.y += shot.velocity.y;
 
-                //move based on velocity
-                shot.x += shot.velocity.x;
-                shot.y += shot.velocity.y;
+            let destroyed = false;
 
-                let destroyed = false;
+            // check for collisions with enemies
+            //get nearby objects from qtree
+            let nearby_objs = this.room.Quadtree.query(new QT.QT_bound(shot.x, shot.y, 100, 100));
 
-                // check for collisions with enemies
-                //get nearby objects from qtree
-                let nearby_objs = this.room.Quadtree.query(new QT.QT_bound(shot.x, shot.y, 100, 100));
+            //loop through nearby objects
+            for (let id in nearby_objs) {
 
-                //loop through nearby objects
-                for (let id in nearby_objs) {
+                //access near entity
+                let entity = nearby_objs[id];
 
-                    //access near entity
-                    let entity = nearby_objs[id];
-
-                    //if entity is enemy, and then check collision
-                    if (entity.constructor.name == "Enemy" &&
-                        Physics.isColliding(
-                            entity, entity.getRadius(),
-                            shot, 0 //shots have no radius
-                        )) {
-
-                        let enemy = entity;
-
-                        destroyed = true;
-
-                        //calculate physics collision
-                        Physics.collideShotEnemy(shot, enemy);
-
-                        //damage enemy
-                        this.room.enemies.damageEnemy(
-                            enemy,
-                            shot.getDamage(),
-                            shot.playerId
-                        );
-
-                        break;
-                    }
-                }
-
-                //check for collision with bosses 
-                //loop through bosses
-                for (let bid in this.room.bosses.objects) {
-
-                    let boss = this.room.bosses.objects[bid];
-
-                    if (Physics.isColliding(
-                        boss, boss.getRadius(),
+                //if entity is enemy, and then check collision
+                if (entity.constructor.name == "Enemy" &&
+                    Physics.isColliding(
+                        entity, entity.getRadius(),
                         shot, 0 //shots have no radius
                     )) {
 
-                        destroyed = true;
+                    let enemy = entity;
 
-                        //boss unaffected by bullet momentum
-                        // Physics.collideShotBoss(shot, boss);
-                        //damage enemy
-                        this.room.bosses.damageBoss(
-                            boss,
-                            shot.getDamage(),
-                            shot.playerId
+                    destroyed = true;
+
+                    //calculate physics collision
+                    Physics.collideShotEnemy(shot, enemy);
+
+                    //damage enemy
+                    this.room.enemies.damageEnemy(
+                        enemy,
+                        shot.getDamage(),
+                        shot.playerId
+                    );
+
+                    break;
+                }
+            }
+
+            //check for collision with bosses 
+            //loop through bosses
+            for (let bid in this.room.bosses.objects) {
+
+                let boss = this.room.bosses.objects[bid];
+
+                if (Physics.isColliding(
+                    boss, boss.getRadius(),
+                    shot, 0 //shots have no radius
+                )) {
+
+                    destroyed = true;
+
+                    //boss unaffected by bullet momentum
+                    // Physics.collideShotBoss(shot, boss);
+                    //damage enemy
+                    this.room.bosses.damageBoss(
+                        boss,
+                        shot.getDamage(),
+                        shot.playerId
+                    );
+
+                    break;
+                }
+            }
+
+            //remove range based on speed
+            shot.range -= shot.getSpeed();
+
+            //destroy if out of range
+            destroyed = destroyed || shot.range <= 1;
+
+            //delete if destroyed
+            if (destroyed) {
+                delete this.playerShots[id];
+                delete this.objects[id];
+            }
+        }
+
+        //loop through all enemy shots
+        for (let id in this.enemyShots) {
+            let enemyShot = this.enemyShots[id];
+
+            //move based on velocity
+            enemyShot.x += enemyShot.velocity.x;
+            enemyShot.y += enemyShot.velocity.y;
+
+            let destroyed = false;
+
+            // check for collisions with players
+            for (let id in this.room.players.playing) {
+                let player = this.room.players.playing[id];
+
+                if (Physics.isColliding(
+                    player, player.getRadius(),
+                    enemyShot, 0 //enemy shots have no radius
+                )) {
+
+                    destroyed = true;
+
+                    Physics.collideShotPlayer(enemyShot, player);
+
+                    //do damage to player if not cheating
+                    if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
+                        this.room.players.damagePlayer(
+                            player,
+                            enemyShot.getDamage()
                         );
-
-                        break;
                     }
-                }
 
-                //remove range based on speed
-                shot.range -= shot.getSpeed();
-
-                //destroy if out of range
-                destroyed = destroyed || shot.range <= 1;
-
-                //delete if destroyed
-                if (destroyed) {
-                    delete this.playerShots[id];
-                    delete this.objects[id];
+                    break;
                 }
             }
 
-            //loop through all enemy shots
-            for (let id in this.enemyShots) {
-                let enemyShot = this.enemyShots[id];
+            //remove range based on speed
+            enemyShot.range -= enemyShot.getSpeed();
 
-                //move based on velocity
-                enemyShot.x += enemyShot.velocity.x;
-                enemyShot.y += enemyShot.velocity.y;
+            //destroy if out of range
+            destroyed = destroyed || enemyShot.range <= 1;
 
-                let destroyed = false;
+            //delete if destroyed
+            if (destroyed) {
+                delete this.enemyShots[id];
+                delete this.objects[id];
+            }
+        }
 
-                // check for collisions with players
-                for (let id in this.room.players.playing) {
-                    let player = this.room.players.playing[id];
+        //loop through all boss shots
+        for (let id in this.bossShots) {
+            let bossShot = this.bossShots[id];
 
-                    if (Physics.isColliding(
-                        player, player.getRadius(),
-                        enemyShot, 0 //enemy shots have no radius
-                    )) {
+            //move based on velocity
+            bossShot.x += bossShot.velocity.x;
+            bossShot.y += bossShot.velocity.y;
 
-                        destroyed = true;
+            let destroyed = false;
 
-                        Physics.collideShotPlayer(enemyShot, player);
+            // check for collisions with players
+            for (let id in this.room.players.playing) {
+                let player = this.room.players.playing[id];
 
-                        //do damage to player if not cheating
-                        if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
-                            this.room.players.damagePlayer(
-                                player,
-                                enemyShot.getDamage()
-                            );
-                        }
+                if (Physics.isColliding(
+                    player, player.getRadius(),
+                    bossShot, 0 //enemy shots have no radius
+                )) {
 
-                        break;
+                    destroyed = true;
+
+                    Physics.collideShotPlayer(bossShot, player);
+
+                    //do damage to player if not cheating
+                    if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
+                        this.room.players.damagePlayer(
+                            player,
+                            bossShot.getDamage()
+                        );
                     }
-                }
 
-                //remove range based on speed
-                enemyShot.range -= enemyShot.getSpeed();
-
-                //destroy if out of range
-                destroyed = destroyed || enemyShot.range <= 1;
-
-                //delete if destroyed
-                if (destroyed) {
-                    delete this.enemyShots[id];
-                    delete this.objects[id];
+                    break;
                 }
             }
 
-            //loop through all boss shots
-            for (let id in this.bossShots) {
-                let bossShot = this.bossShots[id];
+            //remove range based on speed
+            bossShot.range -= bossShot.getSpeed();
 
-                //move based on velocity
-                bossShot.x += bossShot.velocity.x;
-                bossShot.y += bossShot.velocity.y;
+            //destroy if out of range
+            destroyed = destroyed || bossShot.range <= 1;
 
-                let destroyed = false;
-
-                // check for collisions with players
-                for (let id in this.room.players.playing) {
-                    let player = this.room.players.playing[id];
-
-                    if (Physics.isColliding(
-                        player, player.getRadius(),
-                        bossShot, 0 //enemy shots have no radius
-                    )) {
-
-                        destroyed = true;
-
-                        Physics.collideShotPlayer(bossShot, player);
-
-                        //do damage to player if not cheating
-                        if (player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
-                            this.room.players.damagePlayer(
-                                player,
-                                bossShot.getDamage()
-                            );
-                        }
-
-                        break;
-                    }
-                }
-
-                //remove range based on speed
-                bossShot.range -= bossShot.getSpeed();
-
-                //destroy if out of range
-                destroyed = destroyed || bossShot.range <= 1;
-
-                //delete if destroyed
-                if (destroyed) {
-                    delete this.bossShots[id];
-                    delete this.objects[id];
-                }
+            //delete if destroyed
+            if (destroyed) {
+                delete this.bossShots[id];
+                delete this.objects[id];
             }
         }
     }
