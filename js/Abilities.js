@@ -95,7 +95,12 @@ class Abilities extends Container {
     update () {
 
         //loop through all objects
+        for (let id in this.objects) {
+            let ability = this.objects[id];
 
+            //update the ability
+            ability.update();
+        }
     }
 
     //collect info on objects to send to clients
