@@ -24,6 +24,12 @@ class Ability {
         this.id = id;
 
         this.player = player;
+
+        this.timer = gameSettings.playerTypes[this.player.type].ability.duration;
+    }
+
+    update () {
+        this.timer -= gameSettings.tickRate;
     }
 }
 
@@ -36,6 +42,7 @@ class Turret extends Ability {
     }
 
     update () {
+        super();
 
     }
 }
@@ -49,6 +56,7 @@ class Freeze extends Ability {
     }
 
     update () {
+        super();
 
     }
 }
@@ -62,6 +70,7 @@ class FullAuto extends Ability {
     }
 
     update () {
+        super();
 
     }
 }
@@ -75,6 +84,7 @@ class Shield extends Ability {
     }
 
     update () {
+        super();
 
     }
 }
@@ -105,29 +115,34 @@ class Abilities extends Container {
 
     //collect info on objects to send to clients
     collect () {
+        
+        let ability_info = {};
 
+        for (let id in this.objects) {
+
+        }
     }
 
     //spawns an ability for the player
     spawnAbility (player) {
 
-        var ability;
+        let ability;
 
         //generate id
         let id = 'ability' + (this.idCounter++).toString();
 
         //spawn ability based on player class
-        switch (player.type) {
-            case "soldier":
+        switch (gameSettings.playerTypes[player.type].ability.type) {
+            case "shield":
                 ability = new Shield(id, player);
                 break;
-            case "engineer":
+            case "turret":
                 ability = new Turret(id, player);
                 break;
-            case "sniper":
+            case "fullauto":
                 ability = new FullAuto(id, player);
                 break;
-            case "heavy":
+            case "freeze":
                 ability = new Freeze(id, player);
                 break;
         }

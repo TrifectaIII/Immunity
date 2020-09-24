@@ -65,6 +65,11 @@ const gameSettings = {
                 damage: 3,
                 mass: 1,
             },
+
+            ability: {
+                type: "shield",
+                duration: 10000,
+            }
         },
 
         engineer: {
@@ -89,6 +94,11 @@ const gameSettings = {
                 damage: 2,
                 mass: 1,
             },
+
+            ability: {
+                type: "turret",
+                duration: 10000,
+            }
         },
 
         sniper: {
@@ -113,6 +123,11 @@ const gameSettings = {
                 damage: 30,
                 mass: 20,
             },
+
+            ability: {
+                type: "fullauto",
+                duration: 10000,
+            }
         },
 
         heavy: {
@@ -137,6 +152,11 @@ const gameSettings = {
                 damage: 3,
                 mass: 5,
             },
+
+            ability: {
+                type: "freeze",
+                duration: 10000,
+            }
         },
     },
 
