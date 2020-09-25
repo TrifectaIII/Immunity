@@ -25,10 +25,12 @@ class Ability {
 
         this.player = player;
 
+        //ability duration set by player type
         this.timer = gameSettings.playerTypes[this.player.type].ability.duration;
     }
 
     update () {
+        //count down timer based on tickrate
         this.timer -= gameSettings.tickRate;
     }
 }
@@ -39,6 +41,10 @@ class Turret extends Ability {
     constructor (id, player) {
 
         super(id, player);
+
+        //position is current position of the player
+        this.x = this.player.x;
+        this.y = this.player.y;
     }
 
     update () {
@@ -53,6 +59,10 @@ class Freeze extends Ability {
     constructor (id, player) {
 
         super(id, player);
+
+        //position is current position of the player
+        this.x = this.player.x;
+        this.y = this.player.y;
     }
 
     update () {
@@ -110,6 +120,12 @@ class Abilities extends Container {
 
             //update the ability
             ability.update();
+
+            //delete ability if it has run out of time
+            if (ability.timer <= 0) {
+                delete this.objects[id];
+                continue;
+            }
         }
     }
 
