@@ -98,6 +98,7 @@ const gameSettings = {
             ability: {
                 type: "turret",
                 duration: 10000,
+                attackCooldown: 200,
             }
         },
 

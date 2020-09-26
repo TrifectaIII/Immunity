@@ -1,6 +1,8 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
+const { tickRate } = require("../gameSettings");
+
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
@@ -45,11 +47,26 @@ class Turret extends Ability {
         //position is current position of the player
         this.x = this.player.x;
         this.y = this.player.y;
+
+        //time to shoot
+        this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
+
+
     }
 
     update () {
         super();
 
+        //decrease cooldown
+        this.cooldown -= gameSettings.tickRate;
+
+        //shoot if over
+        if (this.cooldown <= 0) {
+            //reset cd
+            this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
+
+            //SHOOT HERE
+        }
     }
 }
 
@@ -118,14 +135,15 @@ class Abilities extends Container {
         for (let id in this.objects) {
             let ability = this.objects[id];
 
+            //delete if out of time, or player not active anymore
+            if (ability.timer <= 0 ||
+                !ability.player.id in this.room.players.playing) {
+                    delete this.objects[id];
+                    continue;
+            }
+
             //update the ability
             ability.update();
-
-            //delete ability if it has run out of time
-            if (ability.timer <= 0) {
-                delete this.objects[id];
-                continue;
-            }
         }
     }
 
@@ -135,6 +153,8 @@ class Abilities extends Container {
         let ability_info = {};
 
         for (let id in this.objects) {
+            let ability = this.objects[id];
+
 
         }
     }
