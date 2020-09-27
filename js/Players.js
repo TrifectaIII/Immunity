@@ -266,22 +266,24 @@ class Players extends Container {
     //deal damage to a player
     damagePlayer(player, amount) {
 
-        //make sure player is alive, and not cheating
+        //make sure player is alive, and is not in cheat mode
         if (player.id in this.playing &&
             player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
-            player.health = Math.max(0, player.health - amount);
 
-            //handle death
-            if (player.health <= 0) {
+                // take health away
+                player.health = Math.max(0, player.health - amount);
 
-                //start respawn timer if game not over
-                if (!this.room.gameOver) {
-                    player.respawnTimer = gameSettings.respawnTime;
+                //handle death
+                if (player.health <= 0) {
+
+                    //start respawn timer if game not over
+                    if (!this.room.gameOver) {
+                        player.respawnTimer = gameSettings.respawnTime;
+                    }
+
+                    //move player to waiting
+                    this.waitPlayer(player);
                 }
-
-                //move player to waiting
-                this.waitPlayer(player);
-            }
         }
     }
 

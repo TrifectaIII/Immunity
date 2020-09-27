@@ -84,7 +84,6 @@ class Freeze extends Ability {
 
     update () {
         super();
-
     }
 }
 
@@ -98,7 +97,6 @@ class FullAuto extends Ability {
 
     update () {
         super();
-
     }
 }
 
@@ -112,7 +110,6 @@ class Shield extends Ability {
 
     update () {
         super();
-
     }
 }
 
@@ -137,7 +134,7 @@ class Abilities extends Container {
 
             //delete if out of time, or player not active anymore
             if (ability.timer <= 0 ||
-                !ability.player.id in this.room.players.playing) {
+                !(ability.player.id in this.room.players.playing)) {
                     delete this.objects[id];
                     continue;
             }
@@ -185,6 +182,23 @@ class Abilities extends Container {
 
         //place into objects
         this.objects[id] = ability;
+    }
+
+    //returns bool on whether or not a player has an ability active currently
+    checkActiveAbility (player) {
+
+        //loop through abilities
+        for (let id in this.objects) {
+            let ability = this.objects[id];
+
+            //check if this ability belongs to the player
+            if (ability.player.id === player.id) {
+                return true;
+            }
+        }
+
+        //if none found
+        return false;
     }
 }
 
