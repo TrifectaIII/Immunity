@@ -55,7 +55,7 @@ class Turret extends Ability {
     }
 
     update () {
-        super();
+        super.update();
 
         //decrease cooldown
         this.cooldown -= gameSettings.tickRate;
@@ -83,7 +83,7 @@ class Freeze extends Ability {
     }
 
     update () {
-        super();
+        super.update();
     }
 }
 
@@ -96,7 +96,7 @@ class FullAuto extends Ability {
     }
 
     update () {
-        super();
+        super.update();
     }
 }
 
@@ -109,7 +109,7 @@ class Shield extends Ability {
     }
 
     update () {
-        super();
+        super.update();
     }
 }
 
@@ -184,7 +184,7 @@ class Abilities extends Container {
         this.objects[id] = ability;
     }
 
-    //returns bool on whether or not a player has an ability active currently
+    //returns string of active ability, null otherwise
     checkActiveAbility (player) {
 
         //loop through abilities
@@ -193,12 +193,12 @@ class Abilities extends Container {
 
             //check if this ability belongs to the player
             if (ability.player.id === player.id) {
-                return true;
+                return gameSettings.playerTypes[player.type].ability.type;
             }
         }
 
         //if none found
-        return false;
+        return null;
     }
 }
 

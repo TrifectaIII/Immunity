@@ -271,9 +271,8 @@ class Players extends Container {
             player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
 
                 //ensure player is not protected by a shield
-                if (gameSettings.playerTypes[player.type].ability.type === 'shield' &&
-                    this.room.abilities.checkActiveAbility(player)) {
-                        return;
+                if (this.room.abilities.checkActiveAbility(player) === 'shield') {
+                    return;
                 }
                 
                 // take health away

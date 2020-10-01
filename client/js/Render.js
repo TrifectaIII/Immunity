@@ -224,7 +224,7 @@ var Render = {
 
                     else if (pickup.type == 'life') {
                         push();
-                        fill(progColor);
+                        fill(Animation.getColor());
                         strokeWeight(4);
                         stroke(gameSettings.colors.black);
                         textAlign(CENTER, CENTER);
