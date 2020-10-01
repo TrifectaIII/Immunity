@@ -415,10 +415,14 @@ class Players extends Container {
         player.socket.on('ability', function () {
             //check to make sure progress is full
             if (player.abilityProgress === gameSettings.abilityCap) {
+
                 //drain progress
                 player.abilityProgress = 0;
+
+                //create ability
+                this.room.abilities.spawnAbility(player);
             }
-        });
+        }.bind(this)); //bind to scope
 
         //restart game if client requests
         player.socket.on('restart_game', function () {
