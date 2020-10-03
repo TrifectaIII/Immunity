@@ -152,8 +152,35 @@ class Abilities extends Container {
         for (let id in this.objects) {
             let ability = this.objects[id];
 
+            switch (ability.constructor) {
+                
+                case Turret:
+                    ability_info[id] = {
 
+                    };
+                    break;
+                
+                case Freeze:
+                    ability_info[id] = {
+
+                    };
+                    break;
+
+                case FullAuto:
+                    ability_info[id] = {
+
+                    };
+                    break;
+
+                case Shield:
+                    ability_info[id] = {
+
+                    };
+                    break;
+            }
         }
+
+        return ability_info;
     }
 
     //spawns an ability for the player
