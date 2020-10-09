@@ -321,7 +321,13 @@ class Players extends Container {
             player.socket.emit('shoot_request');
 
             //start cooldown
-            player.cooldown = player.getShotInfo().cooldown;
+            if (this.room.abilities.checkActiveAbility(player) !== 'fullauto') {
+                player.cooldown = player.getShotInfo().cooldown;
+            }
+            //if full auto is active, cooldown reduced to 10% of normal
+            else {
+                player.cooldown = player.getShotInfo().cooldown/10;
+            }
         }
     }
 

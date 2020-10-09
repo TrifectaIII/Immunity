@@ -1,8 +1,6 @@
 //Global Server Settings from gameSettings.js
 ///////////////////////////////////////////////////////////////////////////
 
-const { tickRate } = require("../gameSettings");
-
 const gameSettings = require(__dirname + '/../gameSettings.js');
 
 
