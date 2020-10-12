@@ -1,4 +1,4 @@
-# Multiplayer-Game
+# Immunity
 
 Play an early version at [immunity.ml](https://www.immunity.ml/)
 
