@@ -3,7 +3,7 @@ const gameSettings = {
     // GENERAL 
     /////////////////////////////////////////////////
 
-    //title of game (WIP)
+    //title of game
     title: "Immunity",
 
     //maximum length of player names
