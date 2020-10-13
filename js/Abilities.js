@@ -48,11 +48,9 @@ class Turret extends Ability {
 
         //time to shoot
         this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
-
-
     }
 
-    update () {
+    update (enemies) {
         super.update();
 
         //decrease cooldown
@@ -63,7 +61,20 @@ class Turret extends Ability {
             //reset cd
             this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
 
-            //SHOOT HERE
+            let closestDistance = Infinity;
+            let closestEnemy = null;
+
+            //loop through enemies to find closest
+            for (let eid in enemies) {
+                let enemy = enemies[eid];
+
+                let dist = Physics.distance(this, enemy);
+
+                if (dist < closestDistance) {
+                    closestDistance = dist;
+                    closestEnemy = enemy;
+                }
+            }
         }
     }
 }
@@ -138,7 +149,7 @@ class Abilities extends Container {
             }
 
             //update the ability
-            ability.update();
+            ability.update(this.room.enemies.objects);
         }
     }
 
