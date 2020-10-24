@@ -1,4 +1,4 @@
-// NODE SETUP
+//SETUP
 ///////////////////////////////////////////////////
 
 // load express package
@@ -18,6 +18,15 @@ const serv = require('http').Server(app);
 
 // connect socket.io to server
 const io = require('socket.io')(serv);
+
+
+
+// ACCESS SQLITE DATABASE
+///////////////////////////////////////////////////
+
+const sqlite3 = require('sqlite3').verbose();
+
+let db = new sqlite3.Database('stored.db');
 
 
 
