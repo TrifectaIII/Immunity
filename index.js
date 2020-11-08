@@ -21,20 +21,6 @@ const io = require('socket.io')(serv);
 
 
 
-// ACCESS SQLITE DATABASE
-///////////////////////////////////////////////////
-
-const sqlite3 = require('sqlite3').verbose();
-
-let db = new sqlite3.Database('highscore.db');
-
-db.run(`CREATE TABLE highscores(
-    name text,
-    score int
-)`);
-
-db.close();
-
 // HTTP SERVER
 ///////////////////////////////////////////////////
 

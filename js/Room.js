@@ -23,6 +23,15 @@ const Bosses = require(__dirname + '/Bosses.js');
 const Abilities = require(__dirname + '/Abilities.js');
 
 
+//Database Library for high scores
+///////////////////////////////////////////////////////////////////////////
+
+const Database = require(__dirname + '/Database.js');
+
+//tests
+// Database.addScore("Dakota", 45);
+// Database.getScores();
+
 //Performance.js for benchmarking 
 ///////////////////////////////////////////////////////////////////////////
 const { PerformanceObserver, performance } = require('perf_hooks');
