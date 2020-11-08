@@ -29,8 +29,8 @@ const Abilities = require(__dirname + '/Abilities.js');
 const Database = require(__dirname + '/Database.js');
 
 //tests
-// Database.addScore("Dakota", 45);
-// Database.getScores();
+// Database.addScore("Dakota", 90);
+// Database.getScores((rows) =>{console.log(rows)});
 
 //Performance.js for benchmarking 
 ///////////////////////////////////////////////////////////////////////////

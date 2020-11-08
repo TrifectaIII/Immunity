@@ -16,7 +16,7 @@ const gameSettings = {
     roomCap: 6,
 
     //space between server updates in MS
-    tickRate: 20,
+    tickRate: 14,
 
     //time between ping checks in MS
     pingRate: 1000,

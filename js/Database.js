@@ -1,13 +1,25 @@
 //get sqlite library
 const sqlite3 = require('sqlite3').verbose();
 
-//create table
-// db.run(`CREATE TABLE highscores(
-//     name text,
-//     score int
-// )`);
+//create initial DB
+function createDB () {
 
+    // open/create database
+    let db = new sqlite3.Database('../highscore.db');
+
+    //create table
+    db.run(`CREATE TABLE highscores(
+        name text,
+        score int
+    )`);
+
+    //close database
+    db.close();
+}
+
+//adds a new score to the table
 function addScore (name, score) {
+
     // open database
     let db = new sqlite3.Database('../highscore.db');
 
@@ -16,9 +28,8 @@ function addScore (name, score) {
         [name, score],
         function (err) {
             if (err) {
-                return console.log(err.message);
+                throw err;
             }
-            console.log(`A row has been inserted with rowid ${this.lastID}`);
         }
     )
 
@@ -26,18 +37,19 @@ function addScore (name, score) {
     db.close();
 }
 
-function getScores () {
+//returns array of objects representing each row in highscore table
+function getScores (callback) {
     // open database
     let db = new sqlite3.Database('../highscore.db');
 
     db.all(
-        'SELECT name, score FROM highscores',
+        'SELECT * FROM highscores',
         [],
         (err, rows) => {
             if (err) {
-                return console.log(err.message);
+                throw err;
             }
-            console.log(rows);
+            callback(rows);
         }
     )
 
@@ -46,6 +58,7 @@ function getScores () {
 }
 
 module.exports = {
+    createDB,
     addScore,
     getScores,
 }   
