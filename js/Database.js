@@ -11,7 +11,10 @@ function createDB () {
     db.run(`CREATE TABLE highscores(
         name text,
         score int
-    )`);
+    )`,
+    (err) => {
+        console.log('Failed to Create DB: Already Exists');
+    });
 
     //close database
     db.close();
