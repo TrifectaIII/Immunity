@@ -32,8 +32,8 @@ const Database = require(__dirname + '/Database.js');
 Database.createDB();
 
 //tests
-Database.addScore("Dakota", 90);
-Database.getScores((rows) =>{console.log(rows)});
+// Database.addScore("Dakota", 90);
+// Database.getScores((rows) =>{console.log(rows)});
 
 //Performance.js for benchmarking 
 ///////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,16 @@ class Room {
         this.players.update();
 
         //if no lives and all players dead, game is over
+        const savedGO = this.gameOver;
         this.gameOver = this.players.allDead() && this.livesCount <= 0;
+
+        //send score to db if game just ended
+        if (!savedGO && this.gameOver) {
+            const nameString = this.players.collectNames().join(', ');
+            Database.addScore(nameString, this.waveCount, () => {
+                Database.getScores((rows) =>{console.log(rows)});
+            });
+        }
 
         //collect return game info for emit to clients in room
         return {

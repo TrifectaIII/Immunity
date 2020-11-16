@@ -21,7 +21,7 @@ function createDB () {
 }
 
 //adds a new score to the table
-function addScore (name, score) {
+function addScore (name, score, callback) {
 
     // open database
     let db = new sqlite3.Database('../highscore.db');
@@ -32,6 +32,9 @@ function addScore (name, score) {
         function (err) {
             if (err) {
                 throw err;
+            }
+            if (callback) {
+                callback();
             }
         }
     )

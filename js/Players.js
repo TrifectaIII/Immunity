@@ -263,6 +263,13 @@ class Players extends Container {
         };
     }
 
+    //gets list of player names, sorted
+    collectNames () {
+        return Object.keys(this.objects).map((id) => {
+            return this.objects[id].name;
+        });
+    }
+
     //deal damage to a player
     damagePlayer(player, amount) {
 
