@@ -43,12 +43,29 @@ function addScore (name, score, callback) {
 }
 
 //returns array of objects representing each row in highscore table
-function getScores (callback) {
+function getAllScores (callback) {
     // open database
     let db = new sqlite3.Database('../highscore.db');
 
     db.all(
-        'SELECT * FROM highscores',
+        'SELECT * FROM highscores ORDER BY score',
+        [],
+        (err, rows) => {
+            if (err) throw err;
+            if (callback) callback(rows);
+        }
+    );
+
+    //close database
+    db.close();
+}
+
+function getTop10Scores (callback) {
+    // open database
+    let db = new sqlite3.Database('../highscore.db');
+
+    db.all(
+        'SELECT * FROM highscores ORDER BY score',
         [],
         (err, rows) => {
             if (err) throw err;
@@ -79,6 +96,6 @@ function clearScores (callback) {
 module.exports = {
     createDB,
     addScore,
-    getScores,
+    getAllScores,
     clearScores,
 }
