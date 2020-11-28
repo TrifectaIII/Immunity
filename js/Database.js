@@ -60,7 +60,7 @@ function getAllScores (callback) {
     db.close();
 }
 
-function getTop10Scores (callback) {
+function getTopScores (amount, callback) {
     // open database
     let db = new sqlite3.Database('../highscore.db');
 
@@ -69,7 +69,8 @@ function getTop10Scores (callback) {
         [],
         (err, rows) => {
             if (err) throw err;
-            if (callback) callback(rows);
+            const topRows = rows.reverse().slice(0,amount);
+            if (callback) callback(topRows);
         }
     );
 
@@ -97,5 +98,6 @@ module.exports = {
     createDB,
     addScore,
     getAllScores,
+    getTopScores,
     clearScores,
 }

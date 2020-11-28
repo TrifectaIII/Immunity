@@ -28,8 +28,6 @@ const Abilities = require(__dirname + '/Abilities.js');
 
 const Database = require(__dirname + '/Database.js');
 
-//create if it doesn't exist already
-Database.createDB();
 
 //Performance.js for benchmarking 
 ///////////////////////////////////////////////////////////////////////////
@@ -124,7 +122,7 @@ class Room {
         if (!savedGO && this.gameOver) {
             const nameString = this.players.collectNames().join(', ');
             Database.addScore(nameString, this.waveCount, () => {
-                Database.getAllScores((rows) =>{console.log(rows)});
+                Database.getTopScores(10,(rows) =>{console.log(rows)});
             });
         }
 

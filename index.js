@@ -19,6 +19,12 @@ const serv = require('http').Server(app);
 // connect socket.io to server
 const io = require('socket.io')(serv);
 
+//Database Library for high scores
+const Database = require(__dirname + '/js/Database.js');
+
+//create db if it doesn't exist already
+Database.createDB();
+
 
 
 // HTTP SERVER
@@ -28,7 +34,7 @@ const io = require('socket.io')(serv);
 serv.listen(process.env.PORT || 8000); // specified port or 8k as backup
 
 //route main page to index.html
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
 });
 
@@ -36,8 +42,15 @@ app.get('/', function(req, res) {
 app.use('/client',express.static(__dirname + '/client'));
 
 //Serve gameSettings.js file
-app.get('/gameSettings.js', function (req, res) {
+app.get('/gameSettings.js', (req, res) => {
     res.sendFile(__dirname + '/gameSettings.js');
+});
+
+//send list of high scores
+app.get('/highscores', (req, res) => {
+    Database.getTopScores(5, (scores) => {
+        res.send(scores);
+    });
 });
 
 console.log("SERVER BOOTED SUCCESSFULLY");
