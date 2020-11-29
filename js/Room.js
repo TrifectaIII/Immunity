@@ -121,9 +121,7 @@ class Room {
         //send score to db if game just ended
         if (!savedGO && this.gameOver) {
             const nameString = this.players.collectNames().join(', ');
-            Database.addScore(nameString, this.waveCount, () => {
-                Database.getTopScores(10,(rows) =>{console.log(rows)});
-            });
+            Database.addScore(nameString, this.waveCount);
         }
 
         //collect return game info for emit to clients in room
