@@ -31,6 +31,12 @@ const gameSettings = {
     //time before next wave after current is complete
     waveTime: 5000,
 
+    //Number of high scores to track
+    highScoreCount: 5,
+
+    //delay between high score updates on client side in MS
+    highScoreDelay: 10000,
+
     // PLAYERS
     /////////////////////////////////////////////////
 

@@ -1,3 +1,6 @@
+//include gameSettings.js
+const gameSettings = require(__dirname + '/gameSettings.js');
+
 //SETUP
 ///////////////////////////////////////////////////
 
@@ -48,7 +51,7 @@ app.get('/gameSettings.js', (req, res) => {
 
 //send list of high scores
 app.get('/highscores', (req, res) => {
-    Database.getTopScores(5, (scores) => {
+    Database.getTopScores(gameSettings.highScoreCount, (scores) => {
         res.send(scores);
     });
 });
@@ -59,9 +62,6 @@ console.log("SERVER BOOTED SUCCESSFULLY");
 
 // GAME ROOMS
 ///////////////////////////////////////////////////
-
-//include gameSettings.js
-const gameSettings = require(__dirname + '/gameSettings.js');
 
 //include Room constructor from Room.js
 const Room = require(__dirname + '/js/Room.js');

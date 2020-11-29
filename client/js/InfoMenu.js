@@ -1,14 +1,21 @@
 //info panel
-
 var InfoMenu = {
     
-    //get div element
+    //get div elements
     div: document.querySelector('.InfoMenu'),
+    scoresDiv: document.querySelector('.InfoMenu-scores'),
 
     //function to toggle display of settings
-    toggle: function () {
-        this.div.classList.toggle('hidden');
+    toggle: () => {
+        InfoMenu.div.classList.toggle('hidden');
     },
+
+    updateScores: () => {
+        InfoMenu.scoresDiv.innerHTML = '';
+        Highscores.scores.forEach((scoreobj)=>{
+            InfoMenu.scoresDiv.innerHTML+=`<p><b>${scoreobj.name}</b> - ${scoreobj.score} Waves</p>`
+        });
+    }
 }
 
 //toggle display of InfoMenu when button pressed
@@ -25,14 +32,20 @@ window.addEventListener('keypress', function (event) {
 //event listener for close button
 InfoMenu.div.querySelector('.InfoMenu-close').addEventListener(
     'click', 
-    InfoMenu.toggle.bind(InfoMenu),
+    InfoMenu.toggle,
 );
 
 //event listener for exit game button
 InfoMenu.div.querySelector('.InfoMenu-exit').addEventListener(
     'click', 
     function () {
-        Error.displayError('Left Game', 5000);
-        endGame();
+        if (state === States.GAME || state === States.LOAD) {
+            Error.displayError('Left Game', 5000);
+            endGame();
+        }
     },
 );
+
+//update scores
+InfoMenu.updateScores();
+setInterval(InfoMenu.updateScores, gameSettings.highScoreDelay/10);
