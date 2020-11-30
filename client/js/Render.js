@@ -48,8 +48,11 @@ var Render = {
             //draw living players
             this.drawLiving(gameState);
 
-            // then draw client player on top if living
+            // then draw client player on top of living
             this.drawPlayer(player);
+
+            //draw abilities after players
+            this.drawAbilities(gameState);
         }
 
         //draw game if player not in game
@@ -84,6 +87,9 @@ var Render = {
 
             //draw living players
             this.drawLiving(gameState);
+
+            //draw abilities after players
+            this.drawAbilities(gameState);
         }
 
         pop();
@@ -629,5 +635,51 @@ var Render = {
                 gameSettings.playerTypes[player.type].radius*2 - 1, 
             );
         }
+    },
+
+    drawAbilities: function (gameState) {
+        push();
+
+        //loop through abilities
+        for (let id in gameState.abilities) {
+            let ability = gameState.abilities[id];
+
+            //switch on ability type
+            switch (ability.type) {
+
+                case "turret":
+                    break;
+                
+                case "freeze":
+                    break;
+
+                case "fullauto":
+                    //find ability user
+                    if (ability.playerId in gameState.players.playing) {
+                        let player = gameState.players.playing[ability.playerId];
+                    }
+                    break;
+
+                case "shield":
+                    //find ability user
+                    if (ability.playerId in gameState.players.playing) {
+                        let player = gameState.players.playing[ability.playerId];
+
+                        //draw shield around that player
+                        stroke('green');
+                        let fillcolor = color('black');
+                        fillcolor.setAlpha(0);
+                        strokeWeight(4);
+                        circle(
+                            player.x-this.screenOffset.x, 
+                            player.y-this.screenOffset.y, 
+                            gameSettings.playerTypes[player.type].radius*2.5 - 1, 
+                        );
+                    }
+                    break;
+            }
+        }
+
+        pop();
     }
 }

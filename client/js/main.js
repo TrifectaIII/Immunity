@@ -27,6 +27,7 @@ var gameState = {
     },
     zones:{},
     pickups:{},
+    abilities:{},
 };
 
 // current roomId

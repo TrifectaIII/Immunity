@@ -165,25 +165,31 @@ class Abilities extends Container {
                 
                 case Turret:
                     ability_info[id] = {
-
+                        type: "turret",
+                        x: ability.x,
+                        y: ability.y,
                     };
                     break;
                 
                 case Freeze:
                     ability_info[id] = {
-
+                        type: "freeze",
+                        x: ability.x,
+                        y: ability.y,
                     };
                     break;
 
                 case FullAuto:
                     ability_info[id] = {
-
+                        type: "fullauto",
+                        playerId: ability.player.id,
                     };
                     break;
 
                 case Shield:
                     ability_info[id] = {
-
+                        type: "shield",
+                        playerId: ability.player.id,
                     };
                     break;
             }
