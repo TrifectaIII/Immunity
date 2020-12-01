@@ -666,9 +666,10 @@ var Render = {
                         let player = gameState.players.playing[ability.playerId];
 
                         //draw shield around that player
-                        stroke('green');
                         let fillcolor = color('black');
                         fillcolor.setAlpha(0);
+                        fill(fillcolor);
+                        stroke(gameSettings.colors.green);
                         strokeWeight(4);
                         circle(
                             player.x-this.screenOffset.x, 

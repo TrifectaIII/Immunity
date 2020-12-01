@@ -145,7 +145,12 @@ class Players extends Container {
                 let player = this.playing[id];
 
                 //reduce shot cooldown
-                player.cooldown -= gameSettings.tickRate;
+                if (this.room.abilities.checkActiveAbility(player) === 'fullauto') {
+                    player.cooldown -= gameSettings.tickRate * 10;
+                }
+                else {
+                    player.cooldown -= gameSettings.tickRate;
+                }
 
                 //shoot for player
                 this.shootRequest(player);
