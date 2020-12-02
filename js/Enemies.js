@@ -80,12 +80,29 @@ class Enemies extends Container {
     //updates all enemies
     update() {
 
-        //get player objects from room
+
+        //get player and ability objects from room
         let players = this.room.players.playing;
+        let abilities = this.room.abilities.objects;
 
         //loop through all enemies
         for (let id in this.objects) {
             let enemy = this.objects[id];
+
+
+            //dont update if inside a freeze ability
+            let frozen = false;
+            for (let aid in abilities) {
+                let ability = abilities[aid];
+                if (
+                    ability.constructor.name === 'Freeze' && 
+                    Physics.distance(ability, enemy) <= gameSettings.abilityTypes.freeze.radius
+                ){
+                        frozen=true;
+                        break;
+                } 
+            }
+            if (frozen) continue;
 
             //find closest player
             let closestDistance = Infinity;

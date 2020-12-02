@@ -1,4 +1,4 @@
-//SOCKET.IO
+//Main JS File
 /////////////////////////////
 
 //enum for game states

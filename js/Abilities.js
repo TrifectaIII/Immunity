@@ -26,7 +26,7 @@ class Ability {
         this.player = player;
 
         //ability duration set by player type
-        this.timer = gameSettings.playerTypes[this.player.type].ability.duration;
+        this.timer = gameSettings.abilityTypes[gameSettings.playerTypes[this.player.type].ability].duration;
     }
 
     update () {
@@ -47,7 +47,7 @@ class Turret extends Ability {
         this.y = this.player.y;
 
         //time to shoot
-        this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
+        this.cooldown = gameSettings.abilityTypes['turret'].attackCooldown;
     }
 
     update (enemies) {
@@ -59,7 +59,7 @@ class Turret extends Ability {
         //shoot if over
         if (this.cooldown <= 0) {
             //reset cd
-            this.cooldown = gameSettings.playerTypes[this.player.type].ability.attackCooldown;
+            this.cooldown = gameSettings.abilityTypes['turret'].attackCooldown;
 
             let closestDistance = Infinity;
             let closestEnemy = null;
@@ -207,7 +207,7 @@ class Abilities extends Container {
         let id = 'ability' + (this.idCounter++).toString();
 
         //spawn ability based on player class
-        switch (gameSettings.playerTypes[player.type].ability.type) {
+        switch (gameSettings.playerTypes[player.type].ability) {
             case "shield":
                 ability = new Shield(id, player);
                 break;
@@ -235,7 +235,7 @@ class Abilities extends Container {
 
             //check if this ability belongs to the player
             if (ability.player.id === player.id) {
-                return gameSettings.playerTypes[player.type].ability.type;
+                return gameSettings.playerTypes[player.type].ability;
             }
         }
 

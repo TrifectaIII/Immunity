@@ -651,12 +651,34 @@ var Render = {
                     break;
                 
                 case "freeze":
+                    let fillcolor = color(gameSettings.colors.blue);
+                    fillcolor.setAlpha(100);
+                    fill(fillcolor);
+                    stroke(Animation.getColor());
+                    strokeWeight(4);
+
+                    circle(
+                        ability.x - this.screenOffset.x,
+                        ability.y - this.screenOffset.y,
+                        gameSettings.abilityTypes[ability.type].radius*2 - 1,
+                    );
+
                     break;
 
                 case "fullauto":
                     //find ability user
                     if (ability.playerId in gameState.players.playing) {
                         let player = gameState.players.playing[ability.playerId];
+
+                        //draw circle around that player
+                        fill(0,0);
+                        stroke(Animation.getColor());
+                        strokeWeight(4);
+                        circle(
+                            player.x-this.screenOffset.x, 
+                            player.y-this.screenOffset.y, 
+                            gameSettings.playerTypes[player.type].radius*2.5 - 1, 
+                        );
                     }
                     break;
 
@@ -665,11 +687,9 @@ var Render = {
                     if (ability.playerId in gameState.players.playing) {
                         let player = gameState.players.playing[ability.playerId];
 
-                        //draw shield around that player
-                        let fillcolor = color('black');
-                        fillcolor.setAlpha(0);
-                        fill(fillcolor);
-                        stroke(gameSettings.colors.green);
+                        //draw circle around that player
+                        fill(0,0);
+                        stroke(Animation.getColor());
                         strokeWeight(4);
                         circle(
                             player.x-this.screenOffset.x, 

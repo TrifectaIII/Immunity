@@ -72,10 +72,7 @@ const gameSettings = {
                 mass: 1,
             },
 
-            ability: {
-                type: "shield",
-                duration: 10000,
-            }
+            ability: "freeze",
         },
 
         engineer: {
@@ -101,11 +98,7 @@ const gameSettings = {
                 mass: 1,
             },
 
-            ability: {
-                type: "turret",
-                duration: 10000,
-                attackCooldown: 200,
-            }
+            ability: "turret",
         },
 
         sniper: {
@@ -131,10 +124,7 @@ const gameSettings = {
                 mass: 20,
             },
 
-            ability: {
-                type: "fullauto",
-                duration: 10000,
-            }
+            ability: "fullauto",
         },
 
         heavy: {
@@ -160,10 +150,7 @@ const gameSettings = {
                 mass: 5,
             },
 
-            ability: {
-                type: "freeze",
-                duration: 10000,
-            }
+            ability: "shield",
         },
     },
 
@@ -377,6 +364,31 @@ const gameSettings = {
 
     //cooldown on zones spawning enemies (ms)
     zoneCooldown: 2500,
+
+    // ABILITIES
+    /////////////////////////////////////////////////
+
+    abilityTypes: {
+
+        freeze: {
+            duration: 10000,
+            radius: 300,
+        },
+
+        fullauto: {
+            duration: 10000,
+        },
+
+        shield: {
+            duration: 10000,
+        },
+
+        turret: {
+            duration: 10000,
+            attackCooldown: 200,
+        },
+
+    },
 
     // OTHER
     /////////////////////////////////////////////////
