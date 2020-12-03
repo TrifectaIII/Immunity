@@ -377,6 +377,7 @@ const gameSettings = {
 
         fullauto: {
             duration: 10000,
+            multiplier: 3,
         },
 
         shield: {

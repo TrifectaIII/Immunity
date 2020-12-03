@@ -53,6 +53,9 @@ var Render = {
 
             //draw abilities after players
             this.drawAbilities(gameState);
+
+            //draw player names
+            this.drawNames(gameState);
         }
 
         //draw game if player not in game
@@ -90,6 +93,9 @@ var Render = {
 
             //draw abilities after players
             this.drawAbilities(gameState);
+
+            //draw player names
+            this.drawNames(gameState);
         }
 
         pop();
@@ -460,39 +466,6 @@ var Render = {
         pop();
     },
 
-    // //draw dead players
-    // drawDead: function () {
-
-    //     push();
-
-    //     for (let id in gameState.players.playing) {
-    //         if (id != socket.id) {
-    //             let player = gameState.players.playing[id];
-    //             if (player.health <= 0 &&
-    //                 player.x-this.screenOffset.x > -50 &&
-    //                 player.x-this.screenOffset.x < width + 50 &&
-    //                 player.y-this.screenOffset.y > -50 &&
-    //                 player.y-this.screenOffset.y < height + 50) {
-    //                     //draw player as transparent
-    //                     let fillcolor = color(gameSettings.playerTypes[player.type].colors.light);
-    //                     fillcolor.setAlpha(100);
-    //                     let strokecolor = color(gameSettings.playerTypes[player.type].colors.dark);
-    //                     strokecolor.setAlpha(100)
-    //                     fill(fillcolor);
-    //                     stroke(strokecolor);
-    //                     strokeWeight(4);
-    //                     circle(
-    //                         player.x-this.screenOffset.x, 
-    //                         player.y-this.screenOffset.y, 
-    //                         gameSettings.playerTypes[player.type].radius*2 - 1, 
-    //                     );
-    //             }
-    //         }
-    //     }
-
-    //     pop();
-    // },
-
     //draw living players
     drawLiving: function (gameState) {
 
@@ -556,34 +529,6 @@ var Render = {
             }
         }
 
-        //draw names
-        strokeWeight(4);
-        textAlign(CENTER, BOTTOM);
-        textSize(22);
-        for (let id in gameState.players.playing) {
-            if (id != socket.id) {
-                let player = gameState.players.playing[id];
-                if (player.health > 0 &&
-                    player.x-this.screenOffset.x > -50 &&
-                    player.x-this.screenOffset.x < width + 50 &&
-                    player.y-this.screenOffset.y > -50 &&
-                    player.y-this.screenOffset.y < height + 50) {
-
-                        let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
-                        let y_offset = -y_offset_abs;
-                        
-                        fill(gameSettings.playerTypes[player.type].colors.light);
-                        stroke(gameSettings.playerTypes[player.type].colors.dark);
-
-                        text(
-                            player.name, 
-                            player.x-this.screenOffset.x,
-                            player.y-this.screenOffset.y+y_offset,
-                        )
-                }
-            }
-        }
-
         pop();
     },
 
@@ -601,23 +546,6 @@ var Render = {
                 player.y-this.screenOffset.y, 
                 gameSettings.playerTypes[player.type].radius*2 - 1, 
             );
-
-            //draw name
-            strokeWeight(4);
-            textAlign(CENTER, BOTTOM);
-            textSize(22);
-            
-            let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
-            let y_offset = -y_offset_abs;
-            
-            fill(gameSettings.playerTypes[player.type].colors.light);
-            stroke(gameSettings.playerTypes[player.type].colors.dark);
-
-            text(
-                player.name, 
-                player.x-this.screenOffset.x,
-                player.y-this.screenOffset.y+y_offset,
-            )
         }
         
         //draw player as transparent if dead
@@ -635,6 +563,8 @@ var Render = {
                 gameSettings.playerTypes[player.type].radius*2 - 1, 
             );
         }
+
+        pop();
     },
 
     drawAbilities: function (gameState) {
@@ -670,7 +600,7 @@ var Render = {
                     if (ability.playerId in gameState.players.playing) {
                         let player = gameState.players.playing[ability.playerId];
 
-                        //draw circle around that player
+                        //draw crosshair around that player
                         fill(0,0);
                         stroke(Animation.getColor());
                         strokeWeight(4);
@@ -679,6 +609,20 @@ var Render = {
                             player.y-this.screenOffset.y, 
                             gameSettings.playerTypes[player.type].radius*2.5 - 1, 
                         );
+                        //horizontal line
+                        line(
+                            player.x-this.screenOffset.x + gameSettings.playerTypes[player.type].radius,
+                            player.y-this.screenOffset.y,
+                            player.x-this.screenOffset.x - gameSettings.playerTypes[player.type].radius,
+                            player.y-this.screenOffset.y,
+                        )
+                        //vertical line
+                        line(
+                            player.x-this.screenOffset.x,
+                            player.y-this.screenOffset.y + gameSettings.playerTypes[player.type].radius,
+                            player.x-this.screenOffset.x,
+                            player.y-this.screenOffset.y - gameSettings.playerTypes[player.type].radius,
+                        )
                     }
                     break;
 
@@ -687,7 +631,7 @@ var Render = {
                     if (ability.playerId in gameState.players.playing) {
                         let player = gameState.players.playing[ability.playerId];
 
-                        //draw circle around that player
+                        //draw double circle around that player to indicate shield
                         fill(0,0);
                         stroke(Animation.getColor());
                         strokeWeight(4);
@@ -696,8 +640,46 @@ var Render = {
                             player.y-this.screenOffset.y, 
                             gameSettings.playerTypes[player.type].radius*2.5 - 1, 
                         );
+
+                        circle(
+                            player.x-this.screenOffset.x, 
+                            player.y-this.screenOffset.y, 
+                            gameSettings.playerTypes[player.type].radius*3 - 1, 
+                        );
                     }
                     break;
+            }
+        }
+
+        pop();
+    },
+
+    drawNames: function (gameState) {
+        push();
+
+        //draw names
+        strokeWeight(4);
+        textAlign(CENTER, BOTTOM);
+        textSize(22);
+        for (let id in gameState.players.playing) {
+            let player = gameState.players.playing[id];
+            if (player.health > 0 &&
+                player.x-this.screenOffset.x > -50 &&
+                player.x-this.screenOffset.x < width + 50 &&
+                player.y-this.screenOffset.y > -50 &&
+                player.y-this.screenOffset.y < height + 50) {
+
+                    let y_offset_abs = gameSettings.playerTypes[player.type].radius + 10;
+                    let y_offset = -y_offset_abs;
+                    
+                    fill(gameSettings.playerTypes[player.type].colors.light);
+                    stroke(gameSettings.playerTypes[player.type].colors.dark);
+
+                    text(
+                        player.name, 
+                        player.x-this.screenOffset.x,
+                        player.y-this.screenOffset.y+y_offset,
+                    )
             }
         }
 

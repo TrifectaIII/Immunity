@@ -47,7 +47,7 @@ class Turret extends Ability {
         this.y = this.player.y;
 
         //time to shoot
-        this.cooldown = gameSettings.abilityTypes['turret'].attackCooldown;
+        this.cooldown = gameSettings.abilityTypes.turret.attackCooldown;
     }
 
     update (enemies) {
@@ -59,7 +59,7 @@ class Turret extends Ability {
         //shoot if over
         if (this.cooldown <= 0) {
             //reset cd
-            this.cooldown = gameSettings.abilityTypes['turret'].attackCooldown;
+            this.cooldown = gameSettings.abilityTypes.turret.attackCooldown;
 
             let closestDistance = Infinity;
             let closestEnemy = null;

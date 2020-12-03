@@ -101,6 +101,11 @@ class Player {
     getShotInfo () {
         return gameSettings.playerTypes[this.type].shots;
     }
+
+    //returns bool of current testing state
+    isTesting () {
+        return this.name.toUpperCase() === gameSettings.testName.toUpperCase();
+    }
 }
 
 
@@ -145,12 +150,7 @@ class Players extends Container {
                 let player = this.playing[id];
 
                 //reduce shot cooldown
-                if (this.room.abilities.checkActiveAbility(player) === 'fullauto') {
-                    player.cooldown -= gameSettings.tickRate * 10;
-                }
-                else {
-                    player.cooldown -= gameSettings.tickRate;
-                }
+                player.cooldown -= gameSettings.tickRate;
 
                 //shoot for player
                 this.shootRequest(player);
@@ -278,9 +278,9 @@ class Players extends Container {
     //deal damage to a player
     damagePlayer(player, amount) {
 
-        //make sure player is alive, and is not in cheat mode
+        //make sure player is alive, and is not in test mode
         if (player.id in this.playing &&
-            player.name.toUpperCase() != gameSettings.testName.toUpperCase()) {
+            !player.isTesting()) {
 
                 //ensure player is not protected by a shield
                 if (this.room.abilities.checkActiveAbility(player) === 'shield') {
@@ -334,11 +334,11 @@ class Players extends Container {
 
             //start cooldown
             if (this.room.abilities.checkActiveAbility(player) !== 'fullauto') {
-                player.cooldown = player.getShotInfo().cooldown;
+                player.cooldown = player.getShotInfo().cooldown; 
             }
-            //if full auto is active, cooldown reduced to 10% of normal
+            //if full auto is active, cooldown reduced based on settings
             else {
-                player.cooldown = player.getShotInfo().cooldown/10;
+                player.cooldown = player.getShotInfo().cooldown/gameSettings.abilityTypes.fullauto.multiplier;
             }
         }
     }
@@ -431,14 +431,15 @@ class Players extends Container {
 
         //handle ability activation
         player.socket.on('ability', function () {
-            //check to make sure progress is full
-            if (player.abilityProgress === gameSettings.abilityCap) {
+            //check to make sure progress is full, or in testing mode
+            if (player.abilityProgress === gameSettings.abilityCap ||
+                player.isTesting()) {
 
-                //drain progress
-                player.abilityProgress = 0;
+                    //drain progress
+                    player.abilityProgress = 0;
 
-                //create ability
-                this.room.abilities.spawnAbility(player);
+                    //create ability
+                    this.room.abilities.spawnAbility(player);
             }
         }.bind(this)); //bind to scope
 
