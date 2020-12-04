@@ -378,7 +378,7 @@ const gameSettings = {
 
         fullauto: {
             duration: 10000,
-            multiplier: 3,
+            multiplier: 1.5,
         },
 
         shield: {
@@ -388,6 +388,7 @@ const gameSettings = {
         turret: {
             duration: 10000,
             attackCooldown: 200,
+            radius: 30, //purely for visuals
         },
 
     },

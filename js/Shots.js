@@ -20,11 +20,11 @@ const QT = require(__dirname +'/Qtree.js');
 //class for individual player shots
 class PlayerShot {
 
-    constructor(id, player, velocity) {
+    constructor(id, player, velocity, originX, originY) {
         this.id = id;
         this.type = player.type;
-        this.x = player.x;
-        this.y = player.y;
+        this.x = originX;
+        this.y = originY;
         this.playerId = player.id;
         this.velocity = velocity;
         this.range = gameSettings.playerTypes[player.type].shots.range;
@@ -310,17 +310,23 @@ class Shots extends Container {
     }
 
     //create a new shot
-    spawnPlayerShot(player, destX, destY) {
+    spawnPlayerShot(player, destX, destY, originX, originY) {
 
         //each player has different settings
         let classShots = player.getShotInfo();
+
+        //if origin not defined, set to players x and y
+        if (typeof originX !== 'number' || typeof originY !== 'number') {
+            originX = player.x;
+            originY = player.y;
+        }
 
         //single-shot classes
         if (classShots.count <= 1) {
 
             //calculate velocity based on shot velocity and where the player clicked
             let velocity = Physics.componentVector(
-                Physics.angleBetween(player.x, player.y, destX, destY),
+                Physics.angleBetween(originX, originY, destX, destY),
                 classShots.velocity
             );
 
@@ -328,7 +334,7 @@ class Shots extends Container {
             let id = 'playerShot' + (this.idCounter++).toString();
 
             //create new object
-            this.objects[id] = new PlayerShot(id, player, velocity);
+            this.objects[id] = new PlayerShot(id, player, velocity, originX, originY);
             this.playerShots[id] = this.objects[id];
         }
         //multi-shot (shotgun) classes
@@ -337,7 +343,7 @@ class Shots extends Container {
 
                 //calculate velocity based on shot velocity and where the player clicked and spread
                 let velocity = Physics.componentVector(
-                    Physics.angleBetween(player.x, player.y, destX, destY)
+                    Physics.angleBetween(originX, originY, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
                     classShots.velocity
@@ -347,7 +353,7 @@ class Shots extends Container {
                 let id = 'playerShot' + (this.idCounter++).toString();
 
                 //create new object
-                this.objects[id] = new PlayerShot(id, player, velocity);
+                this.objects[id] = new PlayerShot(id, player, velocity, originX, originY);
                 this.playerShots[id] = this.objects[id];
             }
         }

@@ -19,12 +19,15 @@ const Physics = require(__dirname + '/Physics.js');
 //class for other ability classes to inherit
 class Ability {
 
-    constructor (id, player) {
+    constructor (id, player, room) {
 
         this.id = id;
 
         this.player = player;
 
+        this.room = room;
+
+        //tie this ability object to the player object
         this.player.ability = this;
 
         //ability duration set by player type
@@ -35,14 +38,19 @@ class Ability {
         //count down timer based on tickrate
         this.timer -= gameSettings.tickRate;
     }
+
+    shutDown () {
+        //removes this ability object from player object
+        this.player.ability = null;
+    }
 }
 
 //turret ability
 class Turret extends Ability {
 
-    constructor (id, player) {
+    constructor (id, player, room) {
 
-        super(id, player);
+        super(id, player, room);
 
         //position is current position of the player
         this.x = this.player.x;
@@ -77,6 +85,13 @@ class Turret extends Ability {
                     closestEnemy = enemy;
                 }
             }
+
+            //make sure closest is in range
+            if (closestDistance <= this.player.getShotInfo().range) {
+
+                //shoot
+                this.room.shots.spawnPlayerShot(this.player, closestEnemy.x, closestEnemy.y, this.x, this.y);
+            }
         }
     }
 }
@@ -84,9 +99,9 @@ class Turret extends Ability {
 //freeze ability
 class Freeze extends Ability {
 
-    constructor (id, player) {
+    constructor (id, player, room) {
 
-        super(id, player);
+        super(id, player, room);
 
         //position is current position of the player
         this.x = this.player.x;
@@ -101,9 +116,9 @@ class Freeze extends Ability {
 //full-auto ability
 class FullAuto extends Ability {
 
-    constructor (id, player) {
+    constructor (id, player, room) {
 
-        super(id, player);
+        super(id, player, room);
     }
 
     update () {
@@ -114,9 +129,9 @@ class FullAuto extends Ability {
 //shield ability
 class Shield extends Ability {
 
-    constructor (id, player) {
+    constructor (id, player, room) {
 
-        super(id, player);
+        super(id, player, room);
     }
 
     update () {
@@ -147,8 +162,8 @@ class Abilities extends Container {
             if (ability.timer <= 0 ||
                 !(ability.player.id in this.room.players.playing)) {
 
-                    //remove from player object
-                    ability.player.ability = null;
+                    //shut down ability
+                    ability.shutDown();
 
                     //remove from abilities object
                     delete this.objects[id];
@@ -211,6 +226,8 @@ class Abilities extends Container {
     //spawns an ability for the player
     spawnAbility (player) {
 
+        let room = this.room;
+
         let ability;
 
         //generate id
@@ -219,16 +236,16 @@ class Abilities extends Container {
         //spawn ability based on player class
         switch (gameSettings.playerTypes[player.type].ability) {
             case "shield":
-                ability = new Shield(id, player);
+                ability = new Shield(id, player, room);
                 break;
             case "turret":
-                ability = new Turret(id, player);
+                ability = new Turret(id, player, room);
                 break;
             case "fullauto":
-                ability = new FullAuto(id, player);
+                ability = new FullAuto(id, player, room);
                 break;
             case "freeze":
-                ability = new Freeze(id, player);
+                ability = new Freeze(id, player, room);
                 break;
         }
 

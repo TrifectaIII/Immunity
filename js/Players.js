@@ -438,6 +438,10 @@ class Players extends Container {
 
         //handle ability activation
         player.socket.on('ability', function () {
+
+            //stop if player already has an active ability
+            if (player.ability) return;
+
             //check to make sure progress is full, or in testing mode
             if (player.abilityProgress === gameSettings.abilityCap ||
                 player.isTesting()) {

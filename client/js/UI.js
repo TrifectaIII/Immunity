@@ -183,7 +183,7 @@ var UI = {
             h: 40,
             color: color,
             prog: player.abilityProgress/gameSettings.abilityCap,
-            leftText: 'AAbility: '+ gameSettings.playerTypes[player.type].ability.toUpperCase(),
+            leftText: 'Ability: '+ gameSettings.playerTypes[player.type].ability.toUpperCase(),
             rightText: 'Press E',
         });
     },
