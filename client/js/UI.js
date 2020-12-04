@@ -156,10 +156,26 @@ var UI = {
 
     //draw client player ability progress bar
     drawAbilityBar: function (player) {
-        let color = gameSettings.colors.red;
-        if (player.abilityProgress == gameSettings.abilityCap){
-            color = gameSettings.colors.mango;
+
+        //if no ability is active and bar not full
+        if (player.abilityProgress !== gameSettings.abilityCap) {
+            let color = gameSettings.colors.red;
+            this.drawBar({
+                x: width*5/8 + 10,
+                y: height - 40,
+                w: width/4,
+                h: 40,
+                color: color,
+                prog: player.abilityProgress/gameSettings.abilityCap,
+                leftText: 'Ability: '+ gameSettings.playerTypes[player.type].ability.toUpperCase(),
+                rightText: player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
+            });
+
+            return;
         }
+
+        //if ability ready
+        let color = Animation.getColor();
         this.drawBar({
             x: width*5/8 + 10,
             y: height - 40,
@@ -167,9 +183,9 @@ var UI = {
             h: 40,
             color: color,
             prog: player.abilityProgress/gameSettings.abilityCap,
-            leftText: 'Ability',
-            rightText: player.abilityProgress.toString()+' / '+ gameSettings.abilityCap.toString(),
-        })
+            leftText: 'AAbility: '+ gameSettings.playerTypes[player.type].ability.toUpperCase(),
+            rightText: 'Press E',
+        });
     },
 
     //draw boss's healthbar

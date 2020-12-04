@@ -611,17 +611,17 @@ var Render = {
                         );
                         //horizontal line
                         line(
-                            player.x-this.screenOffset.x + gameSettings.playerTypes[player.type].radius,
+                            player.x-this.screenOffset.x + gameSettings.playerTypes[player.type].radius + 1,
                             player.y-this.screenOffset.y,
-                            player.x-this.screenOffset.x - gameSettings.playerTypes[player.type].radius,
+                            player.x-this.screenOffset.x - gameSettings.playerTypes[player.type].radius - 1,
                             player.y-this.screenOffset.y,
                         )
                         //vertical line
                         line(
                             player.x-this.screenOffset.x,
-                            player.y-this.screenOffset.y + gameSettings.playerTypes[player.type].radius,
+                            player.y-this.screenOffset.y + gameSettings.playerTypes[player.type].radius + 1,
                             player.x-this.screenOffset.x,
-                            player.y-this.screenOffset.y - gameSettings.playerTypes[player.type].radius,
+                            player.y-this.screenOffset.y - gameSettings.playerTypes[player.type].radius - 1,
                         )
                     }
                     break;

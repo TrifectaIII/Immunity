@@ -25,6 +25,8 @@ class Ability {
 
         this.player = player;
 
+        this.player.ability = this;
+
         //ability duration set by player type
         this.timer = gameSettings.abilityTypes[gameSettings.playerTypes[this.player.type].ability].duration;
     }
@@ -144,7 +146,13 @@ class Abilities extends Container {
             //delete if out of time, or player not active anymore
             if (ability.timer <= 0 ||
                 !(ability.player.id in this.room.players.playing)) {
+
+                    //remove from player object
+                    ability.player.ability = null;
+
+                    //remove from abilities object
                     delete this.objects[id];
+
                     continue;
             }
 
@@ -168,6 +176,7 @@ class Abilities extends Container {
                         type: "turret",
                         x: ability.x,
                         y: ability.y,
+                        playerId: ability.player.id,
                     };
                     break;
                 
@@ -176,6 +185,7 @@ class Abilities extends Container {
                         type: "freeze",
                         x: ability.x,
                         y: ability.y,
+                        playerId: ability.player.id,
                     };
                     break;
 
@@ -224,23 +234,6 @@ class Abilities extends Container {
 
         //place into objects
         this.objects[id] = ability;
-    }
-
-    //returns string of active ability, null otherwise
-    checkActiveAbility (player) {
-
-        //loop through abilities
-        for (let id in this.objects) {
-            let ability = this.objects[id];
-
-            //check if this ability belongs to the player
-            if (ability.player.id === player.id) {
-                return gameSettings.playerTypes[player.type].ability;
-            }
-        }
-
-        //if none found
-        return null;
     }
 }
 

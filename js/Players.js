@@ -61,15 +61,9 @@ class Player {
 
         //start with no ready shots
         this.readyShots = 0;
-    }
 
-    //increase killstreak and ability prog when kill enemy
-    giveKillCredit() {
-        this.killStreak++;
-        this.abilityProgress = Math.min(
-            this.abilityProgress+1, 
-            gameSettings.abilityCap
-        );
+        //to hold ability object
+        this.ability = null;
     }
 
     //return player radius
@@ -282,8 +276,8 @@ class Players extends Container {
         if (player.id in this.playing &&
             !player.isTesting()) {
 
-                //ensure player is not protected by a shield
-                if (this.room.abilities.checkActiveAbility(player) === 'shield') {
+                //skip if player is protected by a shield
+                if (player.ability && player.ability.constructor.name === 'Shield') {
                     return;
                 }
                 
@@ -317,6 +311,19 @@ class Players extends Container {
         }
     }
 
+    //increase killstreak and ability prog when kill enemy
+    giveKillCredit(player) {
+        player.killStreak++;
+
+        //only give ability progress if no active ability
+        if (!player.ability) {
+            player.abilityProgress = Math.min(
+                player.abilityProgress+1, 
+                gameSettings.abilityCap
+            );
+        }
+    }
+
     //request shoot for player if appropriate
     shootRequest(player) {
 
@@ -333,7 +340,7 @@ class Players extends Container {
             player.socket.emit('shoot_request');
 
             //start cooldown
-            if (this.room.abilities.checkActiveAbility(player) !== 'fullauto') {
+            if (!player.ability || player.ability.constructor.name !== 'FullAuto') {
                 player.cooldown = player.getShotInfo().cooldown; 
             }
             //if full auto is active, cooldown reduced based on settings

@@ -287,7 +287,7 @@ class Enemies extends Container {
 
             //give player credit for the kill
             if (playerId in this.room.players.objects) {
-                this.room.players.objects[playerId].giveKillCredit();
+                this.room.players.giveKillCredit(this.room.players.objects[playerId]);
             }
 
             //drop pickup based on chance
