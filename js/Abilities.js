@@ -90,7 +90,7 @@ class Turret extends Ability {
             if (closestDistance <= this.player.getShotInfo().range) {
 
                 //shoot
-                this.room.shots.spawnPlayerShot(this.player, closestEnemy.x, closestEnemy.y, this.x, this.y);
+                this.room.shots.spawnTurretShot(this, closestEnemy.x, closestEnemy.y);
             }
         }
     }
