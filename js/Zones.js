@@ -54,7 +54,7 @@ class Zones extends Container {
             let zone = this.objects[id];
 
             //lower cooldown
-            zone.cooldown -= gameSettings.tickRate;
+            zone.cooldown -= (1000/gameSettings.tickRate);
 
             //spawn enemy if cooldown met
             if (zone.cooldown <= 0) {

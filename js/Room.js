@@ -84,14 +84,14 @@ class Room {
 
             //send game info to clients
             this.io.to(this.roomId).emit('game_update', serverData);
-            //tickrate from settings
-        }.bind(this), gameSettings.tickRate);
+            //tickDelay from settings
+        }.bind(this), (1000/gameSettings.tickRate));
     }
 
     // ROOM UPDATE
     ///////////////////////////////////////////////////////////////////////
 
-    //called every gameSettings.tickRate (ms)
+    //called every (1000/gameSettings.tickRate) (ms)
     update() {
 
         //only update game if active
@@ -154,7 +154,7 @@ class Room {
             this.bosses.count() <= 0) {
             this.waveTimer = Math.max(
                 0,
-                this.waveTimer - gameSettings.tickRate);
+                this.waveTimer - (1000/gameSettings.tickRate));
         }
 
         //check the old wave is gone and that timer is off

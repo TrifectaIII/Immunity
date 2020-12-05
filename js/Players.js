@@ -71,14 +71,14 @@ class Player {
         return gameSettings.playerTypes[this.type].radius;
     }
 
-    //return player max speed
+    //return player max speed adjusted for tickrate
     getMaxSpeed () {
-        return gameSettings.playerTypes[this.type].maxVelocity;
+        return gameSettings.playerTypes[this.type].maxVelocity/gameSettings.tickRate;
     }
 
-    //return player acceleration magnitude
+    //return player acceleration magnitude adjusted for tickrate
     getAcceleration () {
-        return gameSettings.playerTypes[this.type].acceleration;
+        return gameSettings.playerTypes[this.type].acceleration/gameSettings.tickRate;
     }
 
     //return player mass
@@ -131,7 +131,7 @@ class Players extends Container {
             //otherwise subtract from timer, to min of 0
             else {
                 player.respawnTimer = Math.max(
-                    player.respawnTimer - gameSettings.tickRate,
+                    player.respawnTimer - (1000/gameSettings.tickRate),
                     0
                 );
             }
@@ -144,7 +144,7 @@ class Players extends Container {
                 let player = this.playing[id];
 
                 //reduce shot cooldown
-                player.cooldown -= gameSettings.tickRate;
+                player.cooldown -= (1000/gameSettings.tickRate);
 
                 //shoot for player
                 this.shootRequest(player);
@@ -416,7 +416,7 @@ class Players extends Container {
         //switch clicking state
         player.socket.on('click', function (clicking) {
             player.clicking = clicking;
-            //request shoot right away to avoid a click getting clipped by tickRate
+            //request shoot right away to avoid a click getting clipped by tickDelay
             this.shootRequest(player);
         }.bind(this)); //bind to scope
 

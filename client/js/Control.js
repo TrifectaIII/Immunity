@@ -35,24 +35,24 @@ var Control = {
         clearInterval(this.moveInterval);
         this.moveInterval = setInterval(
             function () {this.directionHandler(socket)}.bind(this),
-            //uses half of games tickRate
-            gameSettings.tickRate/2 
+            //uses half of games tickDelay
+            (1000/gameSettings.tickRate)/2 
         );
 
         //execute click emits from Shoot.js
         clearInterval(this.clickInterval);
         this.clickInterval = setInterval(
             function () {this.clickHandler(socket)}.bind(this),
-            //uses half of games tickRate
-            gameSettings.tickRate/2 
+            //uses half of games tickDelay
+            (1000/gameSettings.tickRate)/2 
         );
 
         //execute ability usage from Ability.js
         clearInterval(this.abilityInterval);
         this.abilityInterval = setInterval(
             function () {this.abilityHandler(socket)}.bind(this),
-            //uses half of games tickRate
-            gameSettings.tickRate/2 
+            //uses half of games tickDelay
+            (1000/gameSettings.tickRate)/2 
         );
 
         //recieve and respond to shoot requests

@@ -35,9 +35,9 @@ class PlayerShot {
         return gameSettings.playerTypes[this.type].shots.damage;
     }
 
-    //returns speed of player shot
+    //returns speed of player shot adjusted for tickrate
     getSpeed() {
-        return gameSettings.playerTypes[this.type].shots.velocity;
+        return gameSettings.playerTypes[this.type].shots.velocity/gameSettings.tickRate;
     }
 
     //returns mass of player shot
@@ -64,9 +64,9 @@ class EnemyShot {
         return gameSettings.enemyTypes[this.type].shots.damage;
     }
 
-    //returns speed of enemy shot
+    //returns speed of enemy shot adjusted for tickrate
     getSpeed() {
-        return gameSettings.enemyTypes[this.type].shots.velocity;
+        return gameSettings.enemyTypes[this.type].shots.velocity/gameSettings.tickRate;
     }
 
     //returns mass of enemy shot
@@ -92,9 +92,9 @@ class BossShot {
         return gameSettings.boss.shots.damage;
     }
 
-    //returns speed of boss shot
+    //returns speed of boss shot adjusted for tickrate
     getSpeed() {
-        return gameSettings.boss.shots.velocity;
+        return gameSettings.boss.shots.velocity/gameSettings.tickRate;
     }
 
     //returns mass of boss shot
@@ -327,7 +327,7 @@ class Shots extends Container {
             //calculate velocity based on shot velocity and where the player clicked
             let velocity = Physics.componentVector(
                 Physics.angleBetween(originX, originY, destX, destY),
-                classShots.velocity
+                classShots.velocity/gameSettings.tickRate
             );
 
             //use id counter as id, then increase
@@ -346,7 +346,7 @@ class Shots extends Container {
                     Physics.angleBetween(originX, originY, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
-                    classShots.velocity
+                    classShots.velocity/gameSettings.tickRate
                 );
 
                 //use id counter as id, then increase
@@ -371,7 +371,7 @@ class Shots extends Container {
             //calculate velocity based on destination and shot speed
             let velocity = Physics.componentVector(
                 Physics.angleBetween(enemy.x, enemy.y, destX, destY),
-                classShots.velocity
+                classShots.velocity/gameSettings.tickRate
             );
 
             //use id counter as id, then increase
@@ -390,7 +390,7 @@ class Shots extends Container {
                     Physics.angleBetween(enemy.x, enemy.y, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
-                    classShots.velocity
+                    classShots.velocity/gameSettings.tickRate
                 );
 
                 //use id counter as id, then increase
@@ -415,7 +415,7 @@ class Shots extends Container {
             //calculate velocity based on destination and shot speed
             let velocity = Physics.componentVector(
                 Physics.angleBetween(boss.x, boss.y, destX, destY),
-                bossShots.velocity
+                bossShots.velocity/gameSettings.tickRate
             );
 
             //use id counter as id, then increase
@@ -434,7 +434,7 @@ class Shots extends Container {
                     Physics.angleBetween(boss.x, boss.y, destX, destY)
                     + (i - bossShots.count / 2 + 0.5)
                     * (bossShots.angle / (bossShots.count - 1)),
-                    bossShots.velocity
+                    bossShots.velocity/gameSettings.tickRate
                 );
 
                 //use id counter as id, then increase

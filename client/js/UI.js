@@ -439,7 +439,7 @@ var UI = {
         //add fps to list
         this.fpsList.push(frameRate());
         //remove oldest if above 0.5 seconds
-        if (this.fpsList.length > 500/gameSettings.tickRate) {
+        if (this.fpsList.length > 500/(1000/gameSettings.tickRate)) {
             this.fpsList.shift();
         }
 

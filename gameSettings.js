@@ -15,8 +15,8 @@ const gameSettings = {
     //max players per room
     roomCap: 6,
 
-    //space between server updates in MS
-    tickRate: 20,
+    //number of game ticks per second
+    tickRate: 60,
 
     //time between ping checks in MS
     pingRate: 1000,
@@ -50,8 +50,8 @@ const gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            acceleration: 1,
-            maxVelocity: 5,
+            acceleration: 100,
+            maxVelocity: 500,
             mass: 15,
 
             colors: { //blue
@@ -61,7 +61,7 @@ const gameSettings = {
 
             shots: {
                 count: 1,
-                velocity: 15,
+                velocity: 1500,
                 angle: 0,
                 range: 500,
                 cooldown: 100,
@@ -76,8 +76,8 @@ const gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            acceleration: 1,
-            maxVelocity: 5,
+            acceleration: 100,
+            maxVelocity: 500,
             mass: 20,
 
             colors: { //yellow
@@ -87,7 +87,7 @@ const gameSettings = {
 
             shots: {
                 count: 3,
-                velocity: 15,
+                velocity: 1500,
                 angle:Math.PI/6,
                 range: 300,
                 cooldown: 200,
@@ -102,8 +102,8 @@ const gameSettings = {
 
             radius: 20,
             maxHealth: 10,
-            acceleration: 3,
-            maxVelocity: 7,
+            acceleration: 300,
+            maxVelocity: 700,
             mass: 10,
 
             colors: { //pink
@@ -113,7 +113,7 @@ const gameSettings = {
 
             shots: {
                 count: 1,
-                velocity: 25,
+                velocity: 2500,
                 angle: 0,
                 range: 1000,
                 cooldown: 500,
@@ -128,8 +128,8 @@ const gameSettings = {
             
             radius: 30,
             maxHealth: 20,
-            acceleration: 0.3,
-            maxVelocity: 4,
+            acceleration: 30,
+            maxVelocity: 400,
             mass: 20,
 
             colors: { //green
@@ -139,7 +139,7 @@ const gameSettings = {
 
             shots: {
                 count: 5,
-                velocity: 15,
+                velocity: 1500,
                 angle:Math.PI/4,
                 range: 200,
                 cooldown: 250,
@@ -172,8 +172,8 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 15,
-            acceleration: 0.2,
-            maxVelocity: 4,
+            acceleration: 20,
+            maxVelocity: 400,
             mass: 15,
 
             attack: {
@@ -188,7 +188,7 @@ const gameSettings = {
 
             shots: {
                 count: 1,
-                velocity: 10,
+                velocity: 1000,
                 angle: 0,
                 range: 300,
                 damage: 1,
@@ -202,8 +202,8 @@ const gameSettings = {
             spineCount: 12,
             spineLength: 5,
             maxHealth: 25,
-            acceleration: 0.1,
-            maxVelocity: 3,
+            acceleration: 10,
+            maxVelocity: 300,
             mass: 30,
 
             attack: {
@@ -218,7 +218,7 @@ const gameSettings = {
 
             shots: {
                 count: 3,
-                velocity: 10,
+                velocity: 1000,
                 angle:Math.PI/4,
                 range: 150,
                 damage: 1,
@@ -232,8 +232,8 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 20,
-            acceleration: 1,
-            maxVelocity: 6,
+            acceleration: 100,
+            maxVelocity: 600,
             mass: 20,
 
             attack: {
@@ -253,8 +253,8 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 5,
-            acceleration: 0.5,
-            maxVelocity: 8,
+            acceleration: 50,
+            maxVelocity: 800,
             mass: 1,
 
             attack: {
@@ -285,8 +285,8 @@ const gameSettings = {
         spineCount: 30,
         spineLength: 20,
         maxHealth: 100,//multiplied by number of players
-        acceleration: 0.05,
-        maxVelocity: 2,
+        acceleration: 5,
+        maxVelocity: 200,
         mass: 200,
         focusTime: 10000,//time in ms that the boss will focus a given player
 
@@ -296,7 +296,7 @@ const gameSettings = {
 
         shots: {
             count: 5,
-            velocity: 10,
+            velocity: 1000,
             angle:Math.PI,
             range: 1000,
             damage: 1,

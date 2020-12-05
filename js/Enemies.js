@@ -38,14 +38,14 @@ class Enemy {
         return gameSettings.enemyTypes[this.type].radius;
     }
 
-    //return enemy max speed
+    //return enemy max speed adjusted for tickrate
     getMaxSpeed() {
-        return gameSettings.enemyTypes[this.type].maxVelocity;
+        return gameSettings.enemyTypes[this.type].maxVelocity/gameSettings.tickRate;
     }
 
-    //return enemy acceleration magnitude
+    //return enemy acceleration magnitude adjusted for tickrate
     getAcceleration() {
-        return gameSettings.enemyTypes[this.type].acceleration;
+        return gameSettings.enemyTypes[this.type].acceleration/gameSettings.tickRate;
     }
 
     //return enemy mass
@@ -120,7 +120,7 @@ class Enemies extends Container {
 
             //reduce attack cooldown
             if (enemy.cooldown > 0) {
-                enemy.cooldown -= gameSettings.tickRate;
+                enemy.cooldown -= (1000/gameSettings.tickRate);
             }
 
             //if a living player exists

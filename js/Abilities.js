@@ -35,8 +35,8 @@ class Ability {
     }
 
     update () {
-        //count down timer based on tickrate
-        this.timer -= gameSettings.tickRate;
+        //count down timer based on tickDelay
+        this.timer -= (1000/gameSettings.tickRate);
     }
 
     shutDown () {
@@ -64,7 +64,7 @@ class Turret extends Ability {
         super.update();
 
         //decrease cooldown
-        this.cooldown -= gameSettings.tickRate;
+        this.cooldown -= (1000/gameSettings.tickRate);
 
         //shoot if over
         if (this.cooldown <= 0) {

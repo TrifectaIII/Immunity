@@ -43,14 +43,14 @@ class Boss {
         return gameSettings.boss.radius;
     }
 
-    //return boss max speed
+    //return boss max speed adjusted for tickrate
     getMaxSpeed() {
-        return gameSettings.boss.maxVelocity;
+        return gameSettings.boss.maxVelocity/gameSettings.tickRate;
     }
 
-    //return boss acceleration magnitude
+    //return boss acceleration magnitude adjusted for tickrate
     getAcceleration() {
-        return gameSettings.boss.acceleration;
+        return gameSettings.boss.acceleration/gameSettings.tickRate;
     }
 
     //return boss mass
@@ -96,7 +96,7 @@ class Bosses extends Container {
 
             //countdown focus cooldown
             if (boss.focusCooldown > 0) {
-                boss.focusCooldown -= gameSettings.tickRate;
+                boss.focusCooldown -= (1000/gameSettings.tickRate);
             }
 
             //change focus if needed
@@ -111,7 +111,7 @@ class Bosses extends Container {
 
             //countdown attack cooldown
             if (boss.cooldown > 0) {
-                boss.cooldown -= gameSettings.tickRate;
+                boss.cooldown -= (1000/gameSettings.tickRate);
             }
 
             //if focus exists
