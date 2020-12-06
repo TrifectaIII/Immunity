@@ -22,7 +22,7 @@ var Highscores = {
 
             //error handling
             .catch((err) => {
-                Highscores.scores = {};
+                Highscores.scores = [];
                 console.log("Could not access high scores, ", err);
             })
     },
