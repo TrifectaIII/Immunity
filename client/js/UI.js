@@ -32,7 +32,7 @@ var UI = {
             this.drawWaveCountdown(gameState);
 
             //draw fps counter
-            this.drawFPSandPing(gameSettings.playerTypes[player.type].colors.dark);
+            this.drawTechInfo(gameState, gameSettings.playerTypes[player.type].colors.dark);
 
             // draw crosshair
             this.drawCrosshair(gameSettings.playerTypes[player.type].colors.dark);
@@ -58,7 +58,7 @@ var UI = {
             this.drawWaveCountdown(gameState);
 
             //draw fps counter
-            this.drawFPSandPing(gameSettings.colors.darkgrey);
+            this.drawTechInfo(gameState, gameSettings.colors.darkgrey);
 
             //draw death menus
             if (socket.id in gameState.players.waiting) {
@@ -434,8 +434,9 @@ var UI = {
 
     fpsList: [],
 
-    //draw framerate
-    drawFPSandPing: function (color) {
+    //draw technical info about game
+    drawTechInfo: function (gameState, color) {
+
         //add fps to list
         this.fpsList.push(frameRate());
         //remove oldest if above 0.5 seconds
@@ -457,14 +458,24 @@ var UI = {
         text(
             `FPS: ${fps}`, 
             width-15, 
-            height-30,
+            height-110,
         );
         //draw ping
-        let ms = Ping.value;
         text(
-            `Ping: ${ms}`,
+            `Ping: ${Ping.value}`,
             width-15,
             height-70,
+        );
+        //draw tickrate
+
+        //set color to red if tickrate is low
+        if (gameState.roomInfo.realTickRate/gameSettings.tickRate < 0.9) {
+            fill(gameSettings.colors.red);
+        } 
+        text(
+            `TPS: ${gameState.roomInfo.realTickRate}/${gameSettings.tickRate}`,
+            width-15,
+            height-30,
         );
         pop();
     },

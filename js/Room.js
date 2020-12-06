@@ -76,22 +76,35 @@ class Room {
         //switch for if the game is over
         this.gameOver = false;
 
+        //fopr tracking actual tick rate
+        this.realTickRate = 0;
+        this.tickStart = new Date().getTime();
+        this.tickCounter = 0;
+
         //interval for updating game
         this.updateInterval = setInterval(function () {
 
+            //tracks actual tick rate
+            this.tickCounter++;
+            if (new Date().getTime() > this.tickStart + 1000) {
+                this.realTickRate = this.tickCounter;
+                this.tickCounter = 0;
+                this.tickStart = new Date().getTime();
+            }
+
             //update game
-            let serverData = this.update();
+            let gameState = this.update();
 
             //send game info to clients
-            this.io.to(this.roomId).emit('game_update', serverData);
-            //tickDelay from settings
+            this.io.to(this.roomId).emit('game_update', gameState);
+        //tickDelay from settings
         }.bind(this), (1000/gameSettings.tickRate));
     }
 
     // ROOM UPDATE
     ///////////////////////////////////////////////////////////////////////
 
-    //called every (1000/gameSettings.tickRate) (ms)
+    //called gameSettings.tickRate times a second
     update() {
 
         //only update game if active
@@ -139,6 +152,7 @@ class Room {
                 livesCount: this.livesCount,
                 gameOver: this.gameOver,
                 waveTimer: this.waveTimer,
+                realTickRate: this.realTickRate,
             },
         };
     }
