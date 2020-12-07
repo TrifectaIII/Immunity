@@ -432,22 +432,11 @@ var UI = {
         pop();
     },
 
-    fpsList: [],
-
     //draw technical info about game
     drawTechInfo: function (gameState, color) {
 
-        //add fps to list
-        this.fpsList.push(frameRate());
-        //remove oldest if above 0.5 seconds
-        if (this.fpsList.length > 500/(1000/gameSettings.tickRate)) {
-            this.fpsList.shift();
-        }
-
-        //round and average the list
-        let fpsSum = this.fpsList.reduce((a,b) => a+b);
-        let fpsMean = (fpsSum/this.fpsList.length);
-        let fps = fpsMean.toFixed(0);
+        //tell FPS module to track a frame
+        FPS.markFrame();
 
         push();
         textAlign(RIGHT, CENTER);
@@ -456,7 +445,7 @@ var UI = {
         fill(color);
         //draw fps
         text(
-            `FPS: ${fps}`, 
+            `FPS: ${FPS.getFPS()}`, 
             width-15, 
             height-110,
         );

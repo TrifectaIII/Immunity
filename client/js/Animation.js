@@ -19,11 +19,13 @@ var Animation = {
     //returns current color
     getColor: function () {
         return this.colors[this.colorIndex];
-    }
+    },
+
+    interval: null,
 }
 
 //switch colors every colorTime ms
-setInterval(function () {
+Animation.interval = setInterval(function () {
     //increase index and return to 0 if at length of colors array
     this.colorIndex = (this.colorIndex+1)%this.colors.length;
 }.bind(Animation), Animation.colorTime);

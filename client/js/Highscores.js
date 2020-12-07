@@ -26,7 +26,9 @@ var Highscores = {
                 console.log("Could not access high scores, ", err);
             })
     },
+
+    interval: null,
 }
 
 Highscores.getScores();
-setInterval(Highscores.getScores, gameSettings.highScoreDelay);
+Highscores.interval = setInterval(Highscores.getScores, gameSettings.highScoreDelay);
