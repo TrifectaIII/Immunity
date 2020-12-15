@@ -38,14 +38,27 @@ class Enemy {
         return gameSettings.enemyTypes[this.type].radius;
     }
 
-    //return enemy max speed adjusted for tickrate
+    //return enemy max speed 
     getMaxSpeed() {
-        return gameSettings.enemyTypes[this.type].maxVelocity/gameSettings.tickRate;
+        return gameSettings.enemyTypes[this.type].maxVelocity;
     }
 
-    //return enemy acceleration magnitude adjusted for tickrate
+    //return enemy acceleration magnitude
     getAcceleration() {
+        return gameSettings.enemyTypes[this.type].acceleration;
+    }
+    
+    //return acceleration adjusted for tickrate
+    getTickAcceleration () {
         return gameSettings.enemyTypes[this.type].acceleration/gameSettings.tickRate;
+    }
+
+    //return current velocity adjusted for tickrate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //return enemy mass
@@ -132,7 +145,7 @@ class Enemies extends Container {
                 //accelerate in direction of closest player
                 let acceleration = Physics.componentVector(
                     Physics.angleBetween(enemy.x, enemy.y, player.x, player.y),
-                    enemy.getAcceleration()
+                    enemy.getTickAcceleration()
                 );
                 enemy.velocity.x += acceleration.x;
                 enemy.velocity.y += acceleration.y;
@@ -141,8 +154,9 @@ class Enemies extends Container {
                 Physics.capVelocity(enemy, enemy.getMaxSpeed());
 
                 //move based on velocity
-                enemy.x += enemy.velocity.x;
-                enemy.y += enemy.velocity.y;
+                let tickVel = enemy.getTickVelocity();
+                enemy.x += tickVel.x;
+                enemy.y += tickVel.y;
 
                 //attacking
                 //check for off cooldown
@@ -170,24 +184,6 @@ class Enemies extends Container {
                         this.room.players.damagePlayer(player, enemy.getAttackInfo().damage);
                     }
                 }
-            }
-            //if no living players
-            else {
-                //slow down
-                enemy.velocity.x *= 0.95;
-                enemy.velocity.y *= 0.95;
-
-                //if slow enough, stop
-                if (Math.abs(enemy.velocity.x) < 0.1) {
-                    enemy.velocity.x = 0;
-                }
-                if (Math.abs(enemy.velocity.y) < 0.1) {
-                    enemy.velocity.y = 0;
-                }
-
-                //move based on velocity
-                enemy.x += enemy.velocity.x;
-                enemy.y += enemy.velocity.y;
             }
 
             //boundaries
@@ -227,7 +223,7 @@ class Enemies extends Container {
 
     // spawn an individual enemy in
     spawnEnemy() {
-
+        return
         var type;
         //if mono wave, choose that type
         if (this.room.waveType in gameSettings.enemyTypes) {

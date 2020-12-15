@@ -35,9 +35,22 @@ class PlayerShot {
         return gameSettings.playerTypes[this.type].shots.damage;
     }
 
-    //returns speed of player shot adjusted for tickrate
+    //returns speed of player shot
     getSpeed() {
+        return gameSettings.playerTypes[this.type].shots.velocity;
+    }
+
+    //returns speed of player shot adjusted for tickrate
+    getTickSpeed() {
         return gameSettings.playerTypes[this.type].shots.velocity/gameSettings.tickRate;
+    }
+
+    //return velocity adjusted for tickRate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //returns mass of player shot
@@ -64,9 +77,22 @@ class EnemyShot {
         return gameSettings.enemyTypes[this.type].shots.damage;
     }
 
-    //returns speed of enemy shot adjusted for tickrate
+    //returns speed of enemy shot
     getSpeed() {
+        return gameSettings.enemyTypes[this.type].shots.velocity;
+    }
+
+    //returns speed of enemy shot adjusted for tickrate
+    getTickSpeed() {
         return gameSettings.enemyTypes[this.type].shots.velocity/gameSettings.tickRate;
+    }
+
+    //return velocity adjusted for tickRate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //returns mass of enemy shot
@@ -92,9 +118,22 @@ class BossShot {
         return gameSettings.boss.shots.damage;
     }
 
-    //returns speed of boss shot adjusted for tickrate
+    //returns speed of boss shot
     getSpeed() {
+        return gameSettings.boss.shots.velocity;
+    }
+
+    //returns speed of boss shot adjusted for tickrate
+    getTickSpeed() {
         return gameSettings.boss.shots.velocity/gameSettings.tickRate;
+    }
+
+    //return velocity adjusted for tickRate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //returns mass of boss shot
@@ -133,8 +172,9 @@ class Shots extends Container {
             let shot = this.playerShots[id];
 
             //move based on velocity
-            shot.x += shot.velocity.x;
-            shot.y += shot.velocity.y;
+            let tickVel = shot.getTickVelocity();
+            shot.x += tickVel.x;
+            shot.y += tickVel.y;
 
             let destroyed = false;
 
@@ -200,7 +240,7 @@ class Shots extends Container {
             }
 
             //remove range based on speed
-            shot.range -= shot.getSpeed();
+            shot.range -= shot.getTickSpeed();
 
             //destroy if out of range
             destroyed = destroyed || shot.range <= 1;
@@ -217,8 +257,9 @@ class Shots extends Container {
             let enemyShot = this.enemyShots[id];
 
             //move based on velocity
-            enemyShot.x += enemyShot.velocity.x;
-            enemyShot.y += enemyShot.velocity.y;
+            let tickVel =  enemyShot.getTickVelocity();
+            enemyShot.x += tickVel.x;
+            enemyShot.y += tickVel.y;
 
             let destroyed = false;
 
@@ -248,7 +289,7 @@ class Shots extends Container {
             }
 
             //remove range based on speed
-            enemyShot.range -= enemyShot.getSpeed();
+            enemyShot.range -= enemyShot.getTickSpeed();
 
             //destroy if out of range
             destroyed = destroyed || enemyShot.range <= 1;
@@ -265,8 +306,9 @@ class Shots extends Container {
             let bossShot = this.bossShots[id];
 
             //move based on velocity
-            bossShot.x += bossShot.velocity.x;
-            bossShot.y += bossShot.velocity.y;
+            let tickVel =  bossShot.getTickVelocity();
+            bossShot.x += tickVel.x;
+            bossShot.y += tickVel.y;
 
             let destroyed = false;
 
@@ -296,7 +338,7 @@ class Shots extends Container {
             }
 
             //remove range based on speed
-            bossShot.range -= bossShot.getSpeed();
+            bossShot.range -= bossShot.getTickSpeed();
 
             //destroy if out of range
             destroyed = destroyed || bossShot.range <= 1;
@@ -321,7 +363,7 @@ class Shots extends Container {
             //calculate velocity based on shot velocity and where the player clicked
             let velocity = Physics.componentVector(
                 Physics.angleBetween(player.x, player.y, destX, destY),
-                classShots.velocity/gameSettings.tickRate
+                classShots.velocity
             );
 
             //use id counter as id, then increase
@@ -340,7 +382,7 @@ class Shots extends Container {
                     Physics.angleBetween(player.x, player.y, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
-                    classShots.velocity/gameSettings.tickRate
+                    classShots.velocity
                 );
 
                 //use id counter as id, then increase
@@ -365,7 +407,7 @@ class Shots extends Container {
             //calculate velocity based on shot velocity and where the player clicked
             let velocity = Physics.componentVector(
                 Physics.angleBetween(turret.x, turret.y, destX, destY),
-                classShots.velocity/gameSettings.tickRate
+                classShots.velocity
             );
 
             //use id counter as id, then increase
@@ -388,7 +430,7 @@ class Shots extends Container {
                     Physics.angleBetween(turret.x, turret.y, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
-                    classShots.velocity/gameSettings.tickRate
+                    classShots.velocity
                 );
 
                 //use id counter as id, then increase
@@ -417,7 +459,7 @@ class Shots extends Container {
             //calculate velocity based on destination and shot speed
             let velocity = Physics.componentVector(
                 Physics.angleBetween(enemy.x, enemy.y, destX, destY),
-                classShots.velocity/gameSettings.tickRate
+                classShots.velocity
             );
 
             //use id counter as id, then increase
@@ -436,7 +478,7 @@ class Shots extends Container {
                     Physics.angleBetween(enemy.x, enemy.y, destX, destY)
                     + (i - classShots.count / 2 + 0.5)
                     * (classShots.angle / (classShots.count - 1)),
-                    classShots.velocity/gameSettings.tickRate
+                    classShots.velocity
                 );
 
                 //use id counter as id, then increase
@@ -461,7 +503,7 @@ class Shots extends Container {
             //calculate velocity based on destination and shot speed
             let velocity = Physics.componentVector(
                 Physics.angleBetween(boss.x, boss.y, destX, destY),
-                bossShots.velocity/gameSettings.tickRate
+                bossShots.velocity
             );
 
             //use id counter as id, then increase
@@ -480,7 +522,7 @@ class Shots extends Container {
                     Physics.angleBetween(boss.x, boss.y, destX, destY)
                     + (i - bossShots.count / 2 + 0.5)
                     * (bossShots.angle / (bossShots.count - 1)),
-                    bossShots.velocity/gameSettings.tickRate
+                    bossShots.velocity
                 );
 
                 //use id counter as id, then increase

@@ -43,14 +43,27 @@ class Boss {
         return gameSettings.boss.radius;
     }
 
-    //return boss max speed adjusted for tickrate
+    //return boss max speed
     getMaxSpeed() {
-        return gameSettings.boss.maxVelocity/gameSettings.tickRate;
+        return gameSettings.boss.maxVelocity;
     }
 
-    //return boss acceleration magnitude adjusted for tickrate
+    //return boss acceleration magnitude
     getAcceleration() {
+        return gameSettings.boss.acceleration;
+    }
+
+    //return acceleration adjusted for tickrate
+    getTickAcceleration () {
         return gameSettings.boss.acceleration/gameSettings.tickRate;
+    }
+
+    //return current velocity adjusted for tickrate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //return boss mass
@@ -121,7 +134,7 @@ class Bosses extends Container {
                 //accelerate in direction of focus
                 let acceleration = Physics.componentVector(
                     Physics.angleBetween(boss.x, boss.y, player.x, player.y),
-                    boss.getAcceleration()
+                    boss.getTickAcceleration()
                 );
                 boss.velocity.x += acceleration.x;
                 boss.velocity.y += acceleration.y;
@@ -130,8 +143,9 @@ class Bosses extends Container {
                 Physics.capVelocity(boss, boss.getMaxSpeed());
 
                 //move based on velocity
-                boss.x += boss.velocity.x;
-                boss.y += boss.velocity.y;
+                let tickVel = boss.getTickVelocity();
+                boss.x += tickVel.x;
+                boss.y += tickVel.y;
 
                 //attacking
                 //check for off cooldown

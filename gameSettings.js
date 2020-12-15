@@ -50,7 +50,7 @@ const gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            acceleration: 100,
+            acceleration: 1500,
             maxVelocity: 500,
             mass: 15,
 

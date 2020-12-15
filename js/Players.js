@@ -71,14 +71,27 @@ class Player {
         return gameSettings.playerTypes[this.type].radius;
     }
 
-    //return player max speed adjusted for tickrate
+    //return player max speed
     getMaxSpeed () {
-        return gameSettings.playerTypes[this.type].maxVelocity/gameSettings.tickRate;
+        return gameSettings.playerTypes[this.type].maxVelocity;
     }
 
-    //return player acceleration magnitude adjusted for tickrate
+    //return acceleration magnitude
     getAcceleration () {
+        return gameSettings.playerTypes[this.type].acceleration;
+    }
+
+    //return acceleration adjusted for tickrate
+    getTickAcceleration () {
         return gameSettings.playerTypes[this.type].acceleration/gameSettings.tickRate;
+    }
+
+    //return current velocity adjusted for tickrate
+    getTickVelocity () {
+        return {
+            x: this.velocity.x/gameSettings.tickRate,
+            y: this.velocity.y/gameSettings.tickRate
+        }
     }
 
     //return player mass
@@ -154,50 +167,51 @@ class Players extends Container {
 
                     //degrade velocities when no angle
                     if (player.angle == 'none') {
-                        player.velocity.x *= 0.95;
-                        player.velocity.y *= 0.95;
+                        // player.velocity.x *= 0.95;
+                        // player.velocity.y *= 0.95;
 
-                        //if slow enough, stop
-                        if (Math.abs(player.velocity.x) < 0.1) {
-                            player.velocity.x = 0;
-                        }
-                        if (Math.abs(player.velocity.y) < 0.1) {
-                            player.velocity.y = 0;
-                        }
+                        // //if slow enough, stop
+                        // if (Math.abs(player.velocity.x) < 0.1) {
+                        //     player.velocity.x = 0;
+                        // }
+                        // if (Math.abs(player.velocity.y) < 0.1) {
+                        //     player.velocity.y = 0;
+                        // }
                     }
                     //otherwise accelerate based on players angle and magnitude from settings
                     else {
                         let acceleration = Physics.componentVector(
                             player.angle,
-                            player.getAcceleration());
+                            player.getTickAcceleration());
                         //x with cos
-                        if (Math.abs(Math.cos(player.angle)) < 0.1) {
-                            player.velocity.x *= 0.95;
-                            if (Math.abs(player.velocity.x) < 0.1) {
-                                player.velocity.x = 0;
-                            }
-                        }
-                        else {
+                        // if (Math.abs(Math.cos(player.angle)) < 0.1) {
+                        //     player.velocity.x *= 0.95;
+                        //     if (Math.abs(player.velocity.x) < 0.1) {
+                        //         player.velocity.x = 0;
+                        //     }
+                        // }
+                        // else {
                             player.velocity.x += acceleration.x;
-                        }
-                        //y win sin
-                        if (Math.abs(Math.sin(player.angle)) < 0.1) {
-                            player.velocity.y *= 0.95;
-                            if (Math.abs(player.velocity.y) < 0.1) {
-                                player.velocity.y = 0;
-                            }
-                        }
-                        else {
+                        // }
+                        // //y win sin
+                        // if (Math.abs(Math.sin(player.angle)) < 0.1) {
+                        //     player.velocity.y *= 0.95;
+                        //     if (Math.abs(player.velocity.y) < 0.1) {
+                        //         player.velocity.y = 0;
+                        //     }
+                        // }
+                        // else {
                             player.velocity.y += acceleration.y;
-                        }
+                        // }
                     }
 
                     //cap velocity
                     Physics.capVelocity(player, player.getMaxSpeed());
 
                     //move based on velocity
-                    player.x += player.velocity.x;
-                    player.y += player.velocity.y;
+                    let tickVel = player.getTickVelocity();
+                    player.x += tickVel.x;
+                    player.y += tickVel.y;
 
                     //check for collisions with other players
                     for (let pid in this.playing) {
