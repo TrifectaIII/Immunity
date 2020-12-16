@@ -127,6 +127,16 @@ class Bosses extends Container {
                 boss.cooldown -= (1000/gameSettings.tickRate);
             }
 
+            //degrade velocities with drag factor
+            //get normalized velocity vector
+            let dragAccel = Physics.normalizeVector(boss.velocity);
+            //factor in acceleration magnitude and drag factor
+            dragAccel.x *= boss.getTickAcceleration() * gameSettings.dragFactor * -1;
+            dragAccel.y *= boss.getTickAcceleration() * gameSettings.dragFactor * -1;
+            //change velocity using drag
+            boss.velocity.x += dragAccel.x;
+            boss.velocity.y += dragAccel.y;
+
             //if focus exists
             if (boss.focus in this.room.players.playing) {
                 let player = this.room.players.playing[boss.focus];

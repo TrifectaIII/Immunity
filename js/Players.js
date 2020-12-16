@@ -165,44 +165,24 @@ class Players extends Container {
                 //move player
                 if (player.health > 0) {
 
-                    //degrade velocities when no angle
-                    if (player.angle == 'none') {
-                        // player.velocity.x *= 0.95;
-                        // player.velocity.y *= 0.95;
+                    //degrade velocities with drag factor
+                    //get normalized velocity vector
+                    let dragAccel = Physics.normalizeVector(player.velocity);
+                    //factor in acceleration magnitude and drag factor
+                    dragAccel.x *= player.getTickAcceleration() * gameSettings.dragFactor * -1;
+                    dragAccel.y *= player.getTickAcceleration() * gameSettings.dragFactor * -1;
+                    //change velocity using drag
+                    player.velocity.x += dragAccel.x;
+                    player.velocity.y += dragAccel.y;
 
-                        // //if slow enough, stop
-                        // if (Math.abs(player.velocity.x) < 0.1) {
-                        //     player.velocity.x = 0;
-                        // }
-                        // if (Math.abs(player.velocity.y) < 0.1) {
-                        //     player.velocity.y = 0;
-                        // }
-                    }
-                    //otherwise accelerate based on players angle and magnitude from settings
-                    else {
+                    //accelerate based on players angle and magnitude from settings
+                    if (player.angle != 'none') {
                         let acceleration = Physics.componentVector(
                             player.angle,
-                            player.getTickAcceleration());
-                        //x with cos
-                        // if (Math.abs(Math.cos(player.angle)) < 0.1) {
-                        //     player.velocity.x *= 0.95;
-                        //     if (Math.abs(player.velocity.x) < 0.1) {
-                        //         player.velocity.x = 0;
-                        //     }
-                        // }
-                        // else {
-                            player.velocity.x += acceleration.x;
-                        // }
-                        // //y win sin
-                        // if (Math.abs(Math.sin(player.angle)) < 0.1) {
-                        //     player.velocity.y *= 0.95;
-                        //     if (Math.abs(player.velocity.y) < 0.1) {
-                        //         player.velocity.y = 0;
-                        //     }
-                        // }
-                        // else {
-                            player.velocity.y += acceleration.y;
-                        // }
+                            player.getTickAcceleration()
+                        );
+                        player.velocity.x += acceleration.x;
+                        player.velocity.y += acceleration.y;
                     }
 
                     //cap velocity

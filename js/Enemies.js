@@ -136,6 +136,16 @@ class Enemies extends Container {
                 enemy.cooldown -= (1000/gameSettings.tickRate);
             }
 
+            //degrade velocities with drag factor
+            //get normalized velocity vector
+            let dragAccel = Physics.normalizeVector(enemy.velocity);
+            //factor in acceleration magnitude and drag factor
+            dragAccel.x *= enemy.getTickAcceleration() * gameSettings.dragFactor * -1;
+            dragAccel.y *= enemy.getTickAcceleration() * gameSettings.dragFactor * -1;
+            //change velocity using drag
+            enemy.velocity.x += dragAccel.x;
+            enemy.velocity.y += dragAccel.y;
+
             //if a living player exists
             if (closestDistance < Infinity) {
 
@@ -223,7 +233,7 @@ class Enemies extends Container {
 
     // spawn an individual enemy in
     spawnEnemy() {
-        return
+        
         var type;
         //if mono wave, choose that type
         if (this.room.waveType in gameSettings.enemyTypes) {
@@ -234,7 +244,6 @@ class Enemies extends Container {
             //pick random type for this enemy
             type = Object.keys(gameSettings.enemyTypes)[Math.floor(Math.random() * Object.keys(gameSettings.enemyTypes).length)];
         }
-
 
         //determine side that enemy will spawn on
         let side = Math.floor(Math.random() * 4);

@@ -37,6 +37,9 @@ const gameSettings = {
     //delay between high score updates on client side in MS
     highScoreDelay: 10000,
 
+    //drag factor for physics objects, as fraction of acceleration
+    dragFactor: 0.1,
+
     // PLAYERS
     /////////////////////////////////////////////////
 
@@ -76,7 +79,7 @@ const gameSettings = {
 
             radius: 25,
             maxHealth: 15,
-            acceleration: 100,
+            acceleration: 1500,
             maxVelocity: 500,
             mass: 20,
 
@@ -102,7 +105,7 @@ const gameSettings = {
 
             radius: 20,
             maxHealth: 10,
-            acceleration: 300,
+            acceleration: 2500,
             maxVelocity: 700,
             mass: 10,
 
@@ -128,7 +131,7 @@ const gameSettings = {
             
             radius: 30,
             maxHealth: 20,
-            acceleration: 30,
+            acceleration: 800,
             maxVelocity: 400,
             mass: 20,
 
@@ -172,7 +175,7 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 15,
-            acceleration: 20,
+            acceleration: 1200,
             maxVelocity: 400,
             mass: 15,
 
@@ -202,7 +205,7 @@ const gameSettings = {
             spineCount: 12,
             spineLength: 5,
             maxHealth: 25,
-            acceleration: 10,
+            acceleration: 600,
             maxVelocity: 300,
             mass: 30,
 
@@ -232,7 +235,7 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 20,
-            acceleration: 100,
+            acceleration: 1800,
             maxVelocity: 600,
             mass: 20,
 
@@ -253,7 +256,7 @@ const gameSettings = {
             spineCount: 8,
             spineLength: 5,
             maxHealth: 5,
-            acceleration: 50,
+            acceleration: 2400,
             maxVelocity: 800,
             mass: 1,
 
@@ -276,7 +279,7 @@ const gameSettings = {
     bossEnabled: true,
 
     //frequency of boss waves (value of 5 would be every 5 waves)
-    bossFrequency: 2,
+    bossFrequency: 5,
 
     //info about bosses
     boss: {
@@ -285,7 +288,7 @@ const gameSettings = {
         spineCount: 30,
         spineLength: 20,
         maxHealth: 100,//multiplied by number of players
-        acceleration: 5,
+        acceleration: 50,
         maxVelocity: 200,
         mass: 200,
         focusTime: 10000,//time in ms that the boss will focus a given player

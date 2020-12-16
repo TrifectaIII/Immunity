@@ -10,6 +10,27 @@ class Physics {
         return Math.atan2(y2 - y1, x2 - x1);
     }
 
+    //returns a version of a vector with magnitude 1
+    static normalizeVector(vector) {
+
+        //calculate magnitude
+        let magnitude = Math.sqrt(
+            vector.x ** 2 + 
+            vector.y ** 2
+        );
+
+        //return empty vector if no magnitude
+        if (!magnitude) {
+            return {x:0, y:0}
+        }
+
+        //normalized vector is divided by magnitude
+        return {
+            x: vector.x/magnitude,
+            y: vector.y/magnitude,
+        }
+    }
+
     //calculates x/y component vectors based on angle and magnitude of vector
     static componentVector (angle, magnitude) {
         return {
