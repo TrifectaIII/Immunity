@@ -95,7 +95,7 @@ var Menu = {
         //draw menu hint
         textSize(35);
         text(
-            "Press " + gameSettings.menuToggleButton + " to open the info menu at any time.",
+            "Press ESC to open the info menu at any time.",
             width/2, 30,
         );
 

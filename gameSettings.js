@@ -399,9 +399,6 @@ const gameSettings = {
     // OTHER
     /////////////////////////////////////////////////
 
-    //button to open info menu
-    menuToggleButton: '/',
-
     //color palette
     colors: {
         black:"#000000",

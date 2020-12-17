@@ -18,9 +18,9 @@ var InfoMenu = {
     }
 }
 
-//toggle display of InfoMenu when button pressed
-window.addEventListener('keypress', function (event) {
-    if (event.keyCode == gameSettings.menuToggleButton.charCodeAt(0)) {
+//toggle display of InfoMenu when escape key pressed
+window.addEventListener('keyup', function (event) {
+    if (event.keyCode === 27) {
 
         //prevent default action
         event.preventDefault();
