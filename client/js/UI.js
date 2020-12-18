@@ -184,7 +184,7 @@ var UI = {
             color: color,
             prog: player.abilityProgress/gameSettings.abilityCap,
             leftText: 'Ability: '+ gameSettings.playerTypes[player.type].ability.toUpperCase(),
-            rightText: 'Press E',
+            rightText: 'Press SPACE',
         });
     },
 

@@ -23,14 +23,14 @@ var Ability = {
 
 //track key downs
 document.addEventListener('keydown', function (event) {
-    if (event.keyCode === 69) {
+    if (event.keyCode === 32) {
         Ability.pressing = true;
     }
 });
 
 //track key ups
 document.addEventListener('keyup', function (event) {
-    if (event.keyCode === 69) {
+    if (event.keyCode === 32) {
         Ability.pressing = false;
     }
 });

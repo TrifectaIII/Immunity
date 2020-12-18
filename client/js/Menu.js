@@ -73,7 +73,7 @@ var Menu = {
         //update and draw set name button
         this.startButton.update(
             width/2,
-            height*2/3, 
+            height*3/4, 
             width/4, 
             height/8
         );
@@ -84,13 +84,13 @@ var Menu = {
         strokeWeight(8);
         fill(Animation.getColor());
         textSize(100);
-        text(gameSettings.title.toUpperCase(), width/2, height/3);
+        text(gameSettings.title.toUpperCase(), width/2, height/4);
 
         //draw controls
         strokeWeight(2);
         fill('black');
         textSize(40);
-        text("WASD to Move\nClick to Shoot", width/2, height/2);
+        text("WASD to Move\nClick to Shoot\nSpace to use Ability", width/2, height/2);
 
         //draw menu hint
         textSize(35);
