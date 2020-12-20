@@ -356,6 +356,11 @@ class Players extends Container {
         //add to waiting object
         this.waitPlayer(player);
 
+        //mark room as testing if the player is testing
+        if (player.isTesting) {
+            this.room.testing = true;
+        }
+
         //SET UP LISTENERS
         /////////////////////////////////
 

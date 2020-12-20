@@ -76,6 +76,9 @@ class Room {
         //switch for if the game is over
         this.gameOver = false;
 
+        //switch for whether or not this room contains/contained testers
+        this.testing = false;
+
         //fopr tracking actual tick rate
         this.realTickRate = 0;
         this.tickStart = new Date().getTime();
@@ -131,8 +134,8 @@ class Room {
         const savedGO = this.gameOver;
         this.gameOver = this.players.allDead() && this.livesCount <= 0;
 
-        //send score to db if game just ended
-        if (!savedGO && this.gameOver) {
+        //send score to db if game just ended and room not testing
+        if (!savedGO && this.gameOver && !this.testing) {
             const nameString = this.players.collectNames().join(', ');
             Database.addScore(nameString, this.waveCount);
         }
@@ -265,6 +268,15 @@ class Room {
             this.playersSeen = this.players.count();
             this.livesCount = gameSettings.livesStart + this.players.count();
             this.gameOver = false;
+            this.testing = false;
+
+            //mark as testing if any current player is testing
+            for (let id in this.players.objects) {
+                let player = this.players.objects[id];
+                if (player.isTesting()) {
+                    this.testing = true;
+                }
+            }
         }
     }
 
