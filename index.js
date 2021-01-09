@@ -71,11 +71,12 @@ var rooms = {};
 
 //generates new, currently-unused roomId
 function generateRoomId(rooms) {
-    let roomIdCounter = 101;
-    while (roomIdCounter.toString() in rooms) {
-        roomIdCounter += 1;
+    var roomId;
+    do{
+        roomId = Math.floor(Math.random()*9999)+1;
     }
-    return roomIdCounter.toString();
+    while (roomId.toString() in rooms);
+    return roomId.toString();
 }
 
 //logs current rooms and their populations
