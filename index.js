@@ -34,7 +34,9 @@ Database.createDB();
 ///////////////////////////////////////////////////
 
 //Start Server
-serv.listen(process.env.PORT || 8000); // specified port or 8k as backup
+serv.listen(process.env.PORT || 8000, () => {
+    console.log(`Server Listening on port ${process.env.PORT || 8000}`);
+}); // specified port or 8k as backup
 
 //route main page to index.html
 app.get('/', (req, res) => {
